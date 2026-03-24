@@ -80,9 +80,11 @@ const Navbar = () => {
             <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full px-5 text-xs font-bold">
               Assine já
             </Button>
-            <Button size="sm" className="bg-[hsl(var(--navbar-bg))] text-[hsl(var(--navbar-fg))] hover:bg-[hsl(var(--navbar-bg))]/90 rounded-full px-5 text-xs font-bold">
-              <User className="w-3.5 h-3.5 mr-1" />
-              Área do Cliente
+            <Button size="sm" className="bg-[hsl(var(--navbar-bg))] text-[hsl(var(--navbar-fg))] hover:bg-[hsl(var(--navbar-bg))]/90 rounded-full px-5 text-xs font-bold" asChild>
+              <a href="/assinante">
+                <User className="w-3.5 h-3.5 mr-1" />
+                Área do Cliente
+              </a>
             </Button>
           </div>
 
@@ -138,8 +140,10 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col gap-2">
             <Button variant="outline" size="sm" className="border-primary text-primary rounded-full">Assine já</Button>
-            <Button size="sm" className="bg-primary text-primary-foreground rounded-full">
-              <User className="w-4 h-4 mr-1" /> Área do Cliente
+            <Button size="sm" className="bg-primary text-primary-foreground rounded-full" asChild>
+              <a href="/assinante">
+                <User className="w-4 h-4 mr-1" /> Área do Cliente
+              </a>
             </Button>
           </div>
         </div>
