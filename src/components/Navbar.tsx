@@ -140,8 +140,10 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col gap-2">
             <Button variant="outline" size="sm" className="border-primary text-primary rounded-full">Assine já</Button>
-            <Button size="sm" className="bg-primary text-primary-foreground rounded-full">
-              <User className="w-4 h-4 mr-1" /> Área do Cliente
+            <Button size="sm" className="bg-primary text-primary-foreground rounded-full" asChild>
+              <a href="/assinante">
+                <User className="w-4 h-4 mr-1" /> Área do Cliente
+              </a>
             </Button>
           </div>
         </div>
