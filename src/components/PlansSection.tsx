@@ -71,9 +71,9 @@ const PlansSection = () => {
 
         {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 max-w-6xl mx-auto">
-          {filteredPlans.map((plan, i) => (
+          {plans.map((plan, i) => (
             <motion.div
-              key={plan.speed + activeTab}
+              key={plan.speed}
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}
