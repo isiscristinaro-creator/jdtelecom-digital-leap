@@ -28,22 +28,24 @@ const HeroSection = () => {
 
   return (
     <section id="inicio" className="pt-[136px] md:pt-[172px]">
-      <div className="relative w-full overflow-hidden group bg-primary">
-        {banners.map((src, i) => (
-          <div
-            key={i}
-            className={`w-full transition-opacity duration-700 ease-in-out ${
-              i === current ? "relative opacity-100 z-10" : "absolute inset-0 opacity-0 z-0"
-            }`}
-          >
-            <img
-              src={src}
-              alt={`JD Telecom Banner ${i + 1}`}
-              className="w-full h-auto block"
-              loading={i === 0 ? "eager" : "lazy"}
-            />
-          </div>
-        ))}
+      <div className="relative w-full group bg-primary">
+        <div className="relative w-full" style={{ aspectRatio: "1896 / 523" }}>
+          {banners.map((src, i) => (
+            <div
+              key={i}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                i === current ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+              }`}
+            >
+              <img
+                src={src}
+                alt={`JD Telecom Banner ${i + 1}`}
+                className="w-full h-full object-contain"
+                loading={i === 0 ? "eager" : "lazy"}
+              />
+            </div>
+          ))}
+        </div>
 
         {/* Arrows */}
         <button
