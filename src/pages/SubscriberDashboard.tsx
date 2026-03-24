@@ -89,7 +89,7 @@ const SubscriberDashboard = () => {
     <div className="min-h-screen bg-[hsl(var(--dark-section))] overflow-x-hidden">
       {/* Header */}
       <header className="bg-[hsl(var(--dark-section-card))] border-b border-[hsl(var(--dark-section-border))] sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-full min-w-0">
+        <div className="container mx-auto px-4 sm:px-5 h-16 flex items-center justify-between max-w-full min-w-0">
           <div className="flex items-center gap-3 min-w-0">
             <a href="/">
               <img src={logo} alt="JD Telecom" className="h-8 brightness-0 invert" />
@@ -112,7 +112,7 @@ const SubscriberDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 md:py-10 pb-24 max-w-6xl overflow-hidden">
+      <main className="container mx-auto px-4 sm:px-5 md:px-6 py-6 md:py-10 pb-24 max-w-6xl overflow-hidden">
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
@@ -194,8 +194,8 @@ const SubscriberDashboard = () => {
             {/* Payment history */}
             <Card>
               <CardHeader icon={FileText} title="Histórico de Pagamentos" />
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto -mx-1 px-1 [-webkit-overflow-scrolling:touch]">
+                  <table className="w-full min-w-[620px] text-sm">
                   <thead>
                     <tr className="border-b border-[hsl(var(--dark-section-border))]">
                       <th className="text-left py-3 px-2 text-xs font-semibold text-[hsl(var(--dark-section-muted))] uppercase tracking-wider">Descrição</th>
@@ -254,7 +254,7 @@ const SubscriberDashboard = () => {
                     <Button size="sm" onClick={handleSaveEdit} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex-1 font-bold">
                       Salvar
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditMode(false)} className="text-[hsl(var(--dark-section-muted))] rounded-xl">
+                    <Button size="sm" variant="ghost" onClick={() => setEditMode(false)} className="w-full sm:w-auto text-[hsl(var(--dark-section-muted))] rounded-xl">
                       Cancelar
                     </Button>
                   </div>
@@ -311,7 +311,7 @@ const SubscriberDashboard = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => toast.info("Funcionalidade de troca de plano será disponibilizada em breve.")}
-                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group w-full"
+                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group w-full text-left"
                 >
                   <div className="flex items-center gap-2">
                     <ArrowUpRight className="w-4 h-4 text-primary" />
@@ -323,7 +323,7 @@ const SubscriberDashboard = () => {
                   href="https://wa.me/558005945678?text=Preciso%20de%20suporte%20t%C3%A9cnico"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group text-left"
                 >
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-primary" />
@@ -333,7 +333,7 @@ const SubscriberDashboard = () => {
                 </a>
                 <button
                   onClick={() => toast.info("Funcionalidade de 2ª via será disponibilizada em breve.")}
-                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group w-full"
+                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group w-full text-left"
                 >
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-primary" />
