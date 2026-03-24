@@ -131,10 +131,10 @@ const SubscriberDashboard = () => {
               <CardHeader icon={Wifi} title="Meu Plano" />
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h4 className="font-display text-2xl font-bold text-[hsl(var(--dark-section-fg))]">
+                  <h4 className="font-display text-xl sm:text-2xl font-bold text-[hsl(var(--dark-section-fg))]">
                     {subscriber.plan.name}
                   </h4>
-                  <div className="flex items-center gap-3 mt-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                     <div className="flex items-center gap-1.5 text-sm text-[hsl(var(--dark-section-muted))]">
                       <Zap className="w-4 h-4 text-primary" />
                       {subscriber.plan.speed}
@@ -142,10 +142,22 @@ const SubscriberDashboard = () => {
                     <StatusBadge status={subscriber.plan.status} />
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <p className="text-xs text-[hsl(var(--dark-section-muted))]">Valor mensal</p>
                   <p className="font-display text-2xl font-extrabold text-primary">{subscriber.plan.price}</p>
                 </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))]">
+                <Button
+                  size="sm"
+                  className="bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl"
+                  asChild
+                >
+                  <a href="https://wa.me/558005945678?text=Quero%20trocar%20meu%20plano" target="_blank" rel="noopener noreferrer">
+                    <ArrowUpRight className="w-4 h-4 mr-1" />
+                    Trocar de plano
+                  </a>
+                </Button>
               </div>
             </Card>
 
