@@ -59,16 +59,14 @@ const HeroSection = () => {
         >
           {/* Slide track */}
           <div
-            className="flex transition-transform duration-600 ease-in-out"
+            className="flex"
             style={{
-              width: `${banners.length * 100}%`,
-              transform: `translateX(-${current * (100 / banners.length)}%)`,
-              transitionDuration: "600ms",
-              transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+              transform: `translateX(-${current * 100}%)`,
+              transition: "transform 600ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             {banners.map((src, i) => (
-              <div key={i} className="w-full shrink-0">
+              <div key={i} className="min-w-full">
                 <img
                   src={src}
                   alt={`JD Telecom Banner ${i + 1}`}
