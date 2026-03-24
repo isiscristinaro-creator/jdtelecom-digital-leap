@@ -80,7 +80,7 @@ const AdminSettings = () => {
           { label: "Alertar cancelamentos", desc: "Receba notificações quando um cliente cancelar", key: "notifyCancelamento" as const },
           { label: "Novos clientes", desc: "Receba notificações de novos cadastros", key: "notifyNovosClientes" as const },
         ].map(item => (
-          <div key={item.key} className="flex items-center justify-between gap-4 py-2">
+          <div key={item.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
             <div>
               <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">{item.label}</p>
               <p className="text-xs text-[hsl(var(--dark-section-muted))]">{item.desc}</p>
