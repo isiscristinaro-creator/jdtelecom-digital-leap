@@ -60,8 +60,8 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-[hsl(var(--dark-section-muted))]">
               <li><a href="#planos" className="hover:text-primary transition-colors">Internet Fibra Óptica</a></li>
               <li><a href="#chip" className="hover:text-primary transition-colors">Móvel 4G/5G</a></li>
-              <li><a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Telefonia Fixa</a></li>
-              <li><a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">TV por Assinatura</a></li>
+              <li><a href="#planos" className="hover:text-primary transition-colors">Telefonia Fixa</a></li>
+              <li><a href="#planos" className="hover:text-primary transition-colors">TV por Assinatura</a></li>
             </ul>
           </div>
         </div>
