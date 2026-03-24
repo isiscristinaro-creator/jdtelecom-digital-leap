@@ -7,7 +7,7 @@ const ChipInstructionsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section id="chip" className="py-28 md:py-40 relative overflow-hidden">
+    <section id="chip" className="py-20 sm:py-24 md:py-40 relative overflow-hidden">
       {/* Rich gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
       
@@ -50,13 +50,13 @@ const ChipInstructionsSection = () => {
       <div className="container mx-auto px-4 relative z-10" ref={ref}>
         {/* Header */}
         <motion.div
-          className="text-center mb-16 md:mb-20"
+          className="text-center mb-12 sm:mb-16 md:mb-20"
           initial={{ opacity: 0, y: 30 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
         >
           <motion.span
-            className="inline-flex items-center gap-2 bg-white/[0.12] backdrop-blur-xl text-primary-foreground text-xs font-bold px-6 py-2.5 rounded-full mb-6 border border-white/20 shadow-lg"
+            className="inline-flex items-center gap-2 bg-white/[0.12] backdrop-blur-xl text-primary-foreground text-xs sm:text-sm font-bold px-5 sm:px-6 py-2.5 rounded-full mb-6 border border-white/20 shadow-lg"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={isVisible ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -64,7 +64,7 @@ const ChipInstructionsSection = () => {
             <Signal className="w-3.5 h-3.5" />
             REDE MÓVEL 4G • 5G
           </motion.span>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-[1.05]">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-5 sm:mb-6 leading-[1.05]">
             Ative seu chip seguindo
             <br className="hidden md:block" />
             <span className="relative inline-block mt-1">
@@ -77,14 +77,14 @@ const ChipInstructionsSection = () => {
               />
             </span>
           </h2>
-          <p className="text-primary-foreground/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-primary-foreground/85 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
             Com a <strong className="text-primary-foreground font-bold">JD MÓVEL</strong> você não tem fronteiras!
           </p>
         </motion.div>
 
         {/* Main card with 3D perspective */}
         <motion.div
-          className="max-w-5xl mx-auto"
+          className="max-w-5xl mx-auto px-1 sm:px-0"
           initial={{ opacity: 0, y: 60, rotateX: 8 }}
           animate={isVisible ? { opacity: 1, y: 0, rotateX: 0 } : {}}
           transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
@@ -99,7 +99,7 @@ const ChipInstructionsSection = () => {
             
             {/* Card */}
             <motion.div
-              className="relative rounded-[1.75rem] overflow-hidden bg-white shadow-2xl border border-white/30"
+              className="relative rounded-[1.5rem] sm:rounded-[1.75rem] overflow-hidden bg-white shadow-2xl border border-white/30"
               whileHover={{ scale: 1.01, rotateY: 1, rotateX: -1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
               style={{ transformStyle: "preserve-3d" }}
@@ -118,7 +118,7 @@ const ChipInstructionsSection = () => {
 
         {/* Feature pills below card */}
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mt-12"
+          className="flex flex-wrap justify-center gap-3 sm:gap-4 mt-10 sm:mt-12"
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.6 }}
@@ -130,7 +130,7 @@ const ChipInstructionsSection = () => {
           ].map((item, i) => (
             <motion.div
               key={item.label}
-              className="flex items-center gap-2 bg-white/[0.1] backdrop-blur-lg text-primary-foreground/90 text-sm font-medium px-5 py-2.5 rounded-full border border-white/15"
+              className="flex items-center gap-2 bg-white/[0.1] backdrop-blur-lg text-primary-foreground/90 text-xs sm:text-sm font-medium px-4 sm:px-5 py-2.5 rounded-full border border-white/15"
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.18)" }}
               initial={{ opacity: 0, y: 10 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
