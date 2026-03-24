@@ -250,7 +250,7 @@ const SubscriberDashboard = () => {
                       className="bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] h-10 rounded-xl mt-1"
                     />
                   </div>
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
                     <Button size="sm" onClick={handleSaveEdit} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex-1 font-bold">
                       Salvar
                     </Button>
