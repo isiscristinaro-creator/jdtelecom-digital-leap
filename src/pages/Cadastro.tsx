@@ -419,6 +419,7 @@ const Cadastro = () => {
           </motion.div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
