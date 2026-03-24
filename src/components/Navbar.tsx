@@ -168,7 +168,7 @@ const Navbar = () => {
                 key={link.label}
                 href={link.href}
                 className="flex items-center gap-2 text-xs text-primary py-2"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleAnchorClick(e, link.href)}
               >
                 <link.icon className="w-3.5 h-3.5" />
                 {link.label}
