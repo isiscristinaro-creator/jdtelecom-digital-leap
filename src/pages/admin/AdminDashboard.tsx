@@ -1,17 +1,20 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet
 } from "lucide-react";
 import {
   totalClients, activeClients, inadimplenteClients, canceledClients,
   mrr, totalRevenue, ticketMedio, forecastRevenue,
   growthData, planDistribution, newClientsLast7, newClientsLast30, growthRate,
-  alerts, mockPlans
+  alerts, mockPlans, mockClients, allPayments
 } from "@/data/adminMockData";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
+import { Button } from "@/components/ui/button";
+import { exportToCSV } from "@/utils/exportUtils";
+import { useNavigate } from "react-router-dom";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const fmtK = (v: number) => `R$ ${(v / 1000).toFixed(0)}k`;
@@ -26,6 +29,8 @@ const alertColors = {
 };
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
   const summaryCards = [
     { label: "Total de Clientes", value: totalClients.toLocaleString(), icon: Users, color: "text-primary" },
     { label: "Clientes Ativos", value: activeClients.toLocaleString(), icon: UserCheck, color: "text-emerald-400" },
@@ -46,11 +51,37 @@ const AdminDashboard = () => {
     { label: "Crescimento", value: `${growthRate}%` },
   ];
 
+  const handleExportClients = () => {
+    exportToCSV(mockClients.map(c => ({
+      Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan,
+      "Valor (R$)": c.price.toFixed(2), Status: c.status, "Cliente desde": c.joinDate,
+    })), "clientes_completo_jdtelecom");
+  };
+
+  const handleExportFinanceiro = () => {
+    exportToCSV(allPayments.map(p => ({
+      Cliente: p.clientName, Descrição: p.description, Data: p.date,
+      "Valor (R$)": p.amount.toFixed(2), Status: p.status,
+    })), "financeiro_completo_jdtelecom");
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Dashboard</h1>
-        <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Dashboard</h1>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Button onClick={handleExportClients} variant="outline" size="sm"
+            className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/10 rounded-xl text-xs">
+            <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Clientes
+          </Button>
+          <Button onClick={handleExportFinanceiro} size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs">
+            <Download className="w-3.5 h-3.5 mr-1.5" /> Financeiro
+          </Button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -64,6 +95,24 @@ const AdminDashboard = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Quick actions */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Ver Inadimplentes", action: () => navigate("/admin/clientes"), icon: AlertTriangle, color: "text-amber-400 bg-amber-500/10" },
+          { label: "Gerenciar Planos", action: () => navigate("/admin/planos"), icon: Package, color: "text-primary bg-primary/10" },
+          { label: "Ver Pagamentos", action: () => navigate("/admin/pagamentos"), icon: DollarSign, color: "text-emerald-400 bg-emerald-500/10" },
+          { label: "Relatórios", action: () => navigate("/admin/relatorios"), icon: BarChart3, color: "text-blue-400 bg-blue-500/10" },
+        ].map(q => (
+          <button key={q.label} onClick={q.action}
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-primary/40 transition-all group">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${q.color}`}>
+              <q.icon className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-semibold text-[hsl(var(--dark-section-muted))] group-hover:text-[hsl(var(--dark-section-fg))] transition-colors">{q.label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Summary */}
@@ -133,7 +182,6 @@ const AdminDashboard = () => {
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-4">
-        {/* Growth chart */}
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4">Crescimento de Clientes</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -147,7 +195,6 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Revenue chart */}
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4">Receita Mensal</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -161,7 +208,6 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Plan distribution */}
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5 lg:col-span-2">
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4">Distribuição por Plano</h3>
           <div className="flex flex-col md:flex-row items-center gap-6">

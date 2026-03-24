@@ -12,6 +12,7 @@ const navItems = [
   { label: "Planos", href: "/admin/planos", icon: Package },
   { label: "Pagamentos", href: "/admin/pagamentos", icon: CreditCard },
   { label: "Relatórios", href: "/admin/relatorios", icon: BarChart3 },
+  { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
 ];
 
 const AdminSidebar = () => {
