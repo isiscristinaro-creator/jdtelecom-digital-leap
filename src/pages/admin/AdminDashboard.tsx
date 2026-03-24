@@ -138,7 +138,7 @@ const AdminDashboard = () => {
         <h2 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))] mb-3 flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-primary" /> Financeiro
         </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {financeCards.map((c) => (
             <div key={c.label} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-4 md:p-5">
               <c.icon className="w-5 h-5 text-primary mb-2" />
