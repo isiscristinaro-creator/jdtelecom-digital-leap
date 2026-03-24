@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const fmtK = (v: number) => `R$ ${(v / 1000).toFixed(0)}k`;
