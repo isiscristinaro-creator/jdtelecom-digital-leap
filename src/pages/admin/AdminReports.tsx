@@ -69,7 +69,7 @@ const AdminReports = () => {
   const handleExportCSV = () => {
     const data = getExportData().map(row => {
       const out: Record<string, string | number> = {};
-      Object.entries(row).forEach(([k, v]) => { out[k] = typeof v === "number" ? v.toFixed(2) : v; });
+      Object.entries(row).forEach(([k, v]) => { out[k] = typeof v === "number" ? (v as number).toFixed(2) : String(v); });
       return out;
     });
     exportToCSV(data, `relatorio_${activeTab}_jdtelecom`);
