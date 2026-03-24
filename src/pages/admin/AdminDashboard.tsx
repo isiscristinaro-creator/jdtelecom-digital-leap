@@ -65,13 +65,7 @@ const AdminDashboard = () => {
   };
 
   const handleExportFinanceiro = () => {
-    const data = allPayments.map(p => ({
-      Cliente: p.clientName, Descrição: p.description, Data: p.date,
-      "Valor (R$)": p.amount.toFixed(2), Status: p.status,
-    }));
-    if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
-    exportToCSV(data, "financeiro_completo_jdtelecom");
-    toast.success(`${data.length} registros financeiros exportados com sucesso`);
+    setFinanceiroOpen(true);
   };
 
   return (
