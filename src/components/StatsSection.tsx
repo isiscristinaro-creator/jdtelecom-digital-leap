@@ -47,11 +47,11 @@ const StatsSection = () => {
       </div>
 
       <div className="container mx-auto px-4 py-16 md:py-20">
-        <div className="grid md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-[hsl(var(--dark-section-border))]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 md:divide-x divide-[hsl(var(--dark-section-border))]">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="flex flex-col items-center text-center py-10 md:py-0 px-8 relative cursor-default"
+              className="w-full max-w-md mx-auto md:max-w-none flex flex-col items-center text-center py-8 md:py-0 px-6 md:px-8 rounded-2xl md:rounded-none bg-[hsl(var(--dark-section-card))]/40 md:bg-transparent border border-[hsl(var(--dark-section-border))]/60 md:border-0 relative cursor-default"
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.2 }}

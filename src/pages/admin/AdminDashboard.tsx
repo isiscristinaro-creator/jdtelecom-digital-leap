@@ -69,7 +69,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px] w-full overflow-hidden">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-12 md:pt-0">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Dashboard</h1>
