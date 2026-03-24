@@ -77,8 +77,8 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full px-5 text-xs font-bold">
-              Assine já
+            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full px-5 text-xs font-bold" asChild>
+              <a href="#planos">Assine já</a>
             </Button>
             <Button size="sm" className="bg-[hsl(var(--navbar-bg))] text-[hsl(var(--navbar-fg))] hover:bg-[hsl(var(--navbar-bg))]/90 rounded-full px-5 text-xs font-bold" asChild>
               <a href="/assinante">
