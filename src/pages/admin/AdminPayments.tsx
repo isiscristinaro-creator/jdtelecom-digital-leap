@@ -2,8 +2,9 @@ import { useState, useMemo } from "react";
 import { Search, Download, Calendar, FileSpreadsheet } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { allPayments, mockPlans, type Payment } from "@/data/adminMockData";
+import { allPayments, mockClients, mockPlans } from "@/data/adminMockData";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
+import { toast } from "sonner";
 
 const statusColors = {
   Pago: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -15,11 +16,28 @@ const AdminPayments = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [monthFilter, setMonthFilter] = useState("Todos");
+  const [clientFilter, setClientFilter] = useState("Todos");
   const [planFilter, setPlanFilter] = useState("Todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(0);
   const perPage = 25;
+
+  const clientById = useMemo(() => {
+    return new Map(mockClients.map((client) => [client.id, client]));
+  }, []);
+
+  const availableClients = useMemo(() => {
+    const seen = new Set<string>();
+    return allPayments
+      .map((payment) => ({ id: payment.clientId, name: payment.clientName }))
+      .filter((client) => {
+        if (seen.has(client.id)) return false;
+        seen.add(client.id);
+        return true;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  }, []);
 
   const availableMonths = useMemo(() => {
     const months = [...new Set(allPayments.map(p => {
@@ -34,34 +52,42 @@ const AdminPayments = () => {
     return new Date(y, m - 1, d);
   };
 
+  const parseInputDate = (dateStr: string) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
+
   const filtered = useMemo(() => {
     return allPayments.filter((p) => {
       const matchSearch = !search || p.clientName.toLowerCase().includes(search.toLowerCase());
+      const matchClient = clientFilter === "Todos" || p.clientId === clientFilter;
       const matchStatus = statusFilter === "Todos" || p.status === statusFilter;
       const matchMonth = monthFilter === "Todos" || (() => {
         const parts = p.date.split("/");
         return `${parts[1]}/${parts[2]}` === monthFilter;
       })();
-      const matchPlan = planFilter === "Todos" || p.description.toLowerCase().includes(planFilter.toLowerCase());
+      const clientPlan = clientById.get(p.clientId)?.plan;
+      const matchPlan = planFilter === "Todos" || clientPlan === planFilter;
       
       let matchDateRange = true;
       if (dateFrom) {
         const pDate = parseDate(p.date);
-        const from = new Date(dateFrom);
+        const from = parseInputDate(dateFrom);
         if (pDate < from) matchDateRange = false;
       }
       if (dateTo) {
         const pDate = parseDate(p.date);
-        const to = new Date(dateTo);
+        const to = parseInputDate(dateTo);
+        to.setHours(23, 59, 59, 999);
         if (pDate > to) matchDateRange = false;
       }
       
-      return matchSearch && matchStatus && matchMonth && matchPlan && matchDateRange;
+      return matchSearch && matchClient && matchStatus && matchMonth && matchPlan && matchDateRange;
     });
-  }, [search, statusFilter, monthFilter, planFilter, dateFrom, dateTo]);
+  }, [search, clientFilter, statusFilter, monthFilter, planFilter, dateFrom, dateTo, clientById]);
 
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
-  const totalPages = Math.ceil(filtered.length / perPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
 
   const totalPago = filtered.filter((p) => p.status === "Pago").reduce((s, p) => s + p.amount, 0);
   const totalPendente = filtered.filter((p) => p.status === "Pendente").reduce((s, p) => s + p.amount, 0);
@@ -70,7 +96,9 @@ const AdminPayments = () => {
   const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   const buildExportData = () => filtered.map(p => ({
-    Cliente: p.clientName,
+    Nome: p.clientName,
+    Email: clientById.get(p.clientId)?.email ?? "-",
+    Plano: clientById.get(p.clientId)?.plan ?? "-",
     Descrição: p.description,
     Data: p.date,
     "Valor (R$)": p.amount,
@@ -81,11 +109,35 @@ const AdminPayments = () => {
     let s = "";
     if (statusFilter !== "Todos") s += `_${statusFilter.toLowerCase()}`;
     if (monthFilter !== "Todos") s += `_${monthFilter.replace("/", "-")}`;
+    if (planFilter !== "Todos") s += `_plano`;
+    if (clientFilter !== "Todos") s += `_cliente`;
     return s;
   };
 
-  const handleExportCSV = () => exportToCSV(buildExportData().map(d => ({ ...d, "Valor (R$)": d["Valor (R$)"].toFixed(2) })), `pagamentos_jdtelecom${buildSuffix()}`);
-  const handleExportExcel = () => exportToExcel(buildExportData(), `pagamentos_jdtelecom${buildSuffix()}`);
+  const handleExportCSV = () => {
+    const exportData = buildExportData();
+    if (!exportData.length) {
+      toast.error("Nenhum dado disponível para exportação");
+      return;
+    }
+
+    exportToCSV(
+      exportData.map((item) => ({ ...item, "Valor (R$)": item["Valor (R$)"].toFixed(2) })),
+      `pagamentos_jdtelecom${buildSuffix()}`,
+    );
+    toast.success(`${exportData.length} registros exportados com sucesso`);
+  };
+
+  const handleExportExcel = () => {
+    const exportData = buildExportData();
+    if (!exportData.length) {
+      toast.error("Nenhum dado disponível para exportação");
+      return;
+    }
+
+    exportToExcel(exportData, `pagamentos_jdtelecom${buildSuffix()}`);
+    toast.success(`${exportData.length} registros exportados com sucesso`);
+  };
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
@@ -98,7 +150,7 @@ const AdminPayments = () => {
           <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl font-bold text-sm">
             <Download className="w-4 h-4 mr-2" /> CSV
           </Button>
-          <Button onClick={handleExportExcel} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+          <Button onClick={handleExportExcel} disabled={!filtered.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
           </Button>
         </div>
@@ -149,6 +201,11 @@ const AdminPayments = () => {
             className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
             <option value="Todos">Todos os planos</option>
             {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+          </select>
+          <select value={clientFilter} onChange={e => { setClientFilter(e.target.value); setPage(0); }}
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            <option value="Todos">Todos os clientes</option>
+            {availableClients.map(client => <option key={client.id} value={client.id}>{client.name}</option>)}
           </select>
           <div className="flex items-center gap-2">
             <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">De:</span>
