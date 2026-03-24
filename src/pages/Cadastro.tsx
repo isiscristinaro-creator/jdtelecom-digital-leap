@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { User, MessageCircle, Gauge, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import cadastroPerson from "@/assets/cadastro-person.png";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const ESTADOS = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
@@ -121,22 +123,27 @@ const Cadastro = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-primary py-6 px-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground">Cadastro</h1>
-          <div className="text-primary-foreground/80 text-sm">
-            <a href="/" className="hover:text-primary-foreground transition-colors">home</a>
-            <span className="mx-1">›</span>
+      <Navbar />
+
+      {/* Spacer for fixed navbar */}
+      <div className="pt-[108px] md:pt-[138px]" />
+
+      {/* Header breadcrumb */}
+      <div className="bg-primary py-5 px-4">
+        <div className="max-w-[1140px] mx-auto flex items-center justify-between">
+          <h1 className="font-display text-xl md:text-2xl font-bold text-primary-foreground">Cadastro</h1>
+          <div className="text-primary-foreground/80 text-xs">
+            <a href="/" className="hover:text-primary-foreground transition-colors">Home</a>
+            <span className="mx-1.5">›</span>
             <span>Cadastro</span>
           </div>
         </div>
       </div>
 
       {/* Title */}
-      <div className="text-center py-12 md:py-16">
+      <div className="text-center py-10 md:py-14">
         <motion.h2
-          className="font-display text-3xl md:text-4xl font-bold text-foreground"
+          className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -144,7 +151,7 @@ const Cadastro = () => {
           Estamos aqui para atender você!
         </motion.h2>
         <motion.p
-          className="text-muted-foreground mt-3 text-base"
+          className="text-muted-foreground mt-2 text-sm md:text-base"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -154,8 +161,8 @@ const Cadastro = () => {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 pb-24">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+      <div className="max-w-[1140px] mx-auto px-4 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           {/* Left - Form */}
           <motion.div
             className="lg:col-span-3"
@@ -412,6 +419,7 @@ const Cadastro = () => {
           </motion.div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
