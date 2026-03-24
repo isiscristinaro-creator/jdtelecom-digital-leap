@@ -89,8 +89,8 @@ const SubscriberDashboard = () => {
     <div className="min-h-screen bg-[hsl(var(--dark-section))] overflow-x-hidden">
       {/* Header */}
       <header className="bg-[hsl(var(--dark-section-card))] border-b border-[hsl(var(--dark-section-border))] sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-full">
-          <div className="flex items-center gap-3">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-full min-w-0">
+          <div className="flex items-center gap-3 min-w-0">
             <a href="/">
               <img src={logo} alt="JD Telecom" className="h-8 brightness-0 invert" />
             </a>
@@ -112,7 +112,7 @@ const SubscriberDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 md:py-10 max-w-6xl overflow-hidden">
+      <main className="container mx-auto px-4 py-6 md:py-10 pb-24 max-w-6xl overflow-hidden">
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
@@ -151,7 +151,7 @@ const SubscriberDashboard = () => {
               <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))]">
                 <Button
                   size="sm"
-                  className="bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl"
+                  className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl"
                   onClick={() => toast.info("Funcionalidade de troca de plano será disponibilizada em breve.")}
                 >
                   <ArrowUpRight className="w-4 h-4 mr-1" />
@@ -176,13 +176,13 @@ const SubscriberDashboard = () => {
                     <StatusBadge status={subscriber.billing.status} />
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
                   <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))]">
                     {subscriber.billing.amount}
                   </p>
                   <Button
                     size="sm"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold"
+                    className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold"
                     onClick={() => toast.info("Funcionalidade de pagamento online será disponibilizada em breve.")}
                   >
                     Pagar agora
@@ -250,7 +250,7 @@ const SubscriberDashboard = () => {
                       className="bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] h-10 rounded-xl mt-1"
                     />
                   </div>
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
                     <Button size="sm" onClick={handleSaveEdit} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl flex-1 font-bold">
                       Salvar
                     </Button>
@@ -267,7 +267,7 @@ const SubscriberDashboard = () => {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-[hsl(var(--dark-section-muted))]">{subscriber.email}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))] break-all">{subscriber.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Phone className="w-4 h-4 text-primary shrink-0" />
@@ -275,7 +275,7 @@ const SubscriberDashboard = () => {
                   </div>
                   <div className="flex items-start gap-2 text-sm">
                     <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span className="text-[hsl(var(--dark-section-muted))]">{subscriber.address}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))] break-words">{subscriber.address}</span>
                   </div>
                   <Button
                     size="sm"
@@ -323,7 +323,7 @@ const SubscriberDashboard = () => {
                   href="https://wa.me/558005945678?text=Preciso%20de%20suporte%20t%C3%A9cnico"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
                 >
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-primary" />

@@ -57,13 +57,13 @@ const AdminTeam = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Equipe</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Gerencie os acessos do sistema</p>
         </div>
-        <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold text-sm">
+        <Button onClick={openCreate} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold text-sm">
           <Plus className="w-4 h-4 mr-2" /> Novo Usuário
         </Button>
       </div>
@@ -144,7 +144,7 @@ const AdminTeam = () => {
               </div>
               <div>
                 <label className="text-xs text-[hsl(var(--dark-section-muted))] font-semibold uppercase tracking-wider">Permissões</label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                   {allPermissions.map(p => (
                     <label key={p.id} className="flex items-center gap-2 cursor-pointer bg-[hsl(var(--dark-section))]/50 rounded-xl px-3 py-2 border border-[hsl(var(--dark-section-border))]">
                       <input type="checkbox" checked={formPermissions.includes(p.id)} onChange={() => togglePerm(p.id)}

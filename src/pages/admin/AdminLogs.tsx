@@ -45,27 +45,27 @@ const AdminLogs = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Logs do Sistema</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} registros</p>
         </div>
-        <Button onClick={handleExport} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+        <Button onClick={handleExport} className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
           <Download className="w-4 h-4 mr-2" /> Exportar Excel
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))]" />
           <Input placeholder="Buscar por usuário, ação ou detalhe..." value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
             className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 h-10 rounded-xl" />
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex gap-2">
           {categories.map(c => (
             <button key={c} onClick={() => { setCatFilter(c); setPage(0); }}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${catFilter === c ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"}`}>
+              className={`w-full sm:w-auto px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${catFilter === c ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"}`}>
               {c === "Todos" ? c : categoryLabels[c as SystemLog["category"]]}
             </button>
           ))}
@@ -103,11 +103,11 @@ const AdminLogs = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
           <p className="text-xs text-[hsl(var(--dark-section-muted))]">Página {page + 1} de {totalPages}</p>
-          <div className="flex gap-2">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Anterior</button>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Próxima</button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30 flex-1 sm:flex-none">Anterior</button>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30 flex-1 sm:flex-none">Próxima</button>
           </div>
         </div>
       </div>

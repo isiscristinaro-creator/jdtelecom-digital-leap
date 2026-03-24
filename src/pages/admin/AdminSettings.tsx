@@ -33,13 +33,13 @@ const AdminSettings = () => {
   );
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[900px]">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[900px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Configurações</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Gerencie as configurações do sistema</p>
         </div>
-        <Button onClick={handleSave} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold text-sm">
+        <Button onClick={handleSave} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold text-sm">
           {saved ? <><Check className="w-4 h-4 mr-2" /> Salvo!</> : <><Save className="w-4 h-4 mr-2" /> Salvar Alterações</>}
         </Button>
       </div>
@@ -80,7 +80,7 @@ const AdminSettings = () => {
           { label: "Alertar cancelamentos", desc: "Receba notificações quando um cliente cancelar", key: "notifyCancelamento" as const },
           { label: "Novos clientes", desc: "Receba notificações de novos cadastros", key: "notifyNovosClientes" as const },
         ].map(item => (
-          <div key={item.key} className="flex items-center justify-between gap-4 py-2">
+          <div key={item.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
             <div>
               <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">{item.label}</p>
               <p className="text-xs text-[hsl(var(--dark-section-muted))]">{item.desc}</p>
@@ -95,7 +95,7 @@ const AdminSettings = () => {
         <h2 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
           <Shield className="w-5 h-5 text-primary" /> Regras de Cobrança
         </h2>
-        <div className="flex items-center justify-between gap-4 py-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
           <div>
             <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">Suspensão automática</p>
             <p className="text-xs text-[hsl(var(--dark-section-muted))]">Suspender automaticamente clientes inadimplentes</p>

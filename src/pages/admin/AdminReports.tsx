@@ -99,33 +99,33 @@ const AdminReports = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Relatórios</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Análises detalhadas do negócio</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))] text-white rounded-xl font-bold text-sm">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))] text-white rounded-xl font-bold text-sm w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" /> CSV
           </Button>
-          <Button onClick={handleExportExcel} disabled={!exportData.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
+          <Button onClick={handleExportExcel} disabled={!exportData.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60 w-full sm:w-auto">
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
           </Button>
         </div>
       </div>
 
       {/* Tabs + Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:flex gap-2">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap text-left sm:text-center transition-all border ${
                 activeTab === t.id ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
               }`}>{t.label}</button>
           ))}
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex gap-2">
           {periods.map(p => (
             <button key={p.id} onClick={() => setPeriod(p.id)}
               className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${period === p.id ? "bg-primary/20 text-primary border-primary/40" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"}`}>
@@ -133,7 +133,7 @@ const AdminReports = () => {
             </button>
           ))}
           <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
-            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-9 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-9 rounded-xl text-xs font-semibold appearance-none cursor-pointer col-span-2 sm:col-span-1 w-full sm:w-auto">
             <option value="Todos">Todos os planos</option>
             {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
           </select>
@@ -154,7 +154,7 @@ const AdminReports = () => {
                 <Bar dataKey="revenue" fill="hsl(24,95%,50%)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-6">
               {sliceData(growthData).slice(-4).map((d) => (
                 <div key={d.month} className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 text-center">
                   <p className="text-xs text-[hsl(var(--dark-section-muted))]">{d.month}</p>

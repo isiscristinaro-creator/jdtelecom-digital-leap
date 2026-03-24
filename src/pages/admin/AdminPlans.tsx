@@ -49,13 +49,13 @@ const AdminPlans = () => {
   const showForm = isCreating || editingPlan;
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Planos</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{plans.length} planos cadastrados</p>
         </div>
-        <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
+        <Button onClick={openCreate} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
           <Plus className="w-4 h-4 mr-1" /> Novo Plano
         </Button>
       </div>
@@ -74,7 +74,7 @@ const AdminPlans = () => {
                 <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Turbo Fibra 500"
                   className="bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] h-10 rounded-xl mt-1" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Velocidade</Label>
                   <Input value={form.speed} onChange={(e) => setForm({ ...form, speed: e.target.value })} placeholder="Ex: 500MB"

@@ -140,24 +140,24 @@ const AdminPayments = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Pagamentos</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} registros</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))] text-white rounded-xl font-bold text-sm">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))] text-white rounded-xl font-bold text-sm w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" /> CSV
           </Button>
-          <Button onClick={handleExportExcel} disabled={!filtered.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
+          <Button onClick={handleExportExcel} disabled={!filtered.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60 w-full sm:w-auto">
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
           </Button>
         </div>
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { label: "Total Pago", value: fmt(totalPago), color: "text-emerald-400" },
           { label: "Pendente", value: fmt(totalPendente), color: "text-amber-400" },
@@ -188,32 +188,36 @@ const AdminPayments = () => {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))] pointer-events-none" />
             <select value={monthFilter} onChange={(e) => { setMonthFilter(e.target.value); setPage(0); }}
-              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full">
               <option value="Todos">Todos os meses</option>
               {availableMonths.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
           <select value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(0); }}
-            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full">
             <option value="Todos">Todos os planos</option>
             {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
           </select>
           <select value={clientFilter} onChange={e => { setClientFilter(e.target.value); setPage(0); }}
-            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full">
             <option value="Todos">Todos os clientes</option>
             {availableClients.map(client => <option key={client.id} value={client.id}>{client.name}</option>)}
           </select>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">De:</span>
-            <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(0); }}
-              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs" />
-            <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">Até:</span>
-            <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(0); }}
-              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">De:</span>
+              <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(0); }}
+                className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs w-full" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">Até:</span>
+              <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(0); }}
+                className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs w-full" />
+            </div>
           </div>
         </div>
       </div>
@@ -246,11 +250,11 @@ const AdminPayments = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
           <p className="text-xs text-[hsl(var(--dark-section-muted))]">Página {page + 1} de {totalPages}</p>
-          <div className="flex gap-2">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Anterior</button>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Próxima</button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30 flex-1 sm:flex-none">Anterior</button>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30 flex-1 sm:flex-none">Próxima</button>
           </div>
         </div>
       </div>

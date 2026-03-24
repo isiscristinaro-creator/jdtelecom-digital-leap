@@ -69,13 +69,13 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px] w-full overflow-hidden">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-12 md:pt-0">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Dashboard</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button onClick={handleExportClients} size="sm"
             className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/20 rounded-xl text-xs flex-1 sm:flex-none">
             <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Clientes
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Ver Inadimplentes", action: () => navigate("/admin/clientes"), icon: AlertTriangle, color: "text-amber-400 bg-amber-500/10" },
           { label: "Gerenciar Planos", action: () => navigate("/admin/planos"), icon: Package, color: "text-primary bg-primary/10" },
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {summaryCards.map((c) => (
           <div key={c.label} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-4 md:p-5">
             <div className="flex items-center gap-2 mb-3">
@@ -138,7 +138,7 @@ const AdminDashboard = () => {
         <h2 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))] mb-3 flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-primary" /> Financeiro
         </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {financeCards.map((c) => (
             <div key={c.label} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-4 md:p-5">
               <c.icon className="w-5 h-5 text-primary mb-2" />
@@ -155,7 +155,7 @@ const AdminDashboard = () => {
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-primary" /> Vendas
           </h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {salesCards.map((c) => (
               <div key={c.label} className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
                 <p className="font-display text-xl font-bold text-primary">{c.value}</p>
