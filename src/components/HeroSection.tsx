@@ -28,22 +28,18 @@ const HeroSection = () => {
 
   return (
     <section id="inicio" className="pt-[136px] md:pt-[172px]">
-      <div className="relative w-full overflow-hidden group bg-primary">
+      <div className="relative w-full overflow-hidden group bg-primary" style={{ aspectRatio: "1920/500" }}>
         {banners.map((src, i) => (
           <div
             key={i}
-            className={`w-full transition-all duration-700 ease-in-out ${
-              i === current
-                ? "relative opacity-100"
-                : "absolute inset-0 opacity-0 pointer-events-none"
+            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+              i === current ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
             <img
               src={src}
               alt={`JD Telecom Banner ${i + 1}`}
-              className="w-full h-auto object-cover"
-              width={1920}
-              height={500}
+              className="w-full h-full object-cover"
               loading={i === 0 ? "eager" : "lazy"}
             />
           </div>
