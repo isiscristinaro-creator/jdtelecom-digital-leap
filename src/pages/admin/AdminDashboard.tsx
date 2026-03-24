@@ -53,17 +53,23 @@ const AdminDashboard = () => {
   ];
 
   const handleExportClients = () => {
-    exportToCSV(mockClients.map(c => ({
+    const data = mockClients.map(c => ({
       Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan,
       "Valor (R$)": c.price.toFixed(2), Status: c.status, "Cliente desde": c.joinDate,
-    })), "clientes_completo_jdtelecom");
+    }));
+    if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
+    exportToCSV(data, "clientes_completo_jdtelecom");
+    toast.success(`${data.length} clientes exportados com sucesso`);
   };
 
   const handleExportFinanceiro = () => {
-    exportToCSV(allPayments.map(p => ({
+    const data = allPayments.map(p => ({
       Cliente: p.clientName, Descrição: p.description, Data: p.date,
       "Valor (R$)": p.amount.toFixed(2), Status: p.status,
-    })), "financeiro_completo_jdtelecom");
+    }));
+    if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
+    exportToCSV(data, "financeiro_completo_jdtelecom");
+    toast.success(`${data.length} registros financeiros exportados com sucesso`);
   };
 
   return (
