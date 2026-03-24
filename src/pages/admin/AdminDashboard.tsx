@@ -80,8 +80,8 @@ const AdminDashboard = () => {
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button onClick={handleExportClients} variant="outline" size="sm"
-            className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/10 rounded-xl text-xs">
+          <Button onClick={handleExportClients} size="sm"
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/20 rounded-xl text-xs">
             <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Clientes
           </Button>
           <Button onClick={handleExportFinanceiro} size="sm"
