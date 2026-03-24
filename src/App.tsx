@@ -30,9 +30,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <AdminAuthProvider>
-          <BrowserRouter>
+      <CityProvider>
+        <AuthProvider>
+          <AdminAuthProvider>
+            <CitySelector />
+            <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/cadastro" element={<Cadastro />} />
