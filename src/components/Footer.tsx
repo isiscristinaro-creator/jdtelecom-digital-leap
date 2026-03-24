@@ -1,7 +1,38 @@
 import { Phone, Mail, MapPin } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useCallback } from "react";
 import logo from "@/assets/logo.png";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleAnchorClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    e.preventDefault();
+    if (location.pathname !== "/") {
+      navigate("/" + hash);
+    } else {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.pathname, navigate]);
+
+  const links = [
+    { label: "Início", href: "#inicio" },
+    { label: "Planos", href: "#planos" },
+    { label: "Benefícios", href: "#beneficios" },
+    { label: "Cobertura", href: "#cobertura" },
+    { label: "Autoatendimento", href: "#autoatendimento" },
+    { label: "Contato", href: "#contato" },
+  ];
+
+  const serviceLinks = [
+    { label: "Internet Fibra Óptica", href: "#planos" },
+    { label: "Móvel 4G/5G", href: "#chip" },
+    { label: "Telefonia Fixa", href: "#planos" },
+    { label: "TV por Assinatura", href: "#planos" },
+  ];
+
   return (
     <footer className="bg-dark-section py-20 relative overflow-hidden">
       {/* Subtle top glow */}
@@ -19,16 +50,9 @@ const Footer = () => {
           <div className="space-y-5">
             <h4 className="font-display font-bold text-[hsl(var(--dark-section-fg))] text-base">Links Rápidos</h4>
             <ul className="space-y-3">
-              {[
-                { label: "Início", href: "#inicio" },
-                { label: "Planos", href: "#planos" },
-                { label: "Benefícios", href: "#beneficios" },
-                { label: "Cobertura", href: "#cobertura" },
-                { label: "Autoatendimento", href: "#autoatendimento" },
-                { label: "Contato", href: "#contato" },
-              ].map((l) => (
+              {links.map((l) => (
                 <li key={l.label}>
-                  <a href={l.href} className="text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors duration-300">
+                  <a href={l.href} onClick={(e) => handleAnchorClick(e, l.href)} className="text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors duration-300">
                     {l.label}
                   </a>
                 </li>
@@ -67,10 +91,13 @@ const Footer = () => {
           <div className="space-y-5">
             <h4 className="font-display font-bold text-[hsl(var(--dark-section-fg))] text-base">Serviços</h4>
             <ul className="space-y-3 text-sm text-[hsl(var(--dark-section-muted))]">
-              <li><a href="#planos" className="hover:text-primary transition-colors duration-300">Internet Fibra Óptica</a></li>
-              <li><a href="#chip" className="hover:text-primary transition-colors duration-300">Móvel 4G/5G</a></li>
-              <li><a href="#planos" className="hover:text-primary transition-colors duration-300">Telefonia Fixa</a></li>
-              <li><a href="#planos" className="hover:text-primary transition-colors duration-300">TV por Assinatura</a></li>
+              {serviceLinks.map((l) => (
+                <li key={l.label}>
+                  <a href={l.href} onClick={(e) => handleAnchorClick(e, l.href)} className="hover:text-primary transition-colors duration-300">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
