@@ -53,7 +53,7 @@ const CookieConsent = () => {
               <Button
                 onClick={decline}
                 variant="outline"
-                className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-[hsl(var(--dark-section-card))] text-xs px-6 py-2 rounded-lg"
+                className="border-[hsl(var(--dark-section-muted))] text-[hsl(var(--dark-section-fg))] bg-transparent hover:bg-[hsl(var(--dark-section-card))] text-xs font-bold px-6 py-2 rounded-lg"
               >
                 Apenas necessários
               </Button>
