@@ -51,10 +51,7 @@ const plans = [
 
 const PlansSection = () => {
   const { ref, isVisible } = useScrollAnimation();
-  const [activeTab, setActiveTab] = useState("destaques");
 
-  // Show all plans for "destaques", filter for others
-  const filteredPlans = activeTab === "destaques" ? plans : plans.filter((p) => p.category === activeTab || p.category === "destaques");
 
   return (
     <section id="planos" className="bg-dark-section py-20 md:py-28 relative overflow-hidden">
