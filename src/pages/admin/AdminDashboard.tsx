@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const fmtK = (v: number) => `R$ ${(v / 1000).toFixed(0)}k`;
@@ -31,7 +33,7 @@ const alertColors = {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
+  const [financeiroOpen, setFinanceiroOpen] = useState(false);
   const summaryCards = [
     { label: "Total de Clientes", value: totalClients.toLocaleString(), icon: Users, color: "text-primary" },
     { label: "Clientes Ativos", value: activeClients.toLocaleString(), icon: UserCheck, color: "text-emerald-400" },
@@ -63,13 +65,7 @@ const AdminDashboard = () => {
   };
 
   const handleExportFinanceiro = () => {
-    const data = allPayments.map(p => ({
-      Cliente: p.clientName, Descrição: p.description, Data: p.date,
-      "Valor (R$)": p.amount.toFixed(2), Status: p.status,
-    }));
-    if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
-    exportToCSV(data, "financeiro_completo_jdtelecom");
-    toast.success(`${data.length} registros financeiros exportados com sucesso`);
+    setFinanceiroOpen(true);
   };
 
   return (
@@ -240,6 +236,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+      <ExportFinanceiroModal open={financeiroOpen} onOpenChange={setFinanceiroOpen} />
     </div>
   );
 };
