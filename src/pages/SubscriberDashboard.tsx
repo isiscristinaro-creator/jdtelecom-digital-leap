@@ -90,7 +90,7 @@ const SubscriberDashboard = () => {
       {/* Header */}
       <header className="bg-[hsl(var(--dark-section-card))] border-b border-[hsl(var(--dark-section-border))] sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-full min-w-0">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <a href="/">
               <img src={logo} alt="JD Telecom" className="h-8 brightness-0 invert" />
             </a>
