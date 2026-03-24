@@ -23,7 +23,7 @@ const QuickActionsBar = () => {
   return (
     <motion.section
       ref={ref}
-      className="bg-gradient-to-r from-primary to-[hsl(15,90%,42%)] py-4 md:py-5 relative overflow-hidden"
+      className="bg-gradient-to-r from-primary to-[hsl(15,90%,42%)] py-3 md:py-5 relative overflow-hidden"
       initial={{ opacity: 0 }}
       animate={isVisible ? { opacity: 1 } : {}}
       transition={{ duration: 0.5 }}
@@ -54,13 +54,13 @@ const QuickActionsBar = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-6">
           {actions.map((action, i) => (
             <motion.a
               key={action.label}
               href={action.href}
               {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="flex items-center gap-3 group relative"
+              className="flex items-center gap-3 group relative rounded-xl px-3 py-2.5 md:px-0 md:py-0 bg-primary-foreground/5 md:bg-transparent"
               initial={{ opacity: 0, y: 10 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.4, delay: i * 0.1 }}
@@ -92,7 +92,7 @@ const QuickActionsBar = () => {
                 )}
               </motion.div>
 
-              <p className="text-xs md:text-sm font-medium text-primary-foreground leading-tight">
+              <p className="text-sm font-medium text-primary-foreground leading-tight">
                 {action.label}
               </p>
 
