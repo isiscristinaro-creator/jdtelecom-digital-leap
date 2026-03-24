@@ -25,7 +25,7 @@ const VENCIMENTOS = ["5", "10", "15", "20", "25"];
 
 function validarCPF(cpf: string) {
   const nums = cpf.replace(/\D/g, "");
-  if (nums.length === 14) return nums.length === 14; // CNPJ basic
+  if (nums.length === 14) return nums.length === 14;
   if (nums.length !== 11 || /^(\d)\1+$/.test(nums)) return false;
   let sum = 0;
   for (let i = 0; i < 9; i++) sum += parseInt(nums[i]) * (10 - i);
@@ -113,21 +113,11 @@ const Cadastro = () => {
     setLoading(false);
   };
 
-  const Field = ({ label, field, type = "text", mask, placeholder }: {
-    label: string; field: string; type?: string; mask?: (v: string) => string; placeholder?: string;
-  }) => (
-    <div className="space-y-1">
-      <Label className="text-xs font-medium text-foreground/70">{label}</Label>
-      <Input
-        type={type}
-        placeholder={placeholder || label}
-        value={(form as any)[field]}
-        onChange={e => set(field, mask ? mask(e.target.value) : e.target.value)}
-        className={`bg-background border-border/50 focus:border-primary ${errors[field] ? "border-destructive" : ""}`}
-      />
-      {errors[field] && <p className="text-xs text-destructive">{errors[field]}</p>}
-    </div>
-  );
+  const inputClass = (field: string) =>
+    `h-12 bg-background border-border/40 rounded-lg px-4 text-sm placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all ${errors[field] ? "border-destructive" : ""}`;
+
+  const selectTriggerClass = (field: string) =>
+    `h-12 bg-background border-border/40 rounded-lg px-4 text-sm ${errors[field] ? "border-destructive" : ""}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,20 +134,28 @@ const Cadastro = () => {
       </div>
 
       {/* Title */}
-      <div className="text-center py-10 md:py-14">
+      <div className="text-center py-12 md:py-16">
         <motion.h2
-          className="font-display text-2xl md:text-4xl font-bold text-foreground"
+          className="font-display text-3xl md:text-4xl font-bold text-foreground"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           Estamos aqui para atender você!
         </motion.h2>
+        <motion.p
+          className="text-muted-foreground mt-3 text-base"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          Preencha o formulário e comece a navegar com a JD Telecom
+        </motion.p>
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+      <div className="container mx-auto px-4 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
           {/* Left - Form */}
           <motion.div
             className="lg:col-span-3"
@@ -165,78 +163,210 @@ const Cadastro = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h3 className="font-display text-lg font-bold text-foreground mb-1">Faça seu cadastro pelo formulário</h3>
-            <p className="text-sm text-muted-foreground mb-6">Cadastre-se através do formulário abaixo:</p>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Dados Pessoais */}
+              <div className="space-y-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1 h-5 bg-primary rounded-full" />
+                  <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide">Dados Pessoais</h3>
+                </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Field label="Nome Completo" field="nome" placeholder="Nome Completo" />
-              <Field label="Endereço de Email" field="email" type="email" placeholder="Endereço de Email" />
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome Completo</Label>
+                    <Input
+                      placeholder="Seu nome completo"
+                      value={form.nome}
+                      onChange={e => set("nome", e.target.value)}
+                      className={inputClass("nome")}
+                    />
+                    {errors.nome && <p className="text-xs text-destructive mt-1">{errors.nome}</p>}
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="CPF/CNPJ" field="cpfCnpj" mask={maskCPFCNPJ} placeholder="CPF/CNPJ" />
-                <Field label="Data de Nascimento" field="nascimento" type="date" />
-              </div>
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Endereço de Email</Label>
+                    <Input
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={form.email}
+                      onChange={e => set("email", e.target.value)}
+                      className={inputClass("email")}
+                    />
+                    {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Celular para Contato" field="celular" mask={maskPhone} placeholder="(00) 00000-0000" />
-                <Field label="CEP" field="cep" mask={maskCEP} placeholder="00000-000" />
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">CPF/CNPJ</Label>
+                      <Input
+                        placeholder="000.000.000-00"
+                        value={form.cpfCnpj}
+                        onChange={e => set("cpfCnpj", maskCPFCNPJ(e.target.value))}
+                        className={inputClass("cpfCnpj")}
+                      />
+                      {errors.cpfCnpj && <p className="text-xs text-destructive mt-1">{errors.cpfCnpj}</p>}
+                    </div>
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Data de Nascimento</Label>
+                      <Input
+                        type="date"
+                        value={form.nascimento}
+                        onChange={e => set("nascimento", e.target.value)}
+                        className={inputClass("nascimento")}
+                      />
+                      {errors.nascimento && <p className="text-xs text-destructive mt-1">{errors.nascimento}</p>}
+                    </div>
+                  </div>
 
-              <Field label="Endereço" field="endereco" placeholder="Endereço" />
-              <Field label="Ponto de Referência" field="pontoReferencia" placeholder="Ponto de Referência" />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Número" field="numero" placeholder="Número" />
-                <Field label="Bairro" field="bairro" placeholder="Bairro" />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Cidade" field="cidade" placeholder="Cidade" />
-                <div className="space-y-1">
-                  <Label className="text-xs font-medium text-foreground/70">Estado</Label>
-                  <Select value={form.estado} onValueChange={v => set("estado", v)}>
-                    <SelectTrigger className={`bg-background border-border/50 ${errors.estado ? "border-destructive" : ""}`}>
-                      <SelectValue placeholder="Estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ESTADOS.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {errors.estado && <p className="text-xs text-destructive">{errors.estado}</p>}
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Celular para Contato</Label>
+                    <Input
+                      placeholder="(00) 00000-0000"
+                      value={form.celular}
+                      onChange={e => set("celular", maskPhone(e.target.value))}
+                      className={inputClass("celular")}
+                    />
+                    {errors.celular && <p className="text-xs text-destructive mt-1">{errors.celular}</p>}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <Label className="text-xs font-medium text-foreground/70">Data de Vencimento</Label>
-                  <Select value={form.vencimento} onValueChange={v => set("vencimento", v)}>
-                    <SelectTrigger className={`bg-background border-border/50 ${errors.vencimento ? "border-destructive" : ""}`}>
-                      <SelectValue placeholder="Data de Vencimento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {VENCIMENTOS.map(d => <SelectItem key={d} value={d}>Dia {d}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {errors.vencimento && <p className="text-xs text-destructive">{errors.vencimento}</p>}
+              {/* Separator */}
+              <div className="border-t border-border/30" />
+
+              {/* Endereço */}
+              <div className="space-y-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1 h-5 bg-primary rounded-full" />
+                  <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide">Endereço</h3>
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs font-medium text-foreground/70">Escolha o Plano</Label>
-                  <Select value={form.plano} onValueChange={v => set("plano", v)}>
-                    <SelectTrigger className={`bg-background border-border/50 ${errors.plano ? "border-destructive" : ""}`}>
-                      <SelectValue placeholder="Escolha o Plano" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PLANOS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {errors.plano && <p className="text-xs text-destructive">{errors.plano}</p>}
+
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">CEP</Label>
+                      <Input
+                        placeholder="00000-000"
+                        value={form.cep}
+                        onChange={e => set("cep", maskCEP(e.target.value))}
+                        className={inputClass("cep")}
+                      />
+                      {errors.cep && <p className="text-xs text-destructive mt-1">{errors.cep}</p>}
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Endereço</Label>
+                      <Input
+                        placeholder="Rua, Avenida..."
+                        value={form.endereco}
+                        onChange={e => set("endereco", e.target.value)}
+                        className={inputClass("endereco")}
+                      />
+                      {errors.endereco && <p className="text-xs text-destructive mt-1">{errors.endereco}</p>}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Número</Label>
+                      <Input
+                        placeholder="Nº"
+                        value={form.numero}
+                        onChange={e => set("numero", e.target.value)}
+                        className={inputClass("numero")}
+                      />
+                      {errors.numero && <p className="text-xs text-destructive mt-1">{errors.numero}</p>}
+                    </div>
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Bairro</Label>
+                      <Input
+                        placeholder="Bairro"
+                        value={form.bairro}
+                        onChange={e => set("bairro", e.target.value)}
+                        className={inputClass("bairro")}
+                      />
+                      {errors.bairro && <p className="text-xs text-destructive mt-1">{errors.bairro}</p>}
+                    </div>
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Cidade</Label>
+                      <Input
+                        placeholder="Cidade"
+                        value={form.cidade}
+                        onChange={e => set("cidade", e.target.value)}
+                        className={inputClass("cidade")}
+                      />
+                      {errors.cidade && <p className="text-xs text-destructive mt-1">{errors.cidade}</p>}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Estado</Label>
+                      <Select value={form.estado} onValueChange={v => set("estado", v)}>
+                        <SelectTrigger className={selectTriggerClass("estado")}>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ESTADOS.map(uf => <SelectItem key={uf} value={uf}>{uf}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      {errors.estado && <p className="text-xs text-destructive mt-1">{errors.estado}</p>}
+                    </div>
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Ponto de Referência</Label>
+                      <Input
+                        placeholder="Próximo a..."
+                        value={form.pontoReferencia}
+                        onChange={e => set("pontoReferencia", e.target.value)}
+                        className={inputClass("pontoReferencia")}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
+              {/* Separator */}
+              <div className="border-t border-border/30" />
+
+              {/* Plano */}
+              <div className="space-y-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1 h-5 bg-primary rounded-full" />
+                  <h3 className="font-display text-base font-semibold text-foreground uppercase tracking-wide">Escolha seu Plano</h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Data de Vencimento</Label>
+                    <Select value={form.vencimento} onValueChange={v => set("vencimento", v)}>
+                      <SelectTrigger className={selectTriggerClass("vencimento")}>
+                        <SelectValue placeholder="Selecione o dia" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {VENCIMENTOS.map(d => <SelectItem key={d} value={d}>Dia {d}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    {errors.vencimento && <p className="text-xs text-destructive mt-1">{errors.vencimento}</p>}
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">Plano</Label>
+                    <Select value={form.plano} onValueChange={v => set("plano", v)}>
+                      <SelectTrigger className={selectTriggerClass("plano")}>
+                        <SelectValue placeholder="Selecione o plano" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PLANOS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    {errors.plano && <p className="text-xs text-destructive mt-1">{errors.plano}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit */}
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-foreground text-background hover:bg-foreground/90 font-bold text-sm py-6 rounded-xl uppercase tracking-wider"
+                className="w-full h-14 bg-foreground text-background hover:bg-foreground/90 font-bold text-sm rounded-xl uppercase tracking-widest transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
               >
                 {loading ? "Processando..." : "Finalizar Cadastro"}
               </Button>
@@ -250,61 +380,33 @@ const Cadastro = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            {/* Card 1 - Área do Cliente */}
-            <a
-              href="/assinante"
-              className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl p-5 hover:bg-primary/90 transition-colors group"
-            >
-              <div className="bg-primary-foreground/20 rounded-lg p-3">
-                <User className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-sm uppercase tracking-wide">Área do Cliente</p>
-                <p className="text-xs text-primary-foreground/80">Acesse para visualizar sua fatura</p>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity" />
-            </a>
+            {[
+              { href: "/assinante", icon: User, title: "Área do Cliente", desc: "Acesse para visualizar sua fatura", external: false },
+              { href: "https://wa.me/5592991234567?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20minha%20fatura.", icon: MessageCircle, title: "Fatura via WhatsApp", desc: "Solicite sua fatura", external: true },
+              { href: "https://www.speedtest.net/", icon: Gauge, title: "Teste de Velocidade", desc: "Confira sua velocidade", external: true },
+            ].map(({ href, icon: Icon, title, desc, external }) => (
+              <a
+                key={title}
+                href={href}
+                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl p-5 hover:bg-primary/90 hover:shadow-md transition-all group"
+              >
+                <div className="bg-primary-foreground/20 rounded-lg p-3 shrink-0">
+                  <Icon className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm uppercase tracking-wide">{title}</p>
+                  <p className="text-xs text-primary-foreground/80">{desc}</p>
+                </div>
+                <ChevronRight className="w-5 h-5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
+              </a>
+            ))}
 
-            {/* Card 2 - Fatura via WhatsApp */}
-            <a
-              href="https://wa.me/5592991234567?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20minha%20fatura."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl p-5 hover:bg-primary/90 transition-colors group"
-            >
-              <div className="bg-primary-foreground/20 rounded-lg p-3">
-                <MessageCircle className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-sm uppercase tracking-wide">Fatura via WhatsApp</p>
-                <p className="text-xs text-primary-foreground/80">Solicite sua fatura</p>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity" />
-            </a>
-
-            {/* Card 3 - Teste de Velocidade */}
-            <a
-              href="https://www.speedtest.net/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl p-5 hover:bg-primary/90 transition-colors group"
-            >
-              <div className="bg-primary-foreground/20 rounded-lg p-3">
-                <Gauge className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-sm uppercase tracking-wide">Teste de Velocidade</p>
-                <p className="text-xs text-primary-foreground/80">Confira sua velocidade</p>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity" />
-            </a>
-
-            {/* Image */}
-            <div className="hidden lg:flex justify-center pt-4">
+            <div className="hidden lg:flex justify-center pt-6">
               <img
                 src={cadastroPerson}
                 alt="Pessoa usando dispositivo móvel"
-                className="max-w-[320px] w-full object-contain"
+                className="max-w-[300px] w-full object-contain"
               />
             </div>
           </motion.div>
