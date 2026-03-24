@@ -71,11 +71,11 @@ const Navbar = () => {
               <Gauge className="w-3 h-3 text-primary" />
               Teste de Velocidade
             </a>
-            <a href="#autoatendimento" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
+            <a href="#autoatendimento" onClick={(e) => handleAnchorClick(e, "#autoatendimento")} className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <FileText className="w-3 h-3 text-primary" />
               2ª Via da Fatura
             </a>
-            <a href="#contato" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
+            <a href="#contato" onClick={(e) => handleAnchorClick(e, "#contato")} className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <PhoneCall className="w-3 h-3 text-primary" />
               Ligamos para você
             </a>
