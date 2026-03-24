@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import { growthData, planDistribution, mockClients, allPayments } from "@/data/adminMockData";
+import { exportToCSV } from "@/utils/exportUtils";
 
 const COLORS = ["hsl(24,95%,50%)", "hsl(15,90%,42%)", "hsl(350,80%,55%)", "hsl(40,90%,50%)", "hsl(200,80%,50%)"];
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -16,7 +19,6 @@ const tabs = [
   { id: "planos", label: "Planos" },
 ];
 
-// Inadimplencia data
 const inadData = [
   { month: "Out", rate: 12.1 },
   { month: "Nov", rate: 11.5 },
@@ -29,11 +31,34 @@ const inadData = [
 const AdminReports = () => {
   const [activeTab, setActiveTab] = useState("receita");
 
+  const handleExportReport = () => {
+    if (activeTab === "receita") {
+      exportToCSV(growthData.map(d => ({ Mês: d.month, "Receita (R$)": d.revenue.toFixed(2), Clientes: d.clients })), "relatorio_receita_jdtelecom");
+    } else if (activeTab === "crescimento") {
+      exportToCSV(growthData.map(d => ({ Mês: d.month, Clientes: d.clients, "Receita (R$)": d.revenue.toFixed(2) })), "relatorio_crescimento_jdtelecom");
+    } else if (activeTab === "inadimplencia") {
+      const inadimplentes = mockClients.filter(c => c.status === "Inadimplente");
+      exportToCSV(inadimplentes.map(c => ({
+        Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan, "Valor (R$)": c.price.toFixed(2), "Cliente desde": c.joinDate,
+      })), "relatorio_inadimplentes_jdtelecom");
+    } else if (activeTab === "planos") {
+      const total = planDistribution.reduce((s, x) => s + x.value, 0);
+      exportToCSV(planDistribution.map(p => ({
+        Plano: p.name, Clientes: p.value, "Participação (%)": ((p.value / total) * 100).toFixed(1),
+      })), "relatorio_planos_jdtelecom");
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Relatórios</h1>
-        <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Análises detalhadas do negócio</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Relatórios</h1>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Análises detalhadas do negócio</p>
+        </div>
+        <Button onClick={handleExportReport} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+          <Download className="w-4 h-4 mr-2" /> Exportar Relatório
+        </Button>
       </div>
 
       {/* Tabs */}

@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Download, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { allPayments, type Payment } from "@/data/adminMockData";
+import { exportToCSV } from "@/utils/exportUtils";
 
 const statusColors = {
   Pago: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -12,31 +14,63 @@ const statusColors = {
 const AdminPayments = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
+  const [monthFilter, setMonthFilter] = useState("Todos");
   const [page, setPage] = useState(0);
   const perPage = 25;
+
+  // Extract unique months for filter
+  const availableMonths = useMemo(() => {
+    const months = [...new Set(allPayments.map(p => {
+      const parts = p.date.split("/");
+      return `${parts[1]}/${parts[2]}`;
+    }))];
+    return months.sort().reverse();
+  }, []);
 
   const filtered = useMemo(() => {
     return allPayments.filter((p) => {
       const matchSearch = !search || p.clientName.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "Todos" || p.status === statusFilter;
-      return matchSearch && matchStatus;
+      const matchMonth = monthFilter === "Todos" || (() => {
+        const parts = p.date.split("/");
+        return `${parts[1]}/${parts[2]}` === monthFilter;
+      })();
+      return matchSearch && matchStatus && matchMonth;
     });
-  }, [search, statusFilter]);
+  }, [search, statusFilter, monthFilter]);
 
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
 
-  const totalPago = allPayments.filter((p) => p.status === "Pago").reduce((s, p) => s + p.amount, 0);
-  const totalPendente = allPayments.filter((p) => p.status === "Pendente").reduce((s, p) => s + p.amount, 0);
-  const totalAtrasado = allPayments.filter((p) => p.status === "Atrasado").reduce((s, p) => s + p.amount, 0);
+  const totalPago = filtered.filter((p) => p.status === "Pago").reduce((s, p) => s + p.amount, 0);
+  const totalPendente = filtered.filter((p) => p.status === "Pendente").reduce((s, p) => s + p.amount, 0);
+  const totalAtrasado = filtered.filter((p) => p.status === "Atrasado").reduce((s, p) => s + p.amount, 0);
 
   const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+  const handleExport = () => {
+    const data = filtered.map(p => ({
+      Cliente: p.clientName,
+      Descrição: p.description,
+      Data: p.date,
+      "Valor (R$)": p.amount.toFixed(2),
+      Status: p.status,
+    }));
+    const suffix = statusFilter !== "Todos" ? `_${statusFilter.toLowerCase()}` : "";
+    const monthSuffix = monthFilter !== "Todos" ? `_${monthFilter.replace("/", "-")}` : "";
+    exportToCSV(data, `pagamentos_jdtelecom${suffix}${monthSuffix}`);
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Pagamentos</h1>
-        <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} registros</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Pagamentos</h1>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} registros</p>
+        </div>
+        <Button onClick={handleExport} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+          <Download className="w-4 h-4 mr-2" /> Exportar Planilha
+        </Button>
       </div>
 
       {/* Summary cards */}
@@ -60,13 +94,21 @@ const AdminPayments = () => {
           <Input placeholder="Buscar por cliente..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 h-10 rounded-xl" />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {["Todos", "Pago", "Pendente", "Atrasado"].map((s) => (
             <button key={s} onClick={() => { setStatusFilter(s); setPage(0); }}
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
                 statusFilter === s ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
               }`}>{s}</button>
           ))}
+        </div>
+        <div className="relative">
+          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))] pointer-events-none" />
+          <select value={monthFilter} onChange={(e) => { setMonthFilter(e.target.value); setPage(0); }}
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            <option value="Todos">Todos os meses</option>
+            {availableMonths.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
         </div>
       </div>
 

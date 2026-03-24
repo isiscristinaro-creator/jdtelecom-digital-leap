@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, ChevronDown, ChevronUp, X, Edit2, UserX as UserXIcon, UserCheck } from "lucide-react";
+import { Search, X, Edit2, UserX as UserXIcon, UserCheck, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockClients, type Client } from "@/data/adminMockData";
+import { exportToCSV } from "@/utils/exportUtils";
 
 const statusColors = {
   Ativo: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -28,11 +29,43 @@ const AdminClients = () => {
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
 
+  const handleExportClients = () => {
+    const data = filtered.map(c => ({
+      Nome: c.name,
+      Email: c.email,
+      Telefone: c.phone,
+      Endereço: c.address,
+      Plano: c.plan,
+      Velocidade: c.speed,
+      "Valor (R$)": c.price.toFixed(2),
+      Status: c.status,
+      "Cliente desde": c.joinDate,
+    }));
+    const suffix = statusFilter !== "Todos" ? `_${statusFilter.toLowerCase()}` : "";
+    exportToCSV(data, `clientes_jdtelecom${suffix}`);
+  };
+
+  const handleExportPayments = () => {
+    if (!selectedClient) return;
+    const data = selectedClient.payments.map(p => ({
+      Descrição: p.description,
+      Data: p.date,
+      "Valor (R$)": p.amount.toFixed(2),
+      Status: p.status,
+    }));
+    exportToCSV(data, `pagamentos_${selectedClient.name.replace(/ /g, "_")}`);
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Clientes</h1>
-        <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} clientes encontrados</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Clientes</h1>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} clientes encontrados</p>
+        </div>
+        <Button onClick={handleExportClients} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+          <Download className="w-4 h-4 mr-2" /> Exportar Planilha
+        </Button>
       </div>
 
       {/* Filters */}
@@ -42,7 +75,7 @@ const AdminClients = () => {
           <Input placeholder="Buscar por nome ou email..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 h-10 rounded-xl" />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {["Todos", "Ativo", "Inadimplente", "Cancelado"].map((s) => (
             <button key={s} onClick={() => { setStatusFilter(s); setPage(0); }}
               className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
@@ -139,7 +172,12 @@ const AdminClients = () => {
 
               {/* Payment history */}
               <div>
-                <p className="text-xs uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-2">Histórico de Pagamentos</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Histórico de Pagamentos</p>
+                  <button onClick={handleExportPayments} className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+                    <Download className="w-3 h-3" /> Exportar
+                  </button>
+                </div>
                 <div className="space-y-1.5">
                   {selectedClient.payments.map((p) => (
                     <div key={p.id} className="flex items-center justify-between text-xs bg-[hsl(var(--dark-section))]/50 rounded-lg px-3 py-2">

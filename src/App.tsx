@@ -15,6 +15,7 @@ import AdminClients from "./pages/admin/AdminClients.tsx";
 import AdminPlans from "./pages/admin/AdminPlans.tsx";
 import AdminPayments from "./pages/admin/AdminPayments.tsx";
 import AdminReports from "./pages/admin/AdminReports.tsx";
+import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
                 <Route path="/admin/planos" element={<AdminPlans />} />
                 <Route path="/admin/pagamentos" element={<AdminPayments />} />
                 <Route path="/admin/relatorios" element={<AdminReports />} />
+                <Route path="/admin/configuracoes" element={<AdminSettings />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
