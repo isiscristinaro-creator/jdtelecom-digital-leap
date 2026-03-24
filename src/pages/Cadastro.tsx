@@ -161,8 +161,8 @@ const Cadastro = () => {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 pb-24">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+      <div className="max-w-[1140px] mx-auto px-4 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           {/* Left - Form */}
           <motion.div
             className="lg:col-span-3"
