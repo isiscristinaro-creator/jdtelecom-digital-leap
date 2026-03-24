@@ -59,11 +59,11 @@ const ServicesSection = () => {
           </motion.div>
 
           {/* Right cards */}
-          <div className="flex gap-5 justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 justify-center">
             {services.map((s, i) => (
               <motion.div
                 key={s.title}
-                className="flex-1 max-w-[220px] rounded-3xl overflow-hidden group cursor-default"
+                className="rounded-3xl overflow-hidden group cursor-default max-w-[280px] sm:max-w-[220px] mx-auto w-full"
                 initial={{ opacity: 0, y: 40 }}
                 animate={isVisible ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: i * 0.15 + 0.3 }}
