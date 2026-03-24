@@ -298,7 +298,7 @@ const SubscriberDashboard = () => {
                 Precisa de ajuda? Fale diretamente com nosso time de suporte.
               </p>
               <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-11"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl h-11"
                 asChild
               >
                 <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer">
