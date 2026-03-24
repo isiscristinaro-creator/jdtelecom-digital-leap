@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { CityProvider } from "@/contexts/CityContext";
+import CitySelector from "@/components/CitySelector";
 import Index from "./pages/Index.tsx";
 import SubscriberLogin from "./pages/SubscriberLogin.tsx";
 import SubscriberDashboard from "./pages/SubscriberDashboard.tsx";
@@ -28,9 +30,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <AdminAuthProvider>
-          <BrowserRouter>
+      <CityProvider>
+        <AuthProvider>
+          <AdminAuthProvider>
+            <CitySelector />
+            <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/cadastro" element={<Cadastro />} />
@@ -50,9 +54,10 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </AdminAuthProvider>
-      </AuthProvider>
+            </BrowserRouter>
+          </AdminAuthProvider>
+        </AuthProvider>
+      </CityProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

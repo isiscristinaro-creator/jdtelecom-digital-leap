@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones } from "lucide-react";
+import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCity } from "@/contexts/CityContext";
 import logo from "@/assets/logo.png";
 
 const Navbar = () => {
@@ -21,12 +22,23 @@ const Navbar = () => {
     { label: "Autoatendimento", href: "#autoatendimento", icon: Headphones },
   ];
 
+  const { selectedCity, setShowCityModal } = useCity();
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
       {/* Top bar - dark, sophisticated */}
       <div className="bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
         <div className="container mx-auto px-4 flex items-center justify-between h-10 text-xs">
           <div className="flex items-center gap-6">
+            {/* City selector */}
+            <button
+              onClick={() => setShowCityModal(true)}
+              className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors font-medium"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              {selectedCity ? `${selectedCity.name} ${selectedCity.state}` : "Selecione sua cidade"}
+            </button>
+            <span className="hidden md:inline text-[hsl(var(--dark-section-muted))]">|</span>
             <a href="tel:08005945678" className="flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <Phone className="w-3 h-3 text-primary" />
               <span className="font-medium">0800 594 5678</span>
