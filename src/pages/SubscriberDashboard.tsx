@@ -183,11 +183,9 @@ const SubscriberDashboard = () => {
                   <Button
                     size="sm"
                     className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold"
-                    asChild
+                    onClick={() => toast.info("Funcionalidade de pagamento online será disponibilizada em breve.")}
                   >
-                    <a href="https://wa.me/558005945678?text=Quero%20pagar%20minha%20fatura" target="_blank" rel="noopener noreferrer">
-                      Pagar agora
-                    </a>
+                    Pagar agora
                   </Button>
                 </div>
               </div>
