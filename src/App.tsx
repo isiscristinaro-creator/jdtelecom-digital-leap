@@ -18,6 +18,7 @@ import AdminReports from "./pages/admin/AdminReports.tsx";
 import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import AdminTeam from "./pages/admin/AdminTeam.tsx";
 import AdminLogs from "./pages/admin/AdminLogs.tsx";
+import Cadastro from "./pages/Cadastro.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
