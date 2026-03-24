@@ -176,7 +176,7 @@ const SubscriberDashboard = () => {
                     <StatusBadge status={subscriber.billing.status} />
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
                   <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))]">
                     {subscriber.billing.amount}
                   </p>
