@@ -236,6 +236,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+      <ExportFinanceiroModal open={financeiroOpen} onOpenChange={setFinanceiroOpen} />
     </div>
   );
 };
