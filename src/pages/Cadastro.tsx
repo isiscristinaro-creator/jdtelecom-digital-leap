@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { User, MessageCircle, Gauge, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import cadastroPerson from "@/assets/cadastro-person.png";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const ESTADOS = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
