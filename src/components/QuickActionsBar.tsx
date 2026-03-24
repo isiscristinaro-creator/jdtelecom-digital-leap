@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const actions = [
   { icon: FileText, label: "Acesse agora a sua 2ª via de fatura.", href: "https://wa.me/558005945678", xp: "+10 XP" },
-  { icon: Gauge, label: "Teste a velocidade de sua Internet.", href: "https://wa.me/558005945678", xp: "+15 XP" },
+  { icon: Gauge, label: "Teste a velocidade de sua Internet.", href: "https://www.speedtest.net/pt", xp: "+15 XP" },
   { icon: Wrench, label: "Contate nosso suporte para reparos.", href: "https://wa.me/558005945678", xp: "+20 XP" },
   { icon: ScrollText, label: "Acesse nosso contrato.", href: "https://wa.me/558005945678", xp: "+5 XP" },
 ];
