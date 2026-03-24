@@ -267,7 +267,7 @@ const SubscriberDashboard = () => {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-[hsl(var(--dark-section-muted))]">{subscriber.email}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))] break-all">{subscriber.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Phone className="w-4 h-4 text-primary shrink-0" />
