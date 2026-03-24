@@ -1,5 +1,9 @@
-export function exportToCSV(data: Record<string, string | number>[], filename: string) {
-  if (!data.length) return;
+import * as XLSX from "xlsx";
+
+type ExportValue = string | number | boolean | null | undefined;
+
+export function exportToCSV(data: Record<string, ExportValue>[], filename: string) {
+  if (!data.length) return false;
   const headers = Object.keys(data[0]);
   const csvRows = [
     headers.join(";"),
@@ -17,55 +21,35 @@ export function exportToCSV(data: Record<string, string | number>[], filename: s
   a.download = `${filename}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+
+  return true;
 }
 
-export function exportToExcel(data: Record<string, string | number>[], filename: string) {
-  if (!data.length) return;
+export function exportToExcel(data: Record<string, ExportValue>[], filename: string) {
+  if (!data.length) return false;
+
   const headers = Object.keys(data[0]);
-  
-  // Build XML Spreadsheet (opens natively in Excel)
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<?mso-application progid="Excel.Sheet"?>\n';
-  xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n';
-  xml += ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n';
-  xml += '<Styles>\n';
-  xml += '<Style ss:ID="header"><Font ss:Bold="1" ss:Size="11"/><Interior ss:Color="#F97316" ss:Pattern="Solid"/><Font ss:Color="#FFFFFF" ss:Bold="1"/></Style>\n';
-  xml += '<Style ss:ID="currency"><NumberFormat ss:Format="#,##0.00"/></Style>\n';
-  xml += '<Style ss:ID="default"><Font ss:Size="10"/></Style>\n';
-  xml += '</Styles>\n';
-  xml += '<Worksheet ss:Name="Dados">\n<Table>\n';
 
-  // Column widths
-  headers.forEach(() => { xml += '<Column ss:AutoFitWidth="1" ss:Width="150"/>\n'; });
+  const normalizedData = data.map((row) => {
+    const normalizedRow: Record<string, string | number | boolean> = {};
 
-  // Header row
-  xml += '<Row>\n';
-  headers.forEach(h => { xml += `<Cell ss:StyleID="header"><Data ss:Type="String">${escapeXml(h)}</Data></Cell>\n`; });
-  xml += '</Row>\n';
-
-  // Data rows
-  data.forEach(row => {
-    xml += '<Row>\n';
-    headers.forEach(h => {
-      const val = row[h];
-      const isNum = typeof val === 'number';
-      const style = isNum ? ' ss:StyleID="currency"' : ' ss:StyleID="default"';
-      xml += `<Cell${style}><Data ss:Type="${isNum ? 'Number' : 'String'}">${isNum ? val : escapeXml(String(val ?? ""))}</Data></Cell>\n`;
+    headers.forEach((header) => {
+      const value = row[header];
+      normalizedRow[header] = value ?? "";
     });
-    xml += '</Row>\n';
+
+    return normalizedRow;
   });
 
-  xml += '</Table>\n</Worksheet>\n</Workbook>';
+  const worksheet = XLSX.utils.json_to_sheet(normalizedData, { header: headers });
+  worksheet["!cols"] = headers.map((header) => {
+    const maxDataWidth = Math.max(...normalizedData.map((row) => String(row[header]).length), header.length);
+    return { wch: Math.min(48, maxDataWidth + 3) };
+  });
 
-  const blob = new Blob([xml], { type: "application/vnd.ms-excel" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${filename}.xls`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Dados");
+  XLSX.writeFile(workbook, `${filename}.xlsx`, { compression: true });
 
-function escapeXml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return true;
 }
