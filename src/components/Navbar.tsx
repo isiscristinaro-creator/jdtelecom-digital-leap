@@ -32,7 +32,7 @@ const Navbar = () => {
               <span className="font-medium">0800 594 5678</span>
             </a>
             <span className="hidden md:inline text-[hsl(var(--dark-section-muted))]">|</span>
-            <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
+            <a href="https://www.speedtest.net/pt" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <Gauge className="w-3 h-3 text-primary" />
               Teste de Velocidade
             </a>
