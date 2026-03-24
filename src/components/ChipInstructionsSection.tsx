@@ -132,10 +132,8 @@ const ChipInstructionsSection = () => {
               key={item.label}
               className="flex items-center gap-2 bg-white/[0.1] backdrop-blur-lg text-primary-foreground/90 text-sm font-medium px-5 py-2.5 rounded-full border border-white/15"
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.18)" }}
-              transition={{ duration: 0.25 }}
               initial={{ opacity: 0, y: 10 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              // @ts-ignore
               transition={{ duration: 0.4, delay: 0.7 + i * 0.1 }}
             >
               <item.icon className="w-4 h-4" />

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCity } from "@/contexts/CityContext";
@@ -6,6 +7,28 @@ import logo from "@/assets/logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleAnchorClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    e.preventDefault();
+    if (location.pathname !== "/") {
+      navigate("/" + hash);
+    } else {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsOpen(false);
+  }, [location.pathname, navigate]);
+
+  const handleLogoClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+    }
+  }, [location.pathname, navigate]);
 
   const navLinks = [
     { label: "Home", href: "#inicio" },
@@ -48,11 +71,11 @@ const Navbar = () => {
               <Gauge className="w-3 h-3 text-primary" />
               Teste de Velocidade
             </a>
-            <a href="#autoatendimento" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
+            <a href="#autoatendimento" onClick={(e) => handleAnchorClick(e, "#autoatendimento")} className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <FileText className="w-3 h-3 text-primary" />
               2ª Via da Fatura
             </a>
-            <a href="#contato" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
+            <a href="#contato" onClick={(e) => handleAnchorClick(e, "#contato")} className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <PhoneCall className="w-3 h-3 text-primary" />
               Ligamos para você
             </a>
@@ -72,7 +95,7 @@ const Navbar = () => {
       {/* Main nav */}
       <div className="bg-background border-b border-border">
         <div className="container mx-auto px-4 flex items-center justify-between h-16 md:h-[68px]">
-          <a href="/" className="shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <a href="/" className="shrink-0" onClick={handleLogoClick}>
             <img src={logo} alt="JD Telecom" className="h-10 md:h-12 w-auto" />
           </a>
 
@@ -81,6 +104,7 @@ const Navbar = () => {
               <a
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
                 {link.label}
@@ -90,7 +114,7 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center gap-3">
             <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full px-5 text-xs font-bold" asChild>
-              <a href="#planos">Assine já</a>
+              <a href="#planos" onClick={(e) => handleAnchorClick(e, "#planos")}>Assine já</a>
             </Button>
             <Button size="sm" className="bg-[hsl(var(--navbar-bg))] text-[hsl(var(--navbar-fg))] hover:bg-[hsl(var(--navbar-bg))]/90 rounded-full px-5 text-xs font-bold" asChild>
               <a href="/assinante">
@@ -114,6 +138,7 @@ const Navbar = () => {
               <a
                 key={link.label}
                 href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
                 className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 <link.icon className="w-3.5 h-3.5" />
@@ -132,7 +157,7 @@ const Navbar = () => {
               key={link.href}
               href={link.href}
               className="block py-3 text-sm font-medium text-foreground hover:text-primary transition-colors border-b border-border/50"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => handleAnchorClick(e, link.href)}
             >
               {link.label}
             </a>
@@ -143,7 +168,7 @@ const Navbar = () => {
                 key={link.label}
                 href={link.href}
                 className="flex items-center gap-2 text-xs text-primary py-2"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleAnchorClick(e, link.href)}
               >
                 <link.icon className="w-3.5 h-3.5" />
                 {link.label}
@@ -151,7 +176,7 @@ const Navbar = () => {
             ))}
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="outline" size="sm" className="border-primary text-primary rounded-full" asChild><a href="#planos" onClick={() => setIsOpen(false)}>Assine já</a></Button>
+            <Button variant="outline" size="sm" className="border-primary text-primary rounded-full" asChild><a href="#planos" onClick={(e) => handleAnchorClick(e, "#planos")}>Assine já</a></Button>
             <Button size="sm" className="bg-primary text-primary-foreground rounded-full" asChild>
               <a href="/assinante">
                 <User className="w-4 h-4 mr-1" /> Área do Cliente
