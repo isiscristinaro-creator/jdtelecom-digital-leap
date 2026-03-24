@@ -189,15 +189,18 @@ const PlansSection = () => {
                     </div>
                   </div>
 
-                  {/* CTA */}
-                  <Button
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-sm py-5 rounded-xl"
-                    asChild
-                  >
-                    <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer">
-                      Aproveitar oferta
-                    </a>
-                  </Button>
+              {/* CTA */}
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
+                    <Button
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-sm py-5 rounded-xl relative overflow-hidden group/btn"
+                      asChild
+                    >
+                      <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer">
+                        <span className="relative z-10">Aproveitar oferta</span>
+                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/10 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700" />
+                      </a>
+                    </Button>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
