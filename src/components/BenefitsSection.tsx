@@ -22,7 +22,7 @@ const BenefitsSection = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-primary/[0.02] blur-[80px] pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10" ref={ref}>
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
           {/* Left content */}
           <div>
             <motion.div
@@ -39,7 +39,7 @@ const BenefitsSection = () => {
               >
                 DIFERENCIAIS
               </motion.span>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-6 leading-[1.05]">
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-6 leading-[1.05]">
                 Por que escolher a{" "}
                 <span className="text-gradient">JD Telecom</span>?
               </h2>
@@ -52,7 +52,7 @@ const BenefitsSection = () => {
               {benefits.map((b, i) => (
                 <motion.div
                   key={b.title}
-                  className="flex gap-5 p-6 rounded-2xl bg-background border border-border/50 relative overflow-hidden group cursor-default"
+                  className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 p-5 sm:p-6 rounded-2xl bg-background border border-border/50 relative overflow-hidden group cursor-default"
                   style={{
                     boxShadow: "0 2px 12px hsl(0 0% 0% / 0.04), 0 1px 3px hsl(0 0% 0% / 0.06)"
                   }}
@@ -60,7 +60,8 @@ const BenefitsSection = () => {
                   animate={isVisible ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.5, delay: i * 0.1 + 0.2 }}
                   whileHover={{
-                    x: 8,
+                    y: -4,
+                    scale: 1.01,
                     boxShadow: "0 8px 30px hsl(24 95% 50% / 0.12), 0 2px 8px hsl(0 0% 0% / 0.08)",
                     borderColor: "hsl(24 95% 50% / 0.3)",
                   }}
@@ -72,11 +73,11 @@ const BenefitsSection = () => {
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/0 group-hover:bg-primary rounded-r-full transition-all duration-500" />
 
                   {/* Icon circle */}
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 relative z-10 group-hover:from-primary/25 group-hover:to-primary/10 group-hover:shadow-lg group-hover:shadow-primary/10 transition-all duration-500">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 relative z-10 group-hover:from-primary/25 group-hover:to-primary/10 group-hover:shadow-lg group-hover:shadow-primary/10 transition-all duration-500 mx-auto sm:mx-0">
                     <b.icon className="w-6 h-6 text-primary" />
                   </div>
                   
-                  <div className="relative z-10">
+                  <div className="relative z-10 text-center sm:text-left">
                     <h3 className="font-display font-bold text-foreground text-base mb-1.5">{b.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{b.description}</p>
                   </div>
