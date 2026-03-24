@@ -164,12 +164,12 @@ const SubscriberDashboard = () => {
             {/* Billing card */}
             <Card>
               <CardHeader icon={CreditCard} title="Faturamento" />
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[hsl(var(--dark-section))]/50 rounded-xl p-4">
+              <div className="flex flex-col gap-3 bg-[hsl(var(--dark-section))]/50 rounded-xl p-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">
                     Próxima fatura — {subscriber.billing.nextDue}
                   </p>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--dark-section-muted))]">
                       <Calendar className="w-3.5 h-3.5" />
                       Vencimento: {subscriber.billing.dueDate}
@@ -177,7 +177,7 @@ const SubscriberDashboard = () => {
                     <StatusBadge status={subscriber.billing.status} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
                   <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))]">
                     {subscriber.billing.amount}
                   </p>
