@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, Download, Calendar } from "lucide-react";
+import { Search, Download, Calendar, FileSpreadsheet } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { allPayments, type Payment } from "@/data/adminMockData";
-import { exportToCSV } from "@/utils/exportUtils";
+import { allPayments, mockPlans, type Payment } from "@/data/adminMockData";
+import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 
 const statusColors = {
   Pago: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -15,10 +15,12 @@ const AdminPayments = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [monthFilter, setMonthFilter] = useState("Todos");
+  const [planFilter, setPlanFilter] = useState("Todos");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(0);
   const perPage = 25;
 
-  // Extract unique months for filter
   const availableMonths = useMemo(() => {
     const months = [...new Set(allPayments.map(p => {
       const parts = p.date.split("/");
@@ -26,6 +28,11 @@ const AdminPayments = () => {
     }))];
     return months.sort().reverse();
   }, []);
+
+  const parseDate = (dateStr: string) => {
+    const [d, m, y] = dateStr.split("/").map(Number);
+    return new Date(y, m - 1, d);
+  };
 
   const filtered = useMemo(() => {
     return allPayments.filter((p) => {
@@ -35,9 +42,23 @@ const AdminPayments = () => {
         const parts = p.date.split("/");
         return `${parts[1]}/${parts[2]}` === monthFilter;
       })();
-      return matchSearch && matchStatus && matchMonth;
+      const matchPlan = planFilter === "Todos" || p.description.toLowerCase().includes(planFilter.toLowerCase());
+      
+      let matchDateRange = true;
+      if (dateFrom) {
+        const pDate = parseDate(p.date);
+        const from = new Date(dateFrom);
+        if (pDate < from) matchDateRange = false;
+      }
+      if (dateTo) {
+        const pDate = parseDate(p.date);
+        const to = new Date(dateTo);
+        if (pDate > to) matchDateRange = false;
+      }
+      
+      return matchSearch && matchStatus && matchMonth && matchPlan && matchDateRange;
     });
-  }, [search, statusFilter, monthFilter]);
+  }, [search, statusFilter, monthFilter, planFilter, dateFrom, dateTo]);
 
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
@@ -48,18 +69,23 @@ const AdminPayments = () => {
 
   const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const handleExport = () => {
-    const data = filtered.map(p => ({
-      Cliente: p.clientName,
-      Descrição: p.description,
-      Data: p.date,
-      "Valor (R$)": p.amount.toFixed(2),
-      Status: p.status,
-    }));
-    const suffix = statusFilter !== "Todos" ? `_${statusFilter.toLowerCase()}` : "";
-    const monthSuffix = monthFilter !== "Todos" ? `_${monthFilter.replace("/", "-")}` : "";
-    exportToCSV(data, `pagamentos_jdtelecom${suffix}${monthSuffix}`);
+  const buildExportData = () => filtered.map(p => ({
+    Cliente: p.clientName,
+    Descrição: p.description,
+    Data: p.date,
+    "Valor (R$)": p.amount,
+    Status: p.status,
+  }));
+
+  const buildSuffix = () => {
+    let s = "";
+    if (statusFilter !== "Todos") s += `_${statusFilter.toLowerCase()}`;
+    if (monthFilter !== "Todos") s += `_${monthFilter.replace("/", "-")}`;
+    return s;
   };
+
+  const handleExportCSV = () => exportToCSV(buildExportData().map(d => ({ ...d, "Valor (R$)": d["Valor (R$)"].toFixed(2) })), `pagamentos_jdtelecom${buildSuffix()}`);
+  const handleExportExcel = () => exportToExcel(buildExportData(), `pagamentos_jdtelecom${buildSuffix()}`);
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[1400px]">
@@ -68,9 +94,14 @@ const AdminPayments = () => {
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Pagamentos</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} registros</p>
         </div>
-        <Button onClick={handleExport} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
-          <Download className="w-4 h-4 mr-2" /> Exportar Planilha
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl font-bold text-sm">
+            <Download className="w-4 h-4 mr-2" /> CSV
+          </Button>
+          <Button onClick={handleExportExcel} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+            <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
+          </Button>
+        </div>
       </div>
 
       {/* Summary cards */}
@@ -88,27 +119,45 @@ const AdminPayments = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))]" />
-          <Input placeholder="Buscar por cliente..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 h-10 rounded-xl" />
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))]" />
+            <Input placeholder="Buscar por cliente..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+              className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 h-10 rounded-xl" />
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {["Todos", "Pago", "Pendente", "Atrasado"].map((s) => (
+              <button key={s} onClick={() => { setStatusFilter(s); setPage(0); }}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                  statusFilter === s ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
+                }`}>{s}</button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {["Todos", "Pago", "Pendente", "Atrasado"].map((s) => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(0); }}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
-                statusFilter === s ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
-              }`}>{s}</button>
-          ))}
-        </div>
-        <div className="relative">
-          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))] pointer-events-none" />
-          <select value={monthFilter} onChange={(e) => { setMonthFilter(e.target.value); setPage(0); }}
-            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
-            <option value="Todos">Todos os meses</option>
-            {availableMonths.map(m => <option key={m} value={m}>{m}</option>)}
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative">
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))] pointer-events-none" />
+            <select value={monthFilter} onChange={(e) => { setMonthFilter(e.target.value); setPage(0); }}
+              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+              <option value="Todos">Todos os meses</option>
+              {availableMonths.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
+          <select value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(0); }}
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            <option value="Todos">Todos os planos</option>
+            {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
           </select>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">De:</span>
+            <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(0); }}
+              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs" />
+            <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">Até:</span>
+            <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(0); }}
+              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs" />
+          </div>
         </div>
       </div>
 
@@ -143,10 +192,8 @@ const AdminPayments = () => {
         <div className="flex items-center justify-between px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
           <p className="text-xs text-[hsl(var(--dark-section-muted))]">Página {page + 1} de {totalPages}</p>
           <div className="flex gap-2">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)}
-              className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Anterior</button>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}
-              className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Próxima</button>
+            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Anterior</button>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="px-3 py-1.5 rounded-lg text-xs text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))] disabled:opacity-30">Próxima</button>
           </div>
         </div>
       </div>
