@@ -1,56 +1,68 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { MapPin, Activity, Headphones } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
 
 const stats = [
-  { value: "11+", label: "Cidades atendidas no AM e PA", icon: MapPin },
-  { value: "99.5%", label: "Uptime garantido para sua conexão", icon: Activity },
-  { value: "24/7", label: "Suporte técnico disponível sempre", icon: Headphones },
+  { value: 11, suffix: "+", label: "Cidades atendidas no AM e PA", icon: MapPin },
+  { value: 99.5, suffix: "%", label: "Uptime garantido para sua conexão", icon: Activity, decimal: true },
+  { value: 24, suffix: "/7", label: "Suporte técnico disponível sempre", icon: Headphones },
 ];
+
+const AnimatedCounter = ({ value, suffix, decimal, isVisible }: { value: number; suffix: string; decimal?: boolean; isVisible: boolean }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    let start = 0;
+    const end = value;
+    const duration = 2000;
+    const startTime = Date.now();
+
+    const tick = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(decimal ? parseFloat((eased * end).toFixed(1)) : Math.floor(eased * end));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    tick();
+  }, [isVisible, value, decimal]);
+
+  return (
+    <span>
+      {decimal ? count.toFixed(1) : count}{suffix}
+    </span>
+  );
+};
 
 const StatsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section className="bg-dark-section py-16 relative overflow-hidden" ref={ref}>
-      {/* Animated accent line */}
-      <motion.div
-        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"
-        animate={{ opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
+    <section className="bg-dark-section py-0 relative overflow-hidden" ref={ref}>
+      {/* Top gradient line */}
+      <div className="h-1 bg-gradient-to-r from-primary via-[hsl(15,90%,45%)] to-primary" />
 
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+      <div className="container mx-auto px-4 py-14">
+        <div className="grid md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-[hsl(var(--dark-section-border))]">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="flex items-center gap-5 group"
-              initial={{ opacity: 0, y: 20 }}
+              className="flex flex-col items-center text-center py-8 md:py-0 px-6"
+              initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
+              transition={{ duration: 0.6, delay: i * 0.2 }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
-                <stat.icon className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                <stat.icon className="w-7 h-7 text-primary" />
               </div>
-              <div>
-                <motion.p
-                  className="font-display text-3xl md:text-4xl font-extrabold text-primary mb-0.5"
-                  initial={{ scale: 0.8 }}
-                  animate={isVisible ? { scale: 1 } : {}}
-                  transition={{ duration: 0.4, delay: i * 0.15 + 0.2, type: "spring" }}
-                >
-                  {stat.value}
-                </motion.p>
-                <p className="text-[hsl(var(--dark-section-muted))] text-sm leading-snug">
-                  {stat.label}
-                </p>
-              </div>
+              <p className="font-display text-4xl md:text-5xl font-extrabold text-primary mb-2">
+                <AnimatedCounter value={stat.value} suffix={stat.suffix} decimal={stat.decimal} isVisible={isVisible} />
+              </p>
+              <p className="text-[hsl(var(--dark-section-muted))] text-sm max-w-[200px]">
+                {stat.label}
+              </p>
             </motion.div>
           ))}
         </div>
