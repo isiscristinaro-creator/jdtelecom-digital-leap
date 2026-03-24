@@ -188,32 +188,36 @@ const AdminPayments = () => {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))] pointer-events-none" />
             <select value={monthFilter} onChange={(e) => { setMonthFilter(e.target.value); setPage(0); }}
-              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 pr-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full">
               <option value="Todos">Todos os meses</option>
               {availableMonths.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
           <select value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(0); }}
-            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full">
             <option value="Todos">Todos os planos</option>
             {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
           </select>
           <select value={clientFilter} onChange={e => { setClientFilter(e.target.value); setPage(0); }}
-            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full">
             <option value="Todos">Todos os clientes</option>
             {availableClients.map(client => <option key={client.id} value={client.id}>{client.name}</option>)}
           </select>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">De:</span>
-            <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(0); }}
-              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs" />
-            <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">Até:</span>
-            <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(0); }}
-              className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">De:</span>
+              <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(0); }}
+                className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs w-full" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">Até:</span>
+              <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(0); }}
+                className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-10 rounded-xl text-xs w-full" />
+            </div>
           </div>
         </div>
       </div>
