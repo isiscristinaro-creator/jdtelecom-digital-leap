@@ -270,9 +270,8 @@ const SubscriberDashboard = () => {
                   </div>
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={() => setEditMode(true)}
-                    className="w-full mt-2 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/10 hover:border-primary rounded-xl"
+                    className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl h-10"
                   >
                     Editar dados
                   </Button>
