@@ -16,10 +16,17 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display font-semibold text-[hsl(var(--dark-section-fg))]">Links Rápidos</h4>
             <ul className="space-y-2">
-              {["Início", "Planos", "Benefícios", "Cobertura", "Contato"].map((l) => (
-                <li key={l}>
-                  <a href={`#${l.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`} className="text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors">
-                    {l}
+              {[
+                { label: "Início", href: "#inicio" },
+                { label: "Planos", href: "#planos" },
+                { label: "Benefícios", href: "#beneficios" },
+                { label: "Cobertura", href: "#cobertura" },
+                { label: "Autoatendimento", href: "#autoatendimento" },
+                { label: "Contato", href: "#contato" },
+              ].map((l) => (
+                <li key={l.label}>
+                  <a href={l.href} className="text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors">
+                    {l.label}
                   </a>
                 </li>
               ))}
@@ -47,10 +54,10 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display font-semibold text-[hsl(var(--dark-section-fg))]">Serviços</h4>
             <ul className="space-y-2 text-sm text-[hsl(var(--dark-section-muted))]">
-              <li>Internet Fibra Óptica</li>
-              <li>Móvel 4G/5G</li>
-              <li>Telefonia Fixa</li>
-              <li>TV por Assinatura</li>
+              <li><a href="#planos" className="hover:text-primary transition-colors">Internet Fibra Óptica</a></li>
+              <li><a href="#chip" className="hover:text-primary transition-colors">Móvel 4G/5G</a></li>
+              <li><a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Telefonia Fixa</a></li>
+              <li><a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">TV por Assinatura</a></li>
             </ul>
           </div>
         </div>

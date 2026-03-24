@@ -1,15 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Check, Zap, Phone, MessageCircle, Wifi } from "lucide-react";
+import { Check, Wifi } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { motion } from "framer-motion";
-import { useState } from "react";
-
-const tabs = [
-  { id: "destaques", label: "Destaques" },
-  { id: "internet", label: "Internet" },
-  { id: "movel", label: "Móvel 5G" },
-];
-
 const plans = [
   {
     speed: "400",
@@ -59,10 +51,7 @@ const plans = [
 
 const PlansSection = () => {
   const { ref, isVisible } = useScrollAnimation();
-  const [activeTab, setActiveTab] = useState("destaques");
 
-  // Show all plans for "destaques", filter for others
-  const filteredPlans = activeTab === "destaques" ? plans : plans.filter((p) => p.category === activeTab || p.category === "destaques");
 
   return (
     <section id="planos" className="bg-dark-section py-20 md:py-28 relative overflow-hidden">
@@ -79,43 +68,12 @@ const PlansSection = () => {
           </h2>
         </motion.div>
 
-        {/* Tabs */}
-        <motion.div
-          className="mb-10"
-          initial={{ opacity: 0, y: 10 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="border-b border-[hsl(var(--dark-section-border))]">
-            <div className="flex gap-6">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`pb-3 text-sm font-semibold transition-colors relative ${
-                    activeTab === tab.id
-                      ? "text-primary"
-                      : "text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]"
-                  }`}
-                >
-                  {tab.label}
-                  {activeTab === tab.id && (
-                    <motion.div
-                      layoutId="plans-tab-indicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
-                    />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
 
         {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 max-w-6xl mx-auto">
-          {filteredPlans.map((plan, i) => (
+          {plans.map((plan, i) => (
             <motion.div
-              key={plan.speed + activeTab}
+              key={plan.speed}
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}

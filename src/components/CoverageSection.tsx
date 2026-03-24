@@ -73,6 +73,28 @@ const CoverageSection = () => {
               }} />
 
               <svg viewBox="0 0 100 100" className="w-full h-auto relative z-10" style={{ minHeight: 300 }}>
+                {/* Simplified AM + PA state silhouettes */}
+                {/* Amazonas silhouette */}
+                <path
+                  d="M5,20 L12,12 L22,10 L30,14 L35,10 L40,15 L38,25 L42,35 L38,45 L30,50 L22,48 L15,42 L8,35 L5,28 Z"
+                  fill="hsl(24 95% 50% / 0.06)"
+                  stroke="hsl(24 95% 50% / 0.15)"
+                  strokeWidth="0.3"
+                />
+                {/* Pará silhouette */}
+                <path
+                  d="M40,15 L50,10 L60,12 L72,15 L80,20 L85,30 L82,42 L78,55 L70,65 L60,70 L50,68 L42,60 L38,50 L42,35 L40,25 Z"
+                  fill="hsl(24 95% 50% / 0.06)"
+                  stroke="hsl(24 95% 50% / 0.15)"
+                  strokeWidth="0.3"
+                />
+                {/* Southern PA extension (Redenção area) */}
+                <path
+                  d="M60,70 L65,78 L70,90 L62,92 L55,85 L50,75 L50,68 Z"
+                  fill="hsl(24 95% 50% / 0.04)"
+                  stroke="hsl(24 95% 50% / 0.12)"
+                  strokeWidth="0.3"
+                />
                 {/* Connection lines between cities */}
                 {cities.map((city, i) => {
                   const pos = toSvg(city.lat, city.lng);
