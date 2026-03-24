@@ -2,6 +2,7 @@ import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
   UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   totalClients, activeClients, inadimplenteClients, canceledClients,
   mrr, totalRevenue, ticketMedio, forecastRevenue,
@@ -52,17 +53,23 @@ const AdminDashboard = () => {
   ];
 
   const handleExportClients = () => {
-    exportToCSV(mockClients.map(c => ({
+    const data = mockClients.map(c => ({
       Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan,
       "Valor (R$)": c.price.toFixed(2), Status: c.status, "Cliente desde": c.joinDate,
-    })), "clientes_completo_jdtelecom");
+    }));
+    if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
+    exportToCSV(data, "clientes_completo_jdtelecom");
+    toast.success(`${data.length} clientes exportados com sucesso`);
   };
 
   const handleExportFinanceiro = () => {
-    exportToCSV(allPayments.map(p => ({
+    const data = allPayments.map(p => ({
       Cliente: p.clientName, Descrição: p.description, Data: p.date,
       "Valor (R$)": p.amount.toFixed(2), Status: p.status,
-    })), "financeiro_completo_jdtelecom");
+    }));
+    if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
+    exportToCSV(data, "financeiro_completo_jdtelecom");
+    toast.success(`${data.length} registros financeiros exportados com sucesso`);
   };
 
   return (
@@ -73,8 +80,8 @@ const AdminDashboard = () => {
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button onClick={handleExportClients} variant="outline" size="sm"
-            className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/10 rounded-xl text-xs">
+          <Button onClick={handleExportClients} size="sm"
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/20 rounded-xl text-xs">
             <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Clientes
           </Button>
           <Button onClick={handleExportFinanceiro} size="sm"
