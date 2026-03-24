@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Check, Zap, Phone, MessageCircle, Wifi } from "lucide-react";
+import { Check, Wifi } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { motion } from "framer-motion";
-import { useState } from "react";
-
 const tabs = [
   { id: "destaques", label: "Destaques" },
   { id: "internet", label: "Internet" },
