@@ -157,7 +157,7 @@ const Navbar = () => {
               key={link.href}
               href={link.href}
               className="block py-3 text-sm font-medium text-foreground hover:text-primary transition-colors border-b border-border/50"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => handleAnchorClick(e, link.href)}
             >
               {link.label}
             </a>
