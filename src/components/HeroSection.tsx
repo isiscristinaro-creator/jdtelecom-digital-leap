@@ -9,101 +9,92 @@ const SWIPE_THRESHOLD = 50;
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const dragStartX = useRef<number | null>(null);
   const didSwipe = useRef(false);
 
   const goTo = useCallback((index: number) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setCurrent(index);
-  }, []);
+    setTimeout(() => setIsTransitioning(false), 600);
+  }, [isTransitioning]);
 
   const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % banners.length);
-  }, []);
+    goTo((current + 1) % banners.length);
+  }, [current, goTo]);
 
   const prev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
-  }, []);
+    goTo((current - 1 + banners.length) % banners.length);
+  }, [current, goTo]);
 
   useEffect(() => {
-    const timer = setInterval(next, 5000);
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % banners.length);
+    }, 5000);
     return () => clearInterval(timer);
-  }, [next]);
+  }, []);
 
   const finishDrag = (clientX: number) => {
     if (dragStartX.current === null) return;
-
     const delta = clientX - dragStartX.current;
     if (Math.abs(delta) > SWIPE_THRESHOLD) {
       didSwipe.current = true;
       if (delta < 0) next();
       else prev();
     }
-
     dragStartX.current = null;
-    requestAnimationFrame(() => {
-      didSwipe.current = false;
-    });
-  };
-
-  const handleBannerClick = (direction: "prev" | "next") => {
-    if (didSwipe.current) return;
-    if (direction === "prev") prev();
-    else next();
+    requestAnimationFrame(() => { didSwipe.current = false; });
   };
 
   return (
-    <section id="inicio" className="pt-[136px] md:pt-[172px]">
-      <div className="relative w-full group bg-primary">
+    <section id="inicio" className="pt-[100px] md:pt-[140px]">
+      <div className="relative w-full group">
         <div
-          className="relative w-full select-none touch-pan-y"
-          onPointerDown={(e) => {
-            dragStartX.current = e.clientX;
-          }}
+          className="relative w-full select-none touch-pan-y overflow-hidden"
+          onPointerDown={(e) => { dragStartX.current = e.clientX; }}
           onPointerUp={(e) => finishDrag(e.clientX)}
           onPointerLeave={(e) => finishDrag(e.clientX)}
-          onPointerCancel={() => {
-            dragStartX.current = null;
-          }}
+          onPointerCancel={() => { dragStartX.current = null; }}
         >
-          {banners.map((src, i) => (
-            <div key={i} className={i === current ? "block" : "hidden"}>
-              <img
-                src={src}
-                alt={`JD Telecom Banner ${i + 1}`}
-                className="w-full h-auto block"
-                loading={i === 0 ? "eager" : "lazy"}
-                draggable={false}
-              />
-            </div>
-          ))}
-
-          {/* Click zones */}
-          <button
-            onClick={() => handleBannerClick("prev")}
-            className="absolute left-0 top-0 h-full w-1/2 z-10"
-            aria-label="Ir para o banner anterior"
-          />
-          <button
-            onClick={() => handleBannerClick("next")}
-            className="absolute right-0 top-0 h-full w-1/2 z-10"
-            aria-label="Ir para o próximo banner"
-          />
+          {/* Slide track */}
+          <div
+            className="flex transition-transform duration-600 ease-in-out"
+            style={{
+              width: `${banners.length * 100}%`,
+              transform: `translateX(-${current * (100 / banners.length)}%)`,
+              transitionDuration: "600ms",
+              transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            {banners.map((src, i) => (
+              <div key={i} className="w-full shrink-0">
+                <img
+                  src={src}
+                  alt={`JD Telecom Banner ${i + 1}`}
+                  className="w-full h-auto block"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Arrows */}
         <button
           onClick={prev}
-          className="absolute z-20 left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-foreground/20 backdrop-blur-sm text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary hover:text-primary-foreground"
+          className="absolute z-20 left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary"
           aria-label="Banner anterior"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           onClick={next}
-          className="absolute z-20 right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-foreground/20 backdrop-blur-sm text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary hover:text-primary-foreground"
+          className="absolute z-20 right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary"
           aria-label="Próximo banner"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-5 h-5" />
         </button>
 
         {/* Dots */}
@@ -112,8 +103,8 @@ const HeroSection = () => {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`h-2.5 rounded-full transition-all duration-500 ${
-                i === current ? "w-8 bg-primary-foreground" : "w-2.5 bg-primary-foreground/40 hover:bg-primary-foreground/60"
+              className={`h-2.5 rounded-full transition-all duration-400 ${
+                i === current ? "w-8 bg-white" : "w-2.5 bg-white/40 hover:bg-white/70"
               }`}
               aria-label={`Banner ${i + 1}`}
             />
