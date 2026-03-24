@@ -101,7 +101,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Ver Inadimplentes", action: () => navigate("/admin/clientes"), icon: AlertTriangle, color: "text-amber-400 bg-amber-500/10" },
           { label: "Gerenciar Planos", action: () => navigate("/admin/planos"), icon: Package, color: "text-primary bg-primary/10" },
