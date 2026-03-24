@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useState } from "react";
 import {
-  LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings
+  LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -12,6 +12,8 @@ const navItems = [
   { label: "Planos", href: "/admin/planos", icon: Package },
   { label: "Pagamentos", href: "/admin/pagamentos", icon: CreditCard },
   { label: "Relatórios", href: "/admin/relatorios", icon: BarChart3 },
+  { label: "Equipe", href: "/admin/equipe", icon: UsersRound },
+  { label: "Logs", href: "/admin/logs", icon: ScrollText },
   { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
 ];
 

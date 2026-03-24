@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
-import { growthData, planDistribution, mockClients, allPayments } from "@/data/adminMockData";
-import { exportToCSV } from "@/utils/exportUtils";
+import { growthData, planDistribution, mockClients, mockPlans, allPayments } from "@/data/adminMockData";
+import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 
 const COLORS = ["hsl(24,95%,50%)", "hsl(15,90%,42%)", "hsl(350,80%,55%)", "hsl(40,90%,50%)", "hsl(200,80%,50%)"];
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -17,6 +17,12 @@ const tabs = [
   { id: "crescimento", label: "Crescimento" },
   { id: "inadimplencia", label: "Inadimplência" },
   { id: "planos", label: "Planos" },
+];
+
+const periods = [
+  { id: "all", label: "Tudo" },
+  { id: "3m", label: "3 meses" },
+  { id: "6m", label: "6 meses" },
 ];
 
 const inadData = [
@@ -30,23 +36,43 @@ const inadData = [
 
 const AdminReports = () => {
   const [activeTab, setActiveTab] = useState("receita");
+  const [period, setPeriod] = useState("all");
+  const [planFilter, setPlanFilter] = useState("Todos");
 
-  const handleExportReport = () => {
+  const sliceData = <T,>(data: T[]) => {
+    if (period === "3m") return data.slice(-3);
+    if (period === "6m") return data.slice(-6);
+    return data;
+  };
+
+  const getExportData = () => {
     if (activeTab === "receita") {
-      exportToCSV(growthData.map(d => ({ Mês: d.month, "Receita (R$)": d.revenue.toFixed(2), Clientes: d.clients })), "relatorio_receita_jdtelecom");
+      return sliceData(growthData).map(d => ({ Mês: d.month, "Receita (R$)": d.revenue, Clientes: d.clients }));
     } else if (activeTab === "crescimento") {
-      exportToCSV(growthData.map(d => ({ Mês: d.month, Clientes: d.clients, "Receita (R$)": d.revenue.toFixed(2) })), "relatorio_crescimento_jdtelecom");
+      return sliceData(growthData).map(d => ({ Mês: d.month, Clientes: d.clients, "Receita (R$)": d.revenue }));
     } else if (activeTab === "inadimplencia") {
       const inadimplentes = mockClients.filter(c => c.status === "Inadimplente");
-      exportToCSV(inadimplentes.map(c => ({
-        Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan, "Valor (R$)": c.price.toFixed(2), "Cliente desde": c.joinDate,
-      })), "relatorio_inadimplentes_jdtelecom");
-    } else if (activeTab === "planos") {
+      return inadimplentes.map(c => ({
+        Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan, "Valor (R$)": c.price, "Cliente desde": c.joinDate,
+      }));
+    } else {
       const total = planDistribution.reduce((s, x) => s + x.value, 0);
-      exportToCSV(planDistribution.map(p => ({
-        Plano: p.name, Clientes: p.value, "Participação (%)": ((p.value / total) * 100).toFixed(1),
-      })), "relatorio_planos_jdtelecom");
+      return planDistribution.map(p => ({
+        Plano: p.name, Clientes: p.value, "Participação (%)": Number(((p.value / total) * 100).toFixed(1)),
+      }));
     }
+  };
+
+  const tabLabel = tabs.find(t => t.id === activeTab)?.label ?? "";
+
+  const handleExportExcel = () => exportToExcel(getExportData(), `relatorio_${activeTab}_jdtelecom`);
+  const handleExportCSV = () => {
+    const data = getExportData().map(row => {
+      const out: Record<string, string | number> = {};
+      Object.entries(row).forEach(([k, v]) => { out[k] = typeof v === "number" ? (v as number).toFixed(2) : String(v); });
+      return out;
+    });
+    exportToCSV(data, `relatorio_${activeTab}_jdtelecom`);
   };
 
   return (
@@ -56,19 +82,39 @@ const AdminReports = () => {
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Relatórios</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Análises detalhadas do negócio</p>
         </div>
-        <Button onClick={handleExportReport} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
-          <Download className="w-4 h-4 mr-2" /> Exportar Relatório
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl font-bold text-sm">
+            <Download className="w-4 h-4 mr-2" /> CSV
+          </Button>
+          <Button onClick={handleExportExcel} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+            <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
+          </Button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {tabs.map((t) => (
-          <button key={t.id} onClick={() => setActiveTab(t.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-              activeTab === t.id ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
-            }`}>{t.label}</button>
-        ))}
+      {/* Tabs + Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-between">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {tabs.map((t) => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                activeTab === t.id ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
+              }`}>{t.label}</button>
+          ))}
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {periods.map(p => (
+            <button key={p.id} onClick={() => setPeriod(p.id)}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${period === p.id ? "bg-primary/20 text-primary border-primary/40" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"}`}>
+              {p.label}
+            </button>
+          ))}
+          <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-3 h-9 rounded-xl text-xs font-semibold appearance-none cursor-pointer">
+            <option value="Todos">Todos os planos</option>
+            {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+          </select>
+        </div>
       </div>
 
       {/* Content */}
@@ -77,7 +123,7 @@ const AdminReports = () => {
           <div>
             <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-6">Receita por Período</h3>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={growthData}>
+              <BarChart data={sliceData(growthData)}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
                 <XAxis dataKey="month" tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
                 <YAxis tickFormatter={fmtK} tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
@@ -86,7 +132,7 @@ const AdminReports = () => {
               </BarChart>
             </ResponsiveContainer>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-              {growthData.slice(-4).map((d) => (
+              {sliceData(growthData).slice(-4).map((d) => (
                 <div key={d.month} className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 text-center">
                   <p className="text-xs text-[hsl(var(--dark-section-muted))]">{d.month}</p>
                   <p className="font-display font-bold text-[hsl(var(--dark-section-fg))]">{fmt(d.revenue)}</p>
@@ -100,7 +146,7 @@ const AdminReports = () => {
           <div>
             <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-6">Crescimento de Clientes</h3>
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={growthData}>
+              <LineChart data={sliceData(growthData)}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
                 <XAxis dataKey="month" tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
                 <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
@@ -115,7 +161,7 @@ const AdminReports = () => {
           <div>
             <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-6">Taxa de Inadimplência (%)</h3>
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={inadData}>
+              <LineChart data={sliceData(inadData)}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
                 <XAxis dataKey="month" tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
                 <YAxis unit="%" tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
