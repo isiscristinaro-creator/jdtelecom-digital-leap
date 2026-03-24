@@ -10,6 +10,7 @@ import {
   Phone, Mail, MapPin, Zap, Calendar, DollarSign, Shield, ArrowUpRight
 } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { toast } from "sonner";
 
 const statusColors = {
   Pago: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
