@@ -140,6 +140,27 @@
     mask-composite: exclude;
     pointer-events: none;
   }
+
+  .admin-page {
+    width: min(100%, 1400px);
+    margin-inline: auto;
+    padding-inline: 1rem;
+    padding-top: 4rem;
+    padding-bottom: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .admin-page {
+      padding-inline: 1.5rem;
+      padding-top: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .admin-page {
+      padding-inline: 2rem;
+    }
+  }
 }
 
 html {
@@ -159,5 +180,12 @@ body {
 @media (max-width: 768px) {
   [id] {
     scroll-margin-top: 100px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 }
