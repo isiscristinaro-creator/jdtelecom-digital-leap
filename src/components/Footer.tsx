@@ -70,6 +70,9 @@ const Footer = () => {
           <p className="text-sm text-[hsl(var(--dark-section-muted))]">
             © {new Date().getFullYear()} JD Telecom. Todos os direitos reservados. Grupo JD Telecom
           </p>
+          <p className="text-xs text-[hsl(var(--dark-section-muted))]/60 mt-2">
+            Desenvolvido por <span className="font-semibold text-[hsl(var(--dark-section-muted))]">SANNINS MARKETING LTDA</span>
+          </p>
         </div>
       </div>
     </footer>
