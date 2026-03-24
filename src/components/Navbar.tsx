@@ -95,7 +95,7 @@ const Navbar = () => {
       {/* Main nav */}
       <div className="bg-background border-b border-border">
         <div className="container mx-auto px-4 flex items-center justify-between h-16 md:h-[68px]">
-          <a href="/" className="shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <a href="/" className="shrink-0" onClick={handleLogoClick}>
             <img src={logo} alt="JD Telecom" className="h-10 md:h-12 w-auto" />
           </a>
 
