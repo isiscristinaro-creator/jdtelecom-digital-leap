@@ -79,7 +79,7 @@ const AdminReports = () => {
       return;
     }
 
-    exportToExcel(exportData, `relatorio_${activeTab}_jdtelecom`);
+    exportToExcel(exportData, `relatorio-${activeTab}-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: `Relatório de ${tabLabel}` });
     toast.success(`${exportData.length} registros exportados com sucesso`);
   };
 

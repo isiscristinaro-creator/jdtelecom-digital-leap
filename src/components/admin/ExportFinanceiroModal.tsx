@@ -93,10 +93,10 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
       return;
     }
 
-    const filename = `financeiro_jdtelecom_${new Date().toISOString().slice(0, 10)}`;
+    const filename = `relatorio-financeiro-${new Date().toISOString().slice(0, 10)}`;
 
     if (formato === "excel") {
-      exportToExcel(data, filename);
+      exportToExcel(data, filename, { reportTitle: "JD Telecom", reportSubtitle: "Relatório Financeiro" });
     } else {
       exportToCSV(data, filename);
     }
