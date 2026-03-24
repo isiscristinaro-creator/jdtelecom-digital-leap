@@ -176,7 +176,7 @@ const Navbar = () => {
             ))}
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="outline" size="sm" className="border-primary text-primary rounded-full" asChild><a href="#planos" onClick={() => setIsOpen(false)}>Assine já</a></Button>
+            <Button variant="outline" size="sm" className="border-primary text-primary rounded-full" asChild><a href="#planos" onClick={(e) => handleAnchorClick(e, "#planos")}>Assine já</a></Button>
             <Button size="sm" className="bg-primary text-primary-foreground rounded-full" asChild>
               <a href="/assinante">
                 <User className="w-4 h-4 mr-1" /> Área do Cliente
