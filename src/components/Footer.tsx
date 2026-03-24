@@ -16,10 +16,17 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display font-semibold text-[hsl(var(--dark-section-fg))]">Links Rápidos</h4>
             <ul className="space-y-2">
-              {["Início", "Planos", "Benefícios", "Cobertura", "Contato"].map((l) => (
-                <li key={l}>
-                  <a href={`#${l.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`} className="text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors">
-                    {l}
+              {[
+                { label: "Início", href: "#inicio" },
+                { label: "Planos", href: "#planos" },
+                { label: "Benefícios", href: "#beneficios" },
+                { label: "Cobertura", href: "#cobertura" },
+                { label: "Autoatendimento", href: "#autoatendimento" },
+                { label: "Contato", href: "#contato" },
+              ].map((l) => (
+                <li key={l.label}>
+                  <a href={l.href} className="text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors">
+                    {l.label}
                   </a>
                 </li>
               ))}
