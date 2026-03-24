@@ -86,7 +86,7 @@ const StatsSection = () => {
               <p className="font-display text-5xl md:text-6xl font-extrabold text-primary mb-3">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} decimal={stat.decimal} isVisible={isVisible} />
               </p>
-              <p className="text-[hsl(var(--dark-section-muted))] text-sm max-w-[220px] leading-relaxed">
+              <p className="text-[hsl(var(--dark-section-muted))] text-sm max-w-[260px] leading-relaxed mx-auto">
                 {stat.label}
               </p>
 

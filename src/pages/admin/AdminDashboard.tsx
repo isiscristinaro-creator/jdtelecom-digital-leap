@@ -155,7 +155,7 @@ const AdminDashboard = () => {
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-primary" /> Vendas
           </h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {salesCards.map((c) => (
               <div key={c.label} className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
                 <p className="font-display text-xl font-bold text-primary">{c.value}</p>

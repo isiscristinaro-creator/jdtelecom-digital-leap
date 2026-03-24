@@ -323,7 +323,7 @@ const SubscriberDashboard = () => {
                   href="https://wa.me/558005945678?text=Preciso%20de%20suporte%20t%C3%A9cnico"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
                 >
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-primary" />
