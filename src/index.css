@@ -99,3 +99,17 @@
     color: hsl(var(--dark-section-fg));
   }
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+[id] {
+  scroll-margin-top: 140px;
+}
+
+@media (max-width: 768px) {
+  [id] {
+    scroll-margin-top: 100px;
+  }
+}
