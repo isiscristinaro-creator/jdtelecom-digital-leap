@@ -2,6 +2,7 @@ import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
   UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   totalClients, activeClients, inadimplenteClients, canceledClients,
   mrr, totalRevenue, ticketMedio, forecastRevenue,
