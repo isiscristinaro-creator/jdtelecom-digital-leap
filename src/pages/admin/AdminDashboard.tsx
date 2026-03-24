@@ -33,7 +33,7 @@ const alertColors = {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
+  const [financeiroOpen, setFinanceiroOpen] = useState(false);
   const summaryCards = [
     { label: "Total de Clientes", value: totalClients.toLocaleString(), icon: Users, color: "text-primary" },
     { label: "Clientes Ativos", value: activeClients.toLocaleString(), icon: UserCheck, color: "text-emerald-400" },
