@@ -71,7 +71,7 @@ const SubscriberDashboard = () => {
   };
 
   const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5 md:p-6 ${className}`}>
+    <div className={`bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-4 sm:p-5 md:p-6 ${className}`}>
       {children}
     </div>
   );
@@ -97,22 +97,22 @@ const SubscriberDashboard = () => {
             <span className="hidden sm:inline text-xs text-[hsl(var(--dark-section-muted))]">|</span>
             <span className="hidden sm:inline text-xs font-medium text-primary">Área do Assinante</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span className="hidden md:inline text-sm text-[hsl(var(--dark-section-muted))]">{subscriber.email}</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLogout}
-              className="text-[hsl(var(--dark-section-muted))] hover:text-destructive hover:bg-destructive/10 rounded-xl"
+              className="text-[hsl(var(--dark-section-muted))] hover:text-destructive hover:bg-destructive/10 rounded-xl px-2 sm:px-3"
             >
-              <LogOut className="w-4 h-4 mr-1" />
-              Sair
+              <LogOut className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">Sair</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-5 md:px-6 py-6 md:py-10 pb-24 max-w-6xl overflow-hidden">
+      <main className="container mx-auto px-4 sm:px-5 md:px-6 py-6 md:py-10 pb-28 max-w-6xl overflow-hidden">
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
@@ -195,7 +195,7 @@ const SubscriberDashboard = () => {
             <Card>
               <CardHeader icon={FileText} title="Histórico de Pagamentos" />
                 <div className="overflow-x-auto -mx-1 px-1 [-webkit-overflow-scrolling:touch]">
-                  <table className="w-full min-w-[620px] text-sm">
+                  <table className="w-full min-w-[560px] text-sm">
                   <thead>
                     <tr className="border-b border-[hsl(var(--dark-section-border))]">
                       <th className="text-left py-3 px-2 text-xs font-semibold text-[hsl(var(--dark-section-muted))] uppercase tracking-wider">Descrição</th>

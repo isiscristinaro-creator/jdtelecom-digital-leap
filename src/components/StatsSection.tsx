@@ -46,12 +46,12 @@ const StatsSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-primary via-[hsl(15,90%,45%)] to-primary blur-md opacity-60" />
       </div>
 
-      <div className="container mx-auto px-4 py-16 md:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 md:divide-x divide-[hsl(var(--dark-section-border))]">
+      <div className="container mx-auto px-4 py-10 sm:py-14 md:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-0 md:divide-x divide-[hsl(var(--dark-section-border))]">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="w-full max-w-md mx-auto md:max-w-none flex flex-col items-center text-center py-8 md:py-0 px-6 md:px-8 rounded-2xl md:rounded-none bg-[hsl(var(--dark-section-card))]/40 md:bg-transparent border border-[hsl(var(--dark-section-border))]/60 md:border-0 relative cursor-default"
+              className="w-full mx-auto flex flex-col items-center text-center py-6 sm:py-8 md:py-0 px-5 sm:px-6 md:px-8 rounded-2xl md:rounded-none bg-[hsl(var(--dark-section-card))]/40 md:bg-transparent border border-[hsl(var(--dark-section-border))]/60 md:border-0 relative cursor-default"
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.2 }}
@@ -60,8 +60,7 @@ const StatsSection = () => {
             >
               {/* Icon with level-up glow */}
               <motion.div
-                className="w-18 h-18 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 relative"
-                style={{ width: 72, height: 72 }}
+                className="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-2xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-5 relative"
                 animate={hoveredStat === i ? {
                   boxShadow: [
                     "0 0 0px hsl(24 95% 50% / 0)",
@@ -83,10 +82,10 @@ const StatsSection = () => {
                 )}
               </motion.div>
 
-              <p className="font-display text-5xl md:text-6xl font-extrabold text-primary mb-3">
+              <p className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold text-primary mb-3">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} decimal={stat.decimal} isVisible={isVisible} />
               </p>
-              <p className="text-[hsl(var(--dark-section-muted))] text-sm max-w-[260px] leading-relaxed mx-auto">
+              <p className="text-[hsl(var(--dark-section-muted))] text-sm max-w-[220px] sm:max-w-[260px] leading-relaxed mx-auto">
                 {stat.label}
               </p>
 

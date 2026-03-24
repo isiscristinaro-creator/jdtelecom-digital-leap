@@ -47,7 +47,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section id="inicio" className="pt-[100px] md:pt-[140px]">
+    <section id="inicio" className="pt-[128px] sm:pt-[132px] md:pt-[140px]">
       <div className="relative w-full group">
         <div
           className="relative w-full select-none touch-pan-y overflow-hidden"
