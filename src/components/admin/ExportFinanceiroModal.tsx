@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Download, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
-import { allPayments } from "@/data/adminMockData";
+import { allPayments, mockClients, mockPlans } from "@/data/adminMockData";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 
 interface Props {
@@ -16,12 +16,35 @@ interface Props {
 
 const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
   const [status, setStatus] = useState("todos");
+  const [cliente, setCliente] = useState("todos");
+  const [plano, setPlano] = useState("todos");
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
   const [formato, setFormato] = useState("excel");
 
+  const clientById = useMemo(() => {
+    return new Map(mockClients.map((client) => [client.id, client]));
+  }, []);
+
+  const clientOptions = useMemo(() => {
+    const seen = new Set<string>();
+    return allPayments
+      .map((payment) => ({ id: payment.clientId, name: payment.clientName }))
+      .filter((clientOption) => {
+        if (seen.has(clientOption.id)) return false;
+        seen.add(clientOption.id);
+        return true;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  }, []);
+
   const parseDate = (dateStr: string) => {
     const [d, m, y] = dateStr.split("/").map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const parseInputDate = (dateStr: string) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
     return new Date(y, m - 1, d);
   };
 
@@ -32,31 +55,41 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
       filtered = filtered.filter(p => p.status === status);
     }
 
+    if (cliente !== "todos") {
+      filtered = filtered.filter((payment) => payment.clientId === cliente);
+    }
+
+    if (plano !== "todos") {
+      filtered = filtered.filter((payment) => clientById.get(payment.clientId)?.plan === plano);
+    }
+
     if (dataInicial) {
-      const start = new Date(dataInicial);
+      const start = parseInputDate(dataInicial);
       filtered = filtered.filter(p => parseDate(p.date) >= start);
     }
 
     if (dataFinal) {
-      const end = new Date(dataFinal);
-      end.setHours(23, 59, 59);
+      const end = parseInputDate(dataFinal);
+      end.setHours(23, 59, 59, 999);
       filtered = filtered.filter(p => parseDate(p.date) <= end);
     }
 
     return filtered;
-  }, [status, dataInicial, dataFinal]);
+  }, [status, cliente, plano, dataInicial, dataFinal, clientById]);
 
   const handleExport = () => {
     const data = filteredData.map(p => ({
-      Cliente: p.clientName,
-      "Descrição": p.description,
-      Data: p.date,
-      "Valor (R$)": p.amount,
+      Nome: p.clientName,
+      Email: clientById.get(p.clientId)?.email ?? "-",
+      Plano: clientById.get(p.clientId)?.plan ?? "-",
       Status: p.status,
+      "Valor (R$)": p.amount,
+      Data: p.date,
+      "Descrição": p.description,
     }));
 
     if (!data.length) {
-      toast.error("Nenhum registro encontrado com os filtros selecionados");
+      toast.error("Nenhum dado disponível para exportação");
       return;
     }
 
@@ -100,6 +133,38 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
+              <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Cliente</Label>
+              <Select value={cliente} onValueChange={setCliente}>
+                <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] max-h-60">
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {clientOptions.map((clientOption) => (
+                    <SelectItem key={clientOption.id} value={clientOption.id}>{clientOption.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Plano</Label>
+              <Select value={plano} onValueChange={setPlano}>
+                <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))]">
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {mockPlans.map((planOption) => (
+                    <SelectItem key={planOption.id} value={planOption.name}>{planOption.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
               <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Data Inicial</Label>
               <Input type="date" value={dataInicial} onChange={e => setDataInicial(e.target.value)}
                 className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]" />
@@ -130,7 +195,7 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
             </p>
           </div>
 
-          <Button onClick={handleExport} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
+          <Button onClick={handleExport} disabled={!filteredData.length} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl disabled:opacity-60">
             <FileSpreadsheet className="w-4 h-4 mr-2" />
             Exportar {filteredData.length.toLocaleString()} registros
           </Button>
