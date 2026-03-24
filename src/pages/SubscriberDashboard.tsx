@@ -182,7 +182,7 @@ const SubscriberDashboard = () => {
                   </p>
                   <Button
                     size="sm"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold"
+                    className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold"
                     onClick={() => toast.info("Funcionalidade de pagamento online será disponibilizada em breve.")}
                   >
                     Pagar agora
