@@ -33,13 +33,13 @@ const AdminSettings = () => {
   );
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-[900px]">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[900px] w-full overflow-hidden mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Configurações</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Gerencie as configurações do sistema</p>
         </div>
-        <Button onClick={handleSave} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold text-sm">
+        <Button onClick={handleSave} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold text-sm">
           {saved ? <><Check className="w-4 h-4 mr-2" /> Salvo!</> : <><Save className="w-4 h-4 mr-2" /> Salvar Alterações</>}
         </Button>
       </div>
