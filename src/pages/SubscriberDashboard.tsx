@@ -309,18 +309,16 @@ const SubscriberDashboard = () => {
             <Card>
               <CardHeader icon={Settings} title="Serviços" />
               <div className="space-y-2">
-                <a
-                  href="https://wa.me/558005945678?text=Quero%20mudar%20meu%20plano"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                <button
+                  onClick={() => toast.info("Funcionalidade de troca de plano será disponibilizada em breve.")}
+                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group w-full"
                 >
                   <div className="flex items-center gap-2">
                     <ArrowUpRight className="w-4 h-4 text-primary" />
                     <span className="text-sm text-[hsl(var(--dark-section-fg))]">Mudar de plano</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-[hsl(var(--dark-section-muted))] group-hover:text-primary transition-colors" />
-                </a>
+                </button>
                 <a
                   href="https://wa.me/558005945678?text=Preciso%20de%20suporte%20t%C3%A9cnico"
                   target="_blank"
@@ -333,18 +331,16 @@ const SubscriberDashboard = () => {
                   </div>
                   <ChevronRight className="w-4 h-4 text-[hsl(var(--dark-section-muted))] group-hover:text-primary transition-colors" />
                 </a>
-                <a
-                  href="https://wa.me/558005945678?text=Quero%20a%202%C2%AA%20via%20da%20fatura"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                <button
+                  onClick={() => toast.info("Funcionalidade de 2ª via será disponibilizada em breve.")}
+                  className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group w-full"
                 >
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-primary" />
                     <span className="text-sm text-[hsl(var(--dark-section-fg))]">2ª via da fatura</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-[hsl(var(--dark-section-muted))] group-hover:text-primary transition-colors" />
-                </a>
+                </button>
               </div>
             </Card>
           </div>
