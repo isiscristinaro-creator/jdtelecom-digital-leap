@@ -138,6 +138,7 @@ const Navbar = () => {
               <a
                 key={link.label}
                 href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
                 className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 <link.icon className="w-3.5 h-3.5" />
