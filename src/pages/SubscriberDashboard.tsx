@@ -152,12 +152,10 @@ const SubscriberDashboard = () => {
                 <Button
                   size="sm"
                   className="bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl"
-                  asChild
+                  onClick={() => toast.info("Funcionalidade de troca de plano será disponibilizada em breve.")}
                 >
-                  <a href="https://wa.me/558005945678?text=Quero%20trocar%20meu%20plano" target="_blank" rel="noopener noreferrer">
-                    <ArrowUpRight className="w-4 h-4 mr-1" />
-                    Trocar de plano
-                  </a>
+                  <ArrowUpRight className="w-4 h-4 mr-1" />
+                  Trocar de plano
                 </Button>
               </div>
             </Card>
