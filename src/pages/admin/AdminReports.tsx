@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Download, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
-import { growthData, planDistribution, mockClients, mockPlans, allPayments } from "@/data/adminMockData";
+import { growthData, planDistribution, mockPlans } from "@/data/adminMockData";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
+import { toast } from "sonner";
 
 const COLORS = ["hsl(24,95%,50%)", "hsl(15,90%,42%)", "hsl(350,80%,55%)", "hsl(40,90%,50%)", "hsl(200,80%,50%)"];
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -45,34 +46,56 @@ const AdminReports = () => {
     return data;
   };
 
+  const filteredPlanDistribution = useMemo(() => {
+    if (planFilter === "Todos") return planDistribution;
+    const selectedSpeed = mockPlans.find((plan) => plan.name === planFilter)?.speed;
+    if (!selectedSpeed) return [];
+    return planDistribution.filter((item) => item.name === selectedSpeed);
+  }, [planFilter]);
+
   const getExportData = () => {
     if (activeTab === "receita") {
       return sliceData(growthData).map(d => ({ Mês: d.month, "Receita (R$)": d.revenue, Clientes: d.clients }));
     } else if (activeTab === "crescimento") {
       return sliceData(growthData).map(d => ({ Mês: d.month, Clientes: d.clients, "Receita (R$)": d.revenue }));
     } else if (activeTab === "inadimplencia") {
-      const inadimplentes = mockClients.filter(c => c.status === "Inadimplente");
-      return inadimplentes.map(c => ({
-        Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan, "Valor (R$)": c.price, "Cliente desde": c.joinDate,
-      }));
+      return sliceData(inadData).map(d => ({ Mês: d.month, "Taxa de inadimplência (%)": d.rate }));
     } else {
-      const total = planDistribution.reduce((s, x) => s + x.value, 0);
-      return planDistribution.map(p => ({
+      if (!filteredPlanDistribution.length) return [];
+      const total = filteredPlanDistribution.reduce((s, x) => s + x.value, 0);
+      return filteredPlanDistribution.map(p => ({
         Plano: p.name, Clientes: p.value, "Participação (%)": Number(((p.value / total) * 100).toFixed(1)),
       }));
     }
   };
 
+  const exportData = useMemo(() => getExportData(), [activeTab, period, filteredPlanDistribution]);
+
   const tabLabel = tabs.find(t => t.id === activeTab)?.label ?? "";
 
-  const handleExportExcel = () => exportToExcel(getExportData(), `relatorio_${activeTab}_jdtelecom`);
+  const handleExportExcel = () => {
+    if (!exportData.length) {
+      toast.error("Nenhum dado disponível para exportação");
+      return;
+    }
+
+    exportToExcel(exportData, `relatorio_${activeTab}_jdtelecom`);
+    toast.success(`${exportData.length} registros exportados com sucesso`);
+  };
+
   const handleExportCSV = () => {
-    const data = getExportData().map(row => {
+    if (!exportData.length) {
+      toast.error("Nenhum dado disponível para exportação");
+      return;
+    }
+
+    const data = exportData.map(row => {
       const out: Record<string, string | number> = {};
       Object.entries(row).forEach(([k, v]) => { out[k] = typeof v === "number" ? (v as number).toFixed(2) : String(v); });
       return out;
     });
     exportToCSV(data, `relatorio_${activeTab}_jdtelecom`);
+    toast.success(`${data.length} registros exportados com sucesso`);
   };
 
   return (
@@ -86,7 +109,7 @@ const AdminReports = () => {
           <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl font-bold text-sm">
             <Download className="w-4 h-4 mr-2" /> CSV
           </Button>
-          <Button onClick={handleExportExcel} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+          <Button onClick={handleExportExcel} disabled={!exportData.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
           </Button>
         </div>
@@ -179,8 +202,8 @@ const AdminReports = () => {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <ResponsiveContainer width="100%" height={300} className="max-w-[350px]">
                 <PieChart>
-                  <Pie data={planDistribution} cx="50%" cy="50%" innerRadius={70} outerRadius={120} paddingAngle={3} dataKey="value">
-                    {planDistribution.map((_, i) => (
+                  <Pie data={filteredPlanDistribution} cx="50%" cy="50%" innerRadius={70} outerRadius={120} paddingAngle={3} dataKey="value">
+                    {filteredPlanDistribution.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}
                   </Pie>
@@ -188,8 +211,8 @@ const AdminReports = () => {
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-3 flex-1">
-                {planDistribution.map((p, i) => {
-                  const total = planDistribution.reduce((s, x) => s + x.value, 0);
+                {filteredPlanDistribution.map((p, i) => {
+                  const total = filteredPlanDistribution.reduce((s, x) => s + x.value, 0);
                   const pct = ((p.value / total) * 100).toFixed(1);
                   return (
                     <div key={p.name} className="flex items-center gap-3">
@@ -200,6 +223,9 @@ const AdminReports = () => {
                     </div>
                   );
                 })}
+                {!filteredPlanDistribution.length && (
+                  <p className="text-xs text-[hsl(var(--dark-section-muted))]">Nenhum dado encontrado para o plano selecionado.</p>
+                )}
               </div>
             </div>
           </div>
