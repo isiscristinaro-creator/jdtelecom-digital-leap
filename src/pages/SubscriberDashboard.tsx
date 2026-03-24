@@ -275,7 +275,7 @@ const SubscriberDashboard = () => {
                   </div>
                   <div className="flex items-start gap-2 text-sm">
                     <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span className="text-[hsl(var(--dark-section-muted))]">{subscriber.address}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))] break-words">{subscriber.address}</span>
                   </div>
                   <Button
                     size="sm"
