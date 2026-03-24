@@ -106,8 +106,8 @@ const AdminReports = () => {
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Análises detalhadas do negócio</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl font-bold text-sm">
-            <Download className="w-4 h-4 mr-2" /> Exportar CSV
+          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))] text-white rounded-xl font-bold text-sm">
+            <Download className="w-4 h-4 mr-2" /> CSV
           </Button>
           <Button onClick={handleExportExcel} disabled={!exportData.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
