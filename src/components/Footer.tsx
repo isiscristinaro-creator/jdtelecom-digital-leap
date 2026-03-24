@@ -36,13 +36,17 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display font-semibold text-[hsl(var(--dark-section-fg))]">Contato</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-[hsl(var(--dark-section-muted))]">
-                <Phone className="w-4 h-4 text-primary" />
-                0800 594 5678
+              <li>
+                <a href="tel:08005945678" className="flex items-center gap-2 text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors">
+                  <Phone className="w-4 h-4 text-primary" />
+                  0800 594 5678
+                </a>
               </li>
-              <li className="flex items-center gap-2 text-sm text-[hsl(var(--dark-section-muted))]">
-                <Mail className="w-4 h-4 text-primary" />
-                corporativo@grupojdtelecom.com.br
+              <li>
+                <a href="mailto:corporativo@grupojdtelecom.com.br" className="flex items-center gap-2 text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors">
+                  <Mail className="w-4 h-4 text-primary" />
+                  corporativo@grupojdtelecom.com.br
+                </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-[hsl(var(--dark-section-muted))]">
                 <MapPin className="w-4 h-4 text-primary mt-0.5" />
