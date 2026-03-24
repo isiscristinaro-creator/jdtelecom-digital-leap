@@ -78,21 +78,6 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Arrows */}
-        <button
-          onClick={prev}
-          className="absolute z-20 left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary"
-          aria-label="Banner anterior"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute z-20 right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary"
-          aria-label="Próximo banner"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
 
         {/* Dots */}
         <div className="absolute z-20 bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
