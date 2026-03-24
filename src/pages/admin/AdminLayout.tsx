@@ -14,9 +14,9 @@ const AdminLayout = () => {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--dark-section))] flex">
+    <div className="min-h-screen bg-[hsl(var(--dark-section))] flex overflow-x-hidden">
       <AdminSidebar />
-      <main className="flex-1 min-w-0 overflow-auto">
+      <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto">
         <Outlet />
       </main>
     </div>

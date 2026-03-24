@@ -51,22 +51,22 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50">
       {/* Top bar - dark, sophisticated */}
       <div className="bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
-        <div className="container mx-auto px-4 flex items-center justify-between h-10 text-xs">
-          <div className="flex items-center gap-6">
+        <div className="container mx-auto px-4 flex items-center justify-between h-10 text-xs overflow-hidden">
+          <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-1">
             {/* City selector */}
             <button
               onClick={() => setShowCityModal(true)}
-              className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors font-medium"
+              className="flex items-center gap-1 md:gap-1.5 text-primary hover:text-primary/80 transition-colors font-medium shrink-0"
             >
               <MapPin className="w-3.5 h-3.5" />
-              {selectedCity ? `${selectedCity.name} ${selectedCity.state}` : "Selecione sua cidade"}
+              <span className="hidden sm:inline">{selectedCity ? `${selectedCity.name} ${selectedCity.state}` : "Selecione sua cidade"}</span>
+              <span className="sm:hidden">{selectedCity ? selectedCity.name : "Cidade"}</span>
             </button>
-            <span className="hidden md:inline text-[hsl(var(--dark-section-muted))]">|</span>
-            <a href="tel:08005945678" className="flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
+            <a href="tel:08005945678" className="flex items-center gap-1 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors shrink-0">
               <Phone className="w-3 h-3 text-primary" />
-              <span className="font-medium">0800 594 5678</span>
+              <span className="font-medium hidden sm:inline">0800 594 5678</span>
+              <span className="font-medium sm:hidden">0800</span>
             </a>
-            <span className="hidden md:inline text-[hsl(var(--dark-section-muted))]">|</span>
             <a href="https://www.speedtest.net/pt" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
               <Gauge className="w-3 h-3 text-primary" />
               Teste de Velocidade
@@ -84,10 +84,11 @@ const Navbar = () => {
             href="https://wa.me/558005945678"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-1.5 rounded-md text-xs font-bold hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-1 md:gap-1.5 bg-primary text-primary-foreground px-2.5 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold hover:bg-primary/90 transition-colors shrink-0 ml-2"
           >
-            <MessageCircle className="w-3.5 h-3.5" />
-            Fale via Whatsapp
+            <MessageCircle className="w-3 md:w-3.5 h-3 md:h-3.5" />
+            <span className="hidden sm:inline">Fale via Whatsapp</span>
+            <span className="sm:hidden">WhatsApp</span>
           </a>
         </div>
       </div>
