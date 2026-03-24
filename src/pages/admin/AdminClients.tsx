@@ -42,7 +42,7 @@ const AdminClients = () => {
   }, [search, statusFilter, planFilter]);
 
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
-  const totalPages = Math.ceil(filtered.length / perPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
 
   const openClient = (c: Client) => {
     setSelectedClient(c);
@@ -116,7 +116,7 @@ const AdminClients = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 pt-12 md:pt-6 space-y-6 max-w-[1400px] w-full overflow-hidden mx-auto">
+    <div className="admin-page space-y-6 w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Clientes</h1>
@@ -151,8 +151,8 @@ const AdminClients = () => {
 
       {/* Table */}
       <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto [-webkit-overflow-scrolling:touch]">
+          <table className="w-full min-w-[680px] text-sm">
             <thead>
               <tr className="border-b border-[hsl(var(--dark-section-border))]">
                 <th className="text-left py-3 px-4 text-xs font-semibold text-[hsl(var(--dark-section-muted))] uppercase tracking-wider">Nome</th>
@@ -203,12 +203,12 @@ const AdminClients = () => {
       {/* Client Detail Modal */}
       {selectedClient && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setSelectedClient(null)}>
-          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6"
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-4 sm:p-6"
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))]">{selectedClient.name}</h3>
-              <div className="flex items-center gap-2">
-                <Button size="sm" onClick={() => handleWhatsApp(selectedClient)} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <h3 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))] break-words">{selectedClient.name}</h3>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Button size="sm" onClick={() => handleWhatsApp(selectedClient)} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs w-full sm:w-auto">
                   <MessageCircle className="w-3 h-3 mr-1" /> Atender via WhatsApp
                 </Button>
                 <button onClick={() => setSelectedClient(null)} className="text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]">
@@ -218,10 +218,10 @@ const AdminClients = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-4 border-b border-[hsl(var(--dark-section-border))] pb-3">
+            <div className="flex gap-2 mb-4 border-b border-[hsl(var(--dark-section-border))] pb-3 overflow-x-auto">
               {([["dados", "Dados"], ["pagamentos", "Pagamentos"], ["atendimentos", "Atendimentos"]] as const).map(([id, label]) => (
                 <button key={id} onClick={() => setActiveTab(id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${activeTab === id ? "bg-primary text-primary-foreground border-primary" : "text-[hsl(var(--dark-section-muted))] border-transparent"}`}>
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap ${activeTab === id ? "bg-primary text-primary-foreground border-primary" : "text-[hsl(var(--dark-section-muted))] border-transparent"}`}>
                   {label}
                 </button>
               ))}
@@ -229,7 +229,7 @@ const AdminClients = () => {
 
             {activeTab === "dados" && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { label: "Nome", value: selectedClient.name },
                     { label: "Email", value: selectedClient.email },
@@ -250,17 +250,17 @@ const AdminClients = () => {
                   <span className="text-xs text-[hsl(var(--dark-section-muted))]">Status:</span>
                   <span className={`inline-flex px-2.5 py-1 rounded-full border text-xs font-semibold ${statusColors[selectedClient.status]}`}>{selectedClient.status}</span>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-[hsl(var(--dark-section-border))]">
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-xs"><Edit2 className="w-3 h-3 mr-1" /> Editar</Button>
-                  <Button size="sm" variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl text-xs"><UserCheck className="w-3 h-3 mr-1" /> Alterar Status</Button>
-                  <Button size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl text-xs"><UserXIcon className="w-3 h-3 mr-1" /> Cancelar</Button>
+                <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2 border-t border-[hsl(var(--dark-section-border))]">
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-xs w-full sm:w-auto"><Edit2 className="w-3 h-3 mr-1" /> Editar</Button>
+                  <Button size="sm" variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl text-xs w-full sm:w-auto"><UserCheck className="w-3 h-3 mr-1" /> Alterar Status</Button>
+                  <Button size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl text-xs w-full sm:w-auto"><UserXIcon className="w-3 h-3 mr-1" /> Cancelar</Button>
                 </div>
               </div>
             )}
 
             {activeTab === "pagamentos" && (
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                   <p className="text-xs uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Histórico de Pagamentos</p>
                   <button onClick={handleExportPayments} disabled={!selectedClient.payments.length} className="text-[10px] text-emerald-400 hover:text-emerald-300 disabled:opacity-60 font-semibold flex items-center gap-1">
                     <FileSpreadsheet className="w-3 h-3" /> Exportar Excel
@@ -268,9 +268,9 @@ const AdminClients = () => {
                 </div>
                 <div className="space-y-1.5">
                   {selectedClient.payments.map((p) => (
-                    <div key={p.id} className="flex items-center justify-between text-xs bg-[hsl(var(--dark-section))]/50 rounded-lg px-3 py-2">
-                      <span className="text-[hsl(var(--dark-section-fg))]">{p.description}</span>
-                      <div className="flex items-center gap-3">
+                    <div key={p.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs bg-[hsl(var(--dark-section))]/50 rounded-lg px-3 py-2">
+                      <span className="text-[hsl(var(--dark-section-fg))] break-words">{p.description}</span>
+                      <div className="flex items-center gap-3 self-start sm:self-auto">
                         <span className="text-[hsl(var(--dark-section-muted))]">R$ {p.amount.toFixed(2)}</span>
                         <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold ${
                           p.status === "Pago" ? statusColors.Ativo : p.status === "Pendente" ? statusColors.Inadimplente : statusColors.Cancelado
@@ -284,9 +284,9 @@ const AdminClients = () => {
 
             {activeTab === "atendimentos" && (
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                   <p className="text-xs uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Histórico de Atendimento</p>
-                  <Button size="sm" onClick={() => setShowNewService(!showNewService)} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-xs">
+                  <Button size="sm" onClick={() => setShowNewService(!showNewService)} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-xs w-full sm:w-auto">
                     <Plus className="w-3 h-3 mr-1" /> Novo Atendimento
                   </Button>
                 </div>
@@ -304,9 +304,9 @@ const AdminClients = () => {
                     <textarea value={newServiceDesc} onChange={e => setNewServiceDesc(e.target.value)}
                       placeholder="Descreva o atendimento..."
                       className="w-full bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl p-3 text-xs min-h-[80px] resize-none" />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleAddService} className="bg-primary text-primary-foreground rounded-xl text-xs">Salvar</Button>
-                      <Button size="sm" variant="ghost" onClick={() => setShowNewService(false)} className="text-[hsl(var(--dark-section-muted))] rounded-xl text-xs">Cancelar</Button>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button size="sm" onClick={handleAddService} className="bg-primary text-primary-foreground rounded-xl text-xs w-full sm:w-auto">Salvar</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setShowNewService(false)} className="text-[hsl(var(--dark-section-muted))] rounded-xl text-xs w-full sm:w-auto">Cancelar</Button>
                     </div>
                   </div>
                 )}
@@ -314,8 +314,8 @@ const AdminClients = () => {
                 <div className="space-y-2">
                   {serviceHistory.map(s => (
                     <div key={s.id} className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 border border-[hsl(var(--dark-section-border))]/50">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 mb-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold ${serviceTypeColors[s.type]}`}>{s.type}</span>
                           <span className="text-[10px] text-[hsl(var(--dark-section-muted))]">{s.date}</span>
                         </div>

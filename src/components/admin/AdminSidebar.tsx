@@ -80,7 +80,7 @@ const AdminSidebar = () => {
       {/* Mobile trigger */}
       {!mobileOpen && (
         <button onClick={() => setMobileOpen(true)}
-          className="md:hidden fixed top-3 left-3 z-50 w-10 h-10 rounded-xl bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] flex items-center justify-center text-[hsl(var(--dark-section-fg))] shadow-lg">
+          className="md:hidden fixed top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-50 w-10 h-10 rounded-xl bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] flex items-center justify-center text-[hsl(var(--dark-section-fg))] shadow-lg">
           <Menu className="w-5 h-5" />
         </button>
       )}
@@ -88,7 +88,7 @@ const AdminSidebar = () => {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-black/60" onClick={() => setMobileOpen(false)}>
-          <div className="w-64 h-full bg-[hsl(var(--dark-section-card))]" onClick={(e) => e.stopPropagation()}>
+          <div className="w-[82vw] max-w-72 h-full bg-[hsl(var(--dark-section-card))] shadow-elevated" onClick={(e) => e.stopPropagation()}>
             <SidebarContent />
           </div>
         </div>
