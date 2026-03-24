@@ -131,10 +131,10 @@ const SubscriberDashboard = () => {
               <CardHeader icon={Wifi} title="Meu Plano" />
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h4 className="font-display text-2xl font-bold text-[hsl(var(--dark-section-fg))]">
+                  <h4 className="font-display text-xl sm:text-2xl font-bold text-[hsl(var(--dark-section-fg))]">
                     {subscriber.plan.name}
                   </h4>
-                  <div className="flex items-center gap-3 mt-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                     <div className="flex items-center gap-1.5 text-sm text-[hsl(var(--dark-section-muted))]">
                       <Zap className="w-4 h-4 text-primary" />
                       {subscriber.plan.speed}
@@ -142,22 +142,34 @@ const SubscriberDashboard = () => {
                     <StatusBadge status={subscriber.plan.status} />
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <p className="text-xs text-[hsl(var(--dark-section-muted))]">Valor mensal</p>
                   <p className="font-display text-2xl font-extrabold text-primary">{subscriber.plan.price}</p>
                 </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))]">
+                <Button
+                  size="sm"
+                  className="bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl"
+                  asChild
+                >
+                  <a href="https://wa.me/558005945678?text=Quero%20trocar%20meu%20plano" target="_blank" rel="noopener noreferrer">
+                    <ArrowUpRight className="w-4 h-4 mr-1" />
+                    Trocar de plano
+                  </a>
+                </Button>
               </div>
             </Card>
 
             {/* Billing card */}
             <Card>
               <CardHeader icon={CreditCard} title="Faturamento" />
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[hsl(var(--dark-section))]/50 rounded-xl p-4">
+              <div className="flex flex-col gap-3 bg-[hsl(var(--dark-section))]/50 rounded-xl p-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">
                     Próxima fatura — {subscriber.billing.nextDue}
                   </p>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--dark-section-muted))]">
                       <Calendar className="w-3.5 h-3.5" />
                       Vencimento: {subscriber.billing.dueDate}
@@ -165,7 +177,7 @@ const SubscriberDashboard = () => {
                     <StatusBadge status={subscriber.billing.status} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
                   <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))]">
                     {subscriber.billing.amount}
                   </p>
@@ -270,9 +282,8 @@ const SubscriberDashboard = () => {
                   </div>
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={() => setEditMode(true)}
-                    className="w-full mt-2 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/10 hover:border-primary rounded-xl"
+                    className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl h-10"
                   >
                     Editar dados
                   </Button>
@@ -287,7 +298,7 @@ const SubscriberDashboard = () => {
                 Precisa de ajuda? Fale diretamente com nosso time de suporte.
               </p>
               <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl h-11"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl h-11"
                 asChild
               >
                 <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer">
