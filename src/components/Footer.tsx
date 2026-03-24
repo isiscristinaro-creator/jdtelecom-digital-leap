@@ -64,26 +64,26 @@ const Footer = () => {
             <h4 className="font-display font-bold text-[hsl(var(--dark-section-fg))] text-base">Contato</h4>
             <ul className="space-y-4">
               <li>
-                <a href="tel:08005945678" className="flex items-center gap-3 text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors duration-300">
+                <a href="tel:08005945678" className="flex items-start gap-3 text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors duration-300 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
-                  0800 594 5678
+                  <span>0800 594 5678</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:corporativo@grupojdtelecom.com.br" className="flex items-center gap-3 text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors duration-300">
+                <a href="mailto:corporativo@grupojdtelecom.com.br" className="flex items-start gap-3 text-sm text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors duration-300 min-w-0">
                   <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <Mail className="w-4 h-4 text-primary" />
                   </div>
-                  corporativo@grupojdtelecom.com.br
+                  <span className="break-all">corporativo@grupojdtelecom.com.br</span>
                 </a>
               </li>
-              <li className="flex items-center gap-3 text-sm text-[hsl(var(--dark-section-muted))]">
+              <li className="flex items-start gap-3 text-sm text-[hsl(var(--dark-section-muted))] min-w-0">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                   <MapPin className="w-4 h-4 text-primary" />
                 </div>
-                Manaus - AM
+                <span>Manaus - AM</span>
               </li>
             </ul>
           </div>
