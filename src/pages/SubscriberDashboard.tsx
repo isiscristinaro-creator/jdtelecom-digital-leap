@@ -86,10 +86,10 @@ const SubscriberDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--dark-section))]">
+    <div className="min-h-screen bg-[hsl(var(--dark-section))] overflow-x-hidden">
       {/* Header */}
       <header className="bg-[hsl(var(--dark-section-card))] border-b border-[hsl(var(--dark-section-border))] sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-full">
           <div className="flex items-center gap-3">
             <a href="/">
               <img src={logo} alt="JD Telecom" className="h-8 brightness-0 invert" />
