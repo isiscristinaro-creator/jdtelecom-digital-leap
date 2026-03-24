@@ -7,7 +7,7 @@ const ChipInstructionsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section id="chip" className="py-20 sm:py-24 md:py-40 relative overflow-hidden">
+    <section id="chip" className="py-16 sm:py-20 md:py-32 lg:py-40 relative overflow-hidden">
       {/* Rich gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
       
@@ -20,29 +20,29 @@ const ChipInstructionsSection = () => {
 
       {/* Animated floating orbs */}
       <motion.div
-        className="absolute top-10 left-[10%] w-72 h-72 rounded-full bg-white/[0.06] blur-[80px]"
+        className="absolute top-10 left-[10%] w-48 h-48 sm:w-72 sm:h-72 rounded-full bg-white/[0.06] blur-[80px]"
         animate={{ y: [0, -30, 0], x: [0, 20, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-10 right-[10%] w-96 h-96 rounded-full bg-black/[0.08] blur-[100px]"
+        className="absolute bottom-10 right-[10%] w-56 h-56 sm:w-96 sm:h-96 rounded-full bg-black/[0.08] blur-[100px]"
         animate={{ y: [0, 20, 0], x: [0, -15, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Geometric decorations */}
       <motion.div
-        className="absolute top-20 right-[15%] w-24 h-24 border-2 border-white/[0.08] rounded-3xl"
+        className="absolute top-20 right-[15%] hidden sm:block w-24 h-24 border-2 border-white/[0.08] rounded-3xl"
         animate={{ rotate: [0, 90, 180, 270, 360] }}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       />
       <motion.div
-        className="absolute bottom-28 left-[8%] w-16 h-16 border-2 border-white/[0.06] rounded-full"
+        className="absolute bottom-28 left-[8%] hidden sm:block w-16 h-16 border-2 border-white/[0.06] rounded-full"
         animate={{ scale: [1, 1.4, 1], opacity: [0.06, 0.15, 0.06] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute top-1/2 right-[5%] w-3 h-3 bg-white/20 rounded-full"
+        className="absolute top-1/2 right-[5%] hidden sm:block w-3 h-3 bg-white/20 rounded-full"
         animate={{ y: [0, -40, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -64,7 +64,7 @@ const ChipInstructionsSection = () => {
             <Signal className="w-3.5 h-3.5" />
             REDE MÓVEL 4G • 5G
           </motion.span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-5 sm:mb-6 leading-[1.05]">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-5 sm:mb-6 leading-[1.05]">
             Ative seu chip seguindo
             <br className="hidden md:block" />
             <span className="relative inline-block mt-1">
@@ -84,7 +84,7 @@ const ChipInstructionsSection = () => {
 
         {/* Main card with 3D perspective */}
         <motion.div
-          className="max-w-5xl mx-auto px-1 sm:px-0"
+          className="max-w-4xl mx-auto px-1 sm:px-0"
           initial={{ opacity: 0, y: 60, rotateX: 8 }}
           animate={isVisible ? { opacity: 1, y: 0, rotateX: 0 } : {}}
           transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
@@ -99,7 +99,7 @@ const ChipInstructionsSection = () => {
             
             {/* Card */}
             <motion.div
-              className="relative rounded-[1.5rem] sm:rounded-[1.75rem] overflow-hidden bg-white shadow-2xl border border-white/30"
+              className="relative rounded-[1.25rem] sm:rounded-[1.75rem] overflow-hidden bg-white shadow-2xl border border-white/30"
               whileHover={{ scale: 1.01, rotateY: 1, rotateX: -1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
               style={{ transformStyle: "preserve-3d" }}
@@ -130,7 +130,7 @@ const ChipInstructionsSection = () => {
           ].map((item, i) => (
             <motion.div
               key={item.label}
-              className="flex items-center gap-2 bg-white/[0.1] backdrop-blur-lg text-primary-foreground/90 text-xs sm:text-sm font-medium px-4 sm:px-5 py-2.5 rounded-full border border-white/15"
+              className="w-full sm:w-auto justify-center flex items-center gap-2 bg-white/[0.1] backdrop-blur-lg text-primary-foreground/90 text-xs sm:text-sm font-medium px-4 sm:px-5 py-2.5 rounded-full border border-white/15"
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.18)" }}
               initial={{ opacity: 0, y: 10 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}

@@ -15,21 +15,21 @@ const BenefitsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section id="beneficios" className="py-28 md:py-40 bg-background overflow-hidden relative">
+    <section id="beneficios" className="py-16 sm:py-20 md:py-32 lg:py-40 bg-background overflow-hidden relative">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full bg-primary/[0.03] blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-primary/[0.04] blur-[100px] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-primary/[0.02] blur-[80px] pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10" ref={ref}>
-        <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-20 items-center">
           {/* Left content */}
           <div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7 }}
-              className="mb-14"
+              className="mb-10 sm:mb-12 md:mb-14"
             >
               <motion.span
                 className="inline-block bg-primary/10 text-primary text-xs font-bold px-4 py-2 rounded-full mb-5 border border-primary/20"
@@ -39,20 +39,20 @@ const BenefitsSection = () => {
               >
                 DIFERENCIAIS
               </motion.span>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-6 leading-[1.05]">
+              <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-5 sm:mb-6 leading-[1.05]">
                 Por que escolher a{" "}
                 <span className="text-gradient">JD Telecom</span>?
               </h2>
-              <p className="text-muted-foreground text-lg md:text-xl leading-relaxed max-w-xl">
+              <p className="text-muted-foreground text-base sm:text-lg md:text-xl leading-relaxed max-w-xl">
                 Compromisso com qualidade, velocidade e atendimento de excelência para conectar você ao que importa.
               </p>
             </motion.div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {benefits.map((b, i) => (
                 <motion.div
                   key={b.title}
-                  className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 p-5 sm:p-6 rounded-2xl bg-background border border-border/50 relative overflow-hidden group cursor-default"
+                  className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-background border border-border/50 relative overflow-hidden group cursor-default"
                   style={{
                     boxShadow: "0 2px 12px hsl(0 0% 0% / 0.04), 0 1px 3px hsl(0 0% 0% / 0.06)"
                   }}
@@ -88,14 +88,14 @@ const BenefitsSection = () => {
 
           {/* Right - Sofa image with premium treatment */}
           <motion.div
-            className="flex justify-center relative"
+            className="flex justify-center relative mt-2 lg:mt-0"
             initial={{ opacity: 0, x: 50, scale: 0.9 }}
             animate={isVisible ? { opacity: 1, x: 0, scale: 1 } : {}}
             transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Multi-layer glow behind image */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-[90%] h-[90%] rounded-full bg-primary/[0.08] blur-[60px]" />
+              <div className="w-[85%] h-[85%] rounded-full bg-primary/[0.08] blur-[60px]" />
             </div>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-[60%] h-[60%] rounded-full bg-primary/[0.12] blur-[40px]" />
@@ -103,7 +103,7 @@ const BenefitsSection = () => {
             
             {/* Decorative ring */}
             <motion.div
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              className="absolute inset-0 hidden sm:flex items-center justify-center pointer-events-none"
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
             >
@@ -113,7 +113,7 @@ const BenefitsSection = () => {
             <motion.img
               src={sofaImg}
               alt="Mascote JD Telecom assistindo no sofá"
-              className="w-full max-w-lg object-contain relative z-10"
+              className="w-full max-w-sm sm:max-w-md lg:max-w-lg object-contain relative z-10"
               style={{ filter: "drop-shadow(0 20px 40px hsl(24 95% 50% / 0.2)) drop-shadow(0 8px 16px hsl(0 0% 0% / 0.15))" }}
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
