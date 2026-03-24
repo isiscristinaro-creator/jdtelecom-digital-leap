@@ -15,6 +15,7 @@ import AdminClients from "./pages/admin/AdminClients.tsx";
 import AdminPlans from "./pages/admin/AdminPlans.tsx";
 import AdminPayments from "./pages/admin/AdminPayments.tsx";
 import AdminReports from "./pages/admin/AdminReports.tsx";
+import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
