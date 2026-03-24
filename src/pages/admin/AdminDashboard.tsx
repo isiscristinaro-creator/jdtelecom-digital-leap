@@ -75,7 +75,7 @@ const AdminDashboard = () => {
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Dashboard</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button onClick={handleExportClients} size="sm"
             className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/20 rounded-xl text-xs flex-1 sm:flex-none">
             <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Clientes
