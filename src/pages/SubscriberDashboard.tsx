@@ -112,7 +112,7 @@ const SubscriberDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 md:py-10 max-w-6xl overflow-hidden">
+      <main className="container mx-auto px-4 py-6 md:py-10 pb-24 max-w-6xl overflow-hidden">
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
