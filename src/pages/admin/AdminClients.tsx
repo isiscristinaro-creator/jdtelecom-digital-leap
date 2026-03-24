@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import { Search, X, Edit2, UserX as UserXIcon, UserCheck, Download, FileSpreadsheet, MessageCircle, Plus, Headphones } from "lucide-react";
+import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockClients, mockPlans, type Client } from "@/data/adminMockData";
-import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
+import { exportToExcel } from "@/utils/exportUtils";
 import { generateServiceHistory, type ServiceRecord } from "@/data/adminServiceHistoryData";
+import { toast } from "sonner";
 
 const statusColors = {
   Ativo: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -51,17 +52,46 @@ const AdminClients = () => {
   };
 
   const handleExportClients = () => {
-    exportToExcel(filtered.map(c => ({
-      Nome: c.name, Email: c.email, Telefone: c.phone, Endereço: c.address,
-      Plano: c.plan, Velocidade: c.speed, "Valor (R$)": c.price, Status: c.status, "Cliente desde": c.joinDate,
-    })), `clientes_jdtelecom${statusFilter !== "Todos" ? `_${statusFilter.toLowerCase()}` : ""}`);
+    const exportData = filtered.map((client) => ({
+      Nome: client.name,
+      Email: client.email,
+      Plano: client.plan,
+      Status: client.status,
+      "Valor (R$)": client.price,
+      Data: client.joinDate,
+      Telefone: client.phone,
+      Endereço: client.address,
+      Velocidade: client.speed,
+    }));
+
+    if (!exportData.length) {
+      toast.error("Nenhum dado disponível para exportação");
+      return;
+    }
+
+    exportToExcel(exportData, `clientes_jdtelecom${statusFilter !== "Todos" ? `_${statusFilter.toLowerCase()}` : ""}`);
+    toast.success(`${exportData.length} clientes exportados com sucesso`);
   };
 
   const handleExportPayments = () => {
     if (!selectedClient) return;
-    exportToExcel(selectedClient.payments.map(p => ({
-      Descrição: p.description, Data: p.date, "Valor (R$)": p.amount, Status: p.status,
-    })), `pagamentos_${selectedClient.name.replace(/ /g, "_")}`);
+    const exportData = selectedClient.payments.map((payment) => ({
+      Nome: selectedClient.name,
+      Email: selectedClient.email,
+      Plano: selectedClient.plan,
+      Status: payment.status,
+      "Valor (R$)": payment.amount,
+      Data: payment.date,
+      Descrição: payment.description,
+    }));
+
+    if (!exportData.length) {
+      toast.error("Nenhum dado disponível para exportação");
+      return;
+    }
+
+    exportToExcel(exportData, `pagamentos_${selectedClient.name.replace(/ /g, "_")}`);
+    toast.success(`${exportData.length} pagamentos exportados com sucesso`);
   };
 
   const handleWhatsApp = (client: Client) => {
@@ -92,7 +122,7 @@ const AdminClients = () => {
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Clientes</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{filtered.length} clientes encontrados</p>
         </div>
-        <Button onClick={handleExportClients} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">
+        <Button onClick={handleExportClients} disabled={!filtered.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
           <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
         </Button>
       </div>
@@ -232,7 +262,7 @@ const AdminClients = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Histórico de Pagamentos</p>
-                  <button onClick={handleExportPayments} className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+                  <button onClick={handleExportPayments} disabled={!selectedClient.payments.length} className="text-[10px] text-emerald-400 hover:text-emerald-300 disabled:opacity-60 font-semibold flex items-center gap-1">
                     <FileSpreadsheet className="w-3 h-3" /> Exportar Excel
                   </button>
                 </div>
