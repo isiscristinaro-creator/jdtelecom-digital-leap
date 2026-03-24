@@ -4,10 +4,10 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useState } from "react";
 
 const actions = [
-  { icon: FileText, label: "Acesse agora a sua 2ª via de fatura.", href: "https://wa.me/558005945678", xp: "+10 XP" },
-  { icon: Gauge, label: "Teste a velocidade de sua Internet.", href: "https://www.speedtest.net/pt", xp: "+15 XP" },
-  { icon: Wrench, label: "Contate nosso suporte para reparos.", href: "https://wa.me/558005945678", xp: "+20 XP" },
-  { icon: ScrollText, label: "Acesse nosso contrato.", href: "https://wa.me/558005945678", xp: "+5 XP" },
+  { icon: FileText, label: "Acesse agora a sua 2ª via de fatura.", href: "#autoatendimento", external: false, xp: "+10 XP" },
+  { icon: Gauge, label: "Teste a velocidade de sua Internet.", href: "https://www.speedtest.net/pt", external: true, xp: "+15 XP" },
+  { icon: Wrench, label: "Contate nosso suporte para reparos.", href: "#contato", external: false, xp: "+20 XP" },
+  { icon: ScrollText, label: "Acesse nosso contrato.", href: "#contato", external: false, xp: "+5 XP" },
 ];
 
 const QuickActionsBar = () => {
@@ -59,8 +59,7 @@ const QuickActionsBar = () => {
             <motion.a
               key={action.label}
               href={action.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               className="flex items-center gap-3 group relative"
               initial={{ opacity: 0, y: 10 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -71,7 +70,6 @@ const QuickActionsBar = () => {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
-              {/* Icon with glow pulse on hover */}
               <motion.div
                 className="w-10 h-10 rounded-lg bg-primary-foreground/15 flex items-center justify-center shrink-0 relative"
                 animate={hoveredIndex === i ? {
@@ -84,8 +82,6 @@ const QuickActionsBar = () => {
                 transition={{ duration: 1, repeat: hoveredIndex === i ? Infinity : 0 }}
               >
                 <action.icon className="w-5 h-5 text-primary-foreground" />
-
-                {/* Ring burst on hover */}
                 {hoveredIndex === i && (
                   <motion.div
                     className="absolute inset-0 rounded-lg border-2 border-primary-foreground/40"
@@ -100,7 +96,6 @@ const QuickActionsBar = () => {
                 {action.label}
               </p>
 
-              {/* XP badge on click */}
               {clickedIndex === i && (
                 <motion.span
                   className="absolute -top-3 right-2 text-[10px] font-bold text-primary-foreground flex items-center gap-0.5"

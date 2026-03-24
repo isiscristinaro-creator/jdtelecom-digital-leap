@@ -244,7 +244,7 @@ const CoverageSection = () => {
 
             <div className="mt-6 text-center">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full py-6 font-bold" asChild>
-                <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer">
+                <a href="#contato">
                   <MapPin className="w-5 h-5 mr-2" />
                   Consulte a disponibilidade
                 </a>
