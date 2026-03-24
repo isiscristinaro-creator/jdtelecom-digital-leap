@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones } from "lucide-react";
+import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCity } from "@/contexts/CityContext";
 import logo from "@/assets/logo.png";
 
 const Navbar = () => {
