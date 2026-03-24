@@ -107,7 +107,7 @@ const AdminReports = () => {
         </div>
         <div className="flex gap-2">
           <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl font-bold text-sm">
-            <Download className="w-4 h-4 mr-2" /> CSV
+            <Download className="w-4 h-4 mr-2" /> Exportar CSV
           </Button>
           <Button onClick={handleExportExcel} disabled={!exportData.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60">
             <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
