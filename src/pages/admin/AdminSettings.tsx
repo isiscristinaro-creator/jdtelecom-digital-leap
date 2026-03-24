@@ -116,25 +116,6 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      {/* Connection status */}
-      <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5 md:p-6 space-y-3">
-        <h2 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
-          <Wifi className="w-5 h-5 text-primary" /> Status do Sistema
-        </h2>
-        {[
-          { label: "Servidor Principal", status: "online" },
-          { label: "Gateway de Pagamento", status: "online" },
-          { label: "Sistema de Email", status: "online" },
-          { label: "API WhatsApp", status: "online" },
-        ].map(s => (
-          <div key={s.label} className="flex items-center justify-between py-1.5">
-            <span className="text-sm text-[hsl(var(--dark-section-muted))]">{s.label}</span>
-            <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Online
-            </span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
