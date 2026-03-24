@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.png";
 import bannerGames from "@/assets/banner-games.png";
 import bannerSocial from "@/assets/banner-social.png";
