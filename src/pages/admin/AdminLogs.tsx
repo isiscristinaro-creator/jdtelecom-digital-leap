@@ -41,7 +41,7 @@ const AdminLogs = () => {
       Ação: l.action,
       Detalhes: l.details,
       IP: l.ip,
-    })), "logs_sistema_jdtelecom");
+    })), `logs-sistema-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: "Logs do Sistema" });
   };
 
   return (

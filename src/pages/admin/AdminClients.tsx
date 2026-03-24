@@ -90,7 +90,7 @@ const AdminClients = () => {
       return;
     }
 
-    exportToExcel(exportData, `pagamentos_${selectedClient.name.replace(/ /g, "_")}`);
+    exportToExcel(exportData, `pagamentos-${selectedClient.name.replace(/ /g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: `Pagamentos - ${selectedClient.name}` });
     toast.success(`${exportData.length} pagamentos exportados com sucesso`);
   };
 

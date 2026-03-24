@@ -135,7 +135,7 @@ const AdminPayments = () => {
       return;
     }
 
-    exportToExcel(exportData, `pagamentos_jdtelecom${buildSuffix()}`);
+    exportToExcel(exportData, `relatorio-pagamentos-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: "Relatório de Pagamentos" });
     toast.success(`${exportData.length} registros exportados com sucesso`);
   };
 
