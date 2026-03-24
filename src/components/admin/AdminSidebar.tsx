@@ -78,10 +78,12 @@ const AdminSidebar = () => {
   return (
     <>
       {/* Mobile trigger */}
-      <button onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-xl bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] flex items-center justify-center text-[hsl(var(--dark-section-fg))]">
-        <Menu className="w-5 h-5" />
-      </button>
+      {!mobileOpen && (
+        <button onClick={() => setMobileOpen(true)}
+          className="md:hidden fixed top-3 left-3 z-50 w-10 h-10 rounded-xl bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] flex items-center justify-center text-[hsl(var(--dark-section-fg))] shadow-lg">
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
 
       {/* Mobile overlay */}
       {mobileOpen && (
