@@ -8,20 +8,18 @@ const banners = [heroBanner, bannerGames, bannerSocial];
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(0);
 
-  const goTo = useCallback((index: number, dir: number) => {
-    setDirection(dir);
+  const goTo = useCallback((index: number, _dir: number) => {
     setCurrent(index);
   }, []);
 
   const next = useCallback(() => {
-    goTo((current + 1) % banners.length, 1);
-  }, [current, goTo]);
+    setCurrent((prev) => (prev + 1) % banners.length);
+  }, []);
 
   const prev = useCallback(() => {
-    goTo((current - 1 + banners.length) % banners.length, -1);
-  }, [current, goTo]);
+    setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(next, 5000);
@@ -29,19 +27,16 @@ const HeroSection = () => {
   }, [next]);
 
   return (
-    <section id="inicio" className="pt-[104px] md:pt-[120px]">
-      <div className="relative w-full overflow-hidden group">
+    <section id="inicio" className="pt-[136px] md:pt-[172px]">
+      <div className="relative w-full overflow-hidden group bg-primary">
         {banners.map((src, i) => (
           <div
             key={i}
             className={`w-full transition-all duration-700 ease-in-out ${
               i === current
-                ? "relative opacity-100 translate-x-0 scale-100"
-                : "absolute inset-0 opacity-0 pointer-events-none scale-105"
+                ? "relative opacity-100"
+                : "absolute inset-0 opacity-0 pointer-events-none"
             }`}
-            style={{
-              transform: i === current ? "translateX(0) scale(1)" : `translateX(${i < current ? "-8%" : "8%"}) scale(1.05)`,
-            }}
           >
             <img
               src={src}
@@ -76,8 +71,8 @@ const HeroSection = () => {
             <button
               key={i}
               onClick={() => goTo(i, i > current ? 1 : -1)}
-              className={`h-2 rounded-full transition-all duration-500 ${
-                i === current ? "w-8 bg-primary" : "w-2 bg-background/60 hover:bg-background"
+              className={`h-2.5 rounded-full transition-all duration-500 ${
+                i === current ? "w-8 bg-primary-foreground" : "w-2.5 bg-primary-foreground/40 hover:bg-primary-foreground/60"
               }`}
               aria-label={`Banner ${i + 1}`}
             />
