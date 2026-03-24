@@ -74,7 +74,7 @@ const AdminPlans = () => {
                 <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Turbo Fibra 500"
                   className="bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] h-10 rounded-xl mt-1" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Velocidade</Label>
                   <Input value={form.speed} onChange={(e) => setForm({ ...form, speed: e.target.value })} placeholder="Ex: 500MB"

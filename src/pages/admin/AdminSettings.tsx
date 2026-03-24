@@ -95,7 +95,7 @@ const AdminSettings = () => {
         <h2 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
           <Shield className="w-5 h-5 text-primary" /> Regras de Cobrança
         </h2>
-        <div className="flex items-center justify-between gap-4 py-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
           <div>
             <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">Suspensão automática</p>
             <p className="text-xs text-[hsl(var(--dark-section-muted))]">Suspender automaticamente clientes inadimplentes</p>

@@ -191,11 +191,11 @@ const AdminClients = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
           <p className="text-xs text-[hsl(var(--dark-section-muted))]">Página {page + 1} de {totalPages}</p>
-          <div className="flex gap-2">
-            <Button size="sm" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="text-[hsl(var(--dark-section-muted))] rounded-lg">Anterior</Button>
-            <Button size="sm" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="text-[hsl(var(--dark-section-muted))] rounded-lg">Próxima</Button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button size="sm" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="text-[hsl(var(--dark-section-muted))] rounded-lg flex-1 sm:flex-none">Anterior</Button>
+            <Button size="sm" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="text-[hsl(var(--dark-section-muted))] rounded-lg flex-1 sm:flex-none">Próxima</Button>
           </div>
         </div>
       </div>

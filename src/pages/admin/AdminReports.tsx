@@ -154,7 +154,7 @@ const AdminReports = () => {
                 <Bar dataKey="revenue" fill="hsl(24,95%,50%)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-6">
               {sliceData(growthData).slice(-4).map((d) => (
                 <div key={d.month} className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 text-center">
                   <p className="text-xs text-[hsl(var(--dark-section-muted))]">{d.month}</p>

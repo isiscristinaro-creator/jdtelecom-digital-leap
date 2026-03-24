@@ -144,7 +144,7 @@ const AdminTeam = () => {
               </div>
               <div>
                 <label className="text-xs text-[hsl(var(--dark-section-muted))] font-semibold uppercase tracking-wider">Permissões</label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                   {allPermissions.map(p => (
                     <label key={p.id} className="flex items-center gap-2 cursor-pointer bg-[hsl(var(--dark-section))]/50 rounded-xl px-3 py-2 border border-[hsl(var(--dark-section-border))]">
                       <input type="checkbox" checked={formPermissions.includes(p.id)} onChange={() => togglePerm(p.id)}
