@@ -55,6 +55,16 @@ const MOCK_SUBSCRIBER: Subscriber = {
   email: "teste@jdtelecom.com",
   phone: "(92) 99123-4567",
   address: "Rua das Flores, 123 - Manaus, AM",
+  avatar: "https://api.dicebear.com/9.x/initials/svg?seed=JS&backgroundColor=0ea5e9",
+  cpf: "123.456.789-00",
+  birthdate: "15/03/1990",
+  preferences: {
+    notifications_email: true,
+    notifications_sms: false,
+    notifications_whatsapp: true,
+    dark_mode: true,
+    language: "pt-BR",
+  },
   plan: {
     name: "Turbo Fibra 300",
     speed: "300MB Fibra",
