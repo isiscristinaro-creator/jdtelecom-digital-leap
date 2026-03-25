@@ -25,7 +25,7 @@ const ContactSection = () => {
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-4 leading-[1.1]">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-4 leading-[1.1]">
             Fale <span className="text-gradient">conosco</span>
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl">
@@ -46,13 +46,13 @@ const ContactSection = () => {
               >
                 <Wrapper
                   {...(item.isLink ? { href: item.href, ...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}) } : {})}
-                  className="flex items-center gap-4 p-6 rounded-2xl bg-background border border-border/60 hover:border-primary/40 transition-all duration-500 shadow-card hover:shadow-elevated group h-full relative overflow-hidden"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-2xl bg-background border border-border/60 hover:border-primary/40 transition-all duration-500 shadow-card hover:shadow-elevated group h-full relative overflow-hidden"
                 >
                   {/* Hover glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-500 relative z-10">
-                    <item.icon className="w-6 h-6 text-primary" />
+                  <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 group-hover:from-primary/25 group-hover:to-primary/10 transition-all duration-500 relative z-10">
+                    <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
                   <div className="min-w-0 relative z-10">
                     <p className="font-display font-bold text-foreground text-base">{item.title}</p>

@@ -40,7 +40,7 @@ const ServicesSection = () => {
             animate={isVisible ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7 }}
           >
-            <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-5 leading-[1.1]">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-5 leading-[1.1]">
               Aproveite nossas ofertas{" "}
               <span className="text-gradient">exclusivas</span>{" "}
               em forma de combo
@@ -59,7 +59,7 @@ const ServicesSection = () => {
           </motion.div>
 
           {/* Right cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {services.map((s, i) => (
               <motion.div
                 key={s.title}
@@ -70,7 +70,7 @@ const ServicesSection = () => {
                 whileHover={{ y: -10, scale: 1.02 }}
               >
                 {/* Gradient top */}
-                <div className={`bg-gradient-to-br ${s.color} h-44 flex items-center justify-center relative overflow-hidden`}>
+                <div className={`bg-gradient-to-br ${s.color} h-32 sm:h-44 flex items-center justify-center relative overflow-hidden`}>
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-500" />
                   {/* Floating glow */}
                   <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -78,7 +78,7 @@ const ServicesSection = () => {
                     animate={{ y: [0, -5, 0] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
                   >
-                    <s.icon className="w-16 h-16 text-white/90 relative z-10 drop-shadow-lg" />
+                    <s.icon className="w-10 h-10 sm:w-16 sm:h-16 text-white/90 relative z-10 drop-shadow-lg" />
                   </motion.div>
                 </div>
                 {/* Dark bottom */}

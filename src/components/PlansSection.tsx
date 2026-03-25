@@ -46,7 +46,7 @@ const PlansSection = () => {
           transition={{ duration: 0.6 }}
         >
           <div>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-3 leading-[1.1]">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-3 leading-[1.1]">
               Aproveite nossas ofertas
             </h2>
             <p className="text-[hsl(var(--dark-section-muted))] text-lg">
@@ -88,7 +88,7 @@ const PlansSection = () => {
 
                   <div className="mb-5 relative z-10">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-display text-4xl md:text-[2.75rem] font-extrabold text-[hsl(var(--dark-section-fg))]">
+                      <span className="font-display text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-[hsl(var(--dark-section-fg))]">
                         {plan.speed}<span className="text-2xl">MEGA</span>
                       </span>
                     </div>
@@ -121,7 +121,7 @@ const PlansSection = () => {
                     </p>
                     <div className="flex items-baseline">
                       <span className="text-sm text-primary font-bold mr-1">R$</span>
-                      <span className="font-display text-5xl font-extrabold text-[hsl(var(--dark-section-fg))]">
+                      <span className="font-display text-4xl sm:text-5xl font-extrabold text-[hsl(var(--dark-section-fg))]">
                         {plan.price}
                       </span>
                       <span className="text-base font-bold text-[hsl(var(--dark-section-fg))]">,{plan.cents}</span>
