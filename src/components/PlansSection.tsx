@@ -88,7 +88,7 @@ const PlansSection = () => {
 
                   <div className="mb-5 relative z-10">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-display text-4xl md:text-[2.75rem] font-extrabold text-[hsl(var(--dark-section-fg))]">
+                      <span className="font-display text-3xl sm:text-4xl md:text-[2.75rem] font-extrabold text-[hsl(var(--dark-section-fg))]">
                         {plan.speed}<span className="text-2xl">MEGA</span>
                       </span>
                     </div>
