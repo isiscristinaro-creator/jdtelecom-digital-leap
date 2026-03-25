@@ -228,7 +228,7 @@ const SubscriberDashboard = () => {
           </div>
 
           {/* Right column */}
-          <div className="space-y-5">
+          <div className="space-y-5 min-w-0">
             {/* Client data */}
             <Card>
               <CardHeader icon={User} title="Meus Dados" />
