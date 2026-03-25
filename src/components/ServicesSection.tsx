@@ -40,7 +40,7 @@ const ServicesSection = () => {
             animate={isVisible ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7 }}
           >
-            <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-5 leading-[1.1]">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-5 leading-[1.1]">
               Aproveite nossas ofertas{" "}
               <span className="text-gradient">exclusivas</span>{" "}
               em forma de combo

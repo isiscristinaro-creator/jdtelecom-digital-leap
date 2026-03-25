@@ -121,7 +121,7 @@ const PlansSection = () => {
                     </p>
                     <div className="flex items-baseline">
                       <span className="text-sm text-primary font-bold mr-1">R$</span>
-                      <span className="font-display text-5xl font-extrabold text-[hsl(var(--dark-section-fg))]">
+                      <span className="font-display text-4xl sm:text-5xl font-extrabold text-[hsl(var(--dark-section-fg))]">
                         {plan.price}
                       </span>
                       <span className="text-base font-bold text-[hsl(var(--dark-section-fg))]">,{plan.cents}</span>
