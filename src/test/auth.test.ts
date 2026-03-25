@@ -15,9 +15,11 @@ describe("Subscriber Auth", () => {
   });
 
   it("should reject invalid credentials", async () => {
-    const email = "wrong@email.com";
-    const password = "wrong";
-    const isValid = email === "teste@jdtelecom.com" && password === "123456";
+    const email: string = "wrong@email.com";
+    const password: string = "wrong";
+    const validEmail: string = "teste@jdtelecom.com";
+    const validPass: string = "123456";
+    const isValid = email === validEmail && password === validPass;
     expect(isValid).toBe(false);
   });
 
