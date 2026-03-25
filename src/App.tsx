@@ -56,7 +56,8 @@ const RoutesWithCitySelector = () => {
       </Routes>
     </>
   );
-};
+
+const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -65,7 +66,7 @@ const RoutesWithCitySelector = () => {
         <AuthProvider>
           <AdminAuthProvider>
             <BrowserRouter>
-            <RoutesWithCitySelector />
+              <RoutesWithCitySelector />
             </BrowserRouter>
           </AdminAuthProvider>
         </AuthProvider>
