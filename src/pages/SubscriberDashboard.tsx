@@ -8,7 +8,7 @@ import {
   Wifi, LogOut, CreditCard, FileText, User, MessageCircle,
   Settings, CheckCircle, Clock, AlertTriangle, ChevronRight,
   Phone, Mail, MapPin, Zap, Calendar, DollarSign, Shield, ArrowUpRight,
-  Bell, BellOff, Smartphone, Globe
+  Bell, Smartphone, Globe
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { toast } from "sonner";
@@ -305,21 +305,25 @@ const SubscriberDashboard = () => {
                   { label: "SMS", icon: Smartphone, key: "notifications_sms" as const },
                   { label: "WhatsApp", icon: MessageCircle, key: "notifications_whatsapp" as const },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                  <button
+                    key={item.key}
+                    onClick={() => {
+                      const newVal = !subscriber.preferences[item.key];
+                      updateSubscriber({
+                        preferences: { ...subscriber.preferences, [item.key]: newVal },
+                      });
+                      toast.success(`${item.label} ${newVal ? "ativado" : "desativado"}`);
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 transition-colors group"
+                  >
                     <div className="flex items-center gap-2">
                       <item.icon className="w-4 h-4 text-primary" />
                       <span className="text-sm text-[hsl(var(--dark-section-fg))]">{item.label}</span>
                     </div>
-                    {subscriber.preferences[item.key] ? (
-                      <span className="flex items-center gap-1 text-xs font-semibold text-emerald-400">
-                        <Bell className="w-3 h-3" /> Ativo
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-xs font-semibold text-[hsl(var(--dark-section-muted))]">
-                        <BellOff className="w-3 h-3" /> Inativo
-                      </span>
-                    )}
-                  </div>
+                    <div className={`relative w-10 h-5 rounded-full transition-colors ${subscriber.preferences[item.key] ? "bg-primary" : "bg-[hsl(var(--dark-section-border))]"}`}>
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${subscriber.preferences[item.key] ? "translate-x-5" : "translate-x-0.5"}`} />
+                    </div>
+                  </button>
                 ))}
                 <div className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
                   <div className="flex items-center gap-2">
