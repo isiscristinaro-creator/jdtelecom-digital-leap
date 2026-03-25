@@ -114,14 +114,21 @@ const SubscriberDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 sm:px-5 md:px-6 py-6 md:py-10 pb-28 max-w-6xl overflow-hidden">
-        {/* Greeting */}
-        <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
-            Olá, {subscriber.name.split(" ")[0]} 👋
-          </h1>
-          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">
-            Seja bem-vindo à sua área do assinante
-          </p>
+        {/* Greeting with Avatar */}
+        <div className="mb-8 flex items-center gap-4">
+          <img
+            src={subscriber.avatar}
+            alt={subscriber.name}
+            className="w-14 h-14 rounded-full border-2 border-primary/30 bg-[hsl(var(--dark-section-card))]"
+          />
+          <div>
+            <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
+              Olá, {subscriber.name.split(" ")[0]} 👋
+            </h1>
+            <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-0.5">
+              Seja bem-vindo à sua área do assinante
+            </p>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-5">
