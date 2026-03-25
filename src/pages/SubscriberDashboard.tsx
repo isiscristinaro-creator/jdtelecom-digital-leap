@@ -151,7 +151,7 @@ const SubscriberDashboard = () => {
               <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))]">
                 <Button
                   size="sm"
-                  className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl"
+                  className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl whitespace-normal text-xs sm:text-sm leading-tight h-auto min-h-10 py-2"
                   onClick={() => toast.info("Funcionalidade de troca de plano será disponibilizada em breve.")}
                 >
                   <ArrowUpRight className="w-4 h-4 mr-1" />
