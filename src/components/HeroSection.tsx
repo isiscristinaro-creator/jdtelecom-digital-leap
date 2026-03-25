@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { motion } from "framer-motion";
 import heroBanner from "@/assets/hero-banner.png";
 import bannerGames from "@/assets/banner-games.png";
 import bannerSocial from "@/assets/banner-social.png";
@@ -48,7 +49,12 @@ const HeroSection = () => {
 
   return (
     <section id="inicio" className="pt-[128px] sm:pt-[132px] md:pt-[140px]">
-      <div className="relative w-full group">
+      <motion.div
+        className="relative w-full group"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div
           className="relative w-full select-none touch-pan-y overflow-hidden"
           onPointerDown={(e) => { dragStartX.current = e.clientX; }}
@@ -82,7 +88,12 @@ const HeroSection = () => {
 
 
         {/* Dots */}
-        <div className="absolute z-20 bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <motion.div
+          className="absolute z-20 bottom-4 left-1/2 -translate-x-1/2 flex gap-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           {banners.map((_, i) => (
             <button
               key={i}
@@ -93,8 +104,8 @@ const HeroSection = () => {
               aria-label={`Banner ${i + 1}`}
             />
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
