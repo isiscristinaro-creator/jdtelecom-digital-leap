@@ -59,9 +59,11 @@ describe("Admin Auth", () => {
   });
 
   it("should reject invalid admin credentials", () => {
-    const email = "user@email.com";
-    const password = "abc";
-    const isValid = email === "admin@jdtelecom.com" && password === "123456";
+    const email: string = "user@email.com";
+    const password: string = "abc";
+    const validEmail: string = "admin@jdtelecom.com";
+    const validPass: string = "123456";
+    const isValid = email === validEmail && password === validPass;
     expect(isValid).toBe(false);
   });
 
