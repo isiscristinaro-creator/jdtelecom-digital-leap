@@ -46,7 +46,7 @@ const ContactSection = () => {
               >
                 <Wrapper
                   {...(item.isLink ? { href: item.href, ...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}) } : {})}
-                  className="flex items-center gap-4 p-6 rounded-2xl bg-background border border-border/60 hover:border-primary/40 transition-all duration-500 shadow-card hover:shadow-elevated group h-full relative overflow-hidden"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-2xl bg-background border border-border/60 hover:border-primary/40 transition-all duration-500 shadow-card hover:shadow-elevated group h-full relative overflow-hidden"
                 >
                   {/* Hover glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
