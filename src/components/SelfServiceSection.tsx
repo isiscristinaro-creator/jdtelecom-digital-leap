@@ -26,7 +26,7 @@ const SelfServiceSection = () => {
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-4">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-4">
             Autoatendimento para clientes
           </h2>
           <p className="text-[hsl(var(--dark-section-muted))] text-lg">
