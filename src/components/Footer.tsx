@@ -1,4 +1,6 @@
 import { Phone, Mail, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCallback } from "react";
 import logo from "@/assets/logo.png";
@@ -6,6 +8,7 @@ import logo from "@/assets/logo.png";
 const Footer = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { ref, isVisible } = useScrollAnimation(0.1);
 
   const handleAnchorClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
     e.preventDefault();
@@ -34,20 +37,30 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-dark-section py-20 relative overflow-hidden">
+    <footer className="bg-dark-section py-20 relative overflow-hidden" ref={ref}>
       {/* Subtle top glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
-          <div className="space-y-5">
+          <motion.div
+            className="space-y-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+          >
             <img src={logo} alt="JD Telecom" className="h-12 w-auto brightness-0 invert" />
             <p className="text-sm text-[hsl(var(--dark-section-muted))] leading-relaxed">
               Internet fibra óptica de alta velocidade para a região Norte do Brasil. Conectando famílias e empresas com excelência.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="space-y-5">
+          <motion.div
+            className="space-y-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <h4 className="font-display font-bold text-[hsl(var(--dark-section-fg))] text-base">Links Rápidos</h4>
             <ul className="space-y-3">
               {links.map((l) => (
@@ -58,9 +71,14 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          <div className="space-y-5">
+          <motion.div
+            className="space-y-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h4 className="font-display font-bold text-[hsl(var(--dark-section-fg))] text-base">Contato</h4>
             <ul className="space-y-4">
               <li>
@@ -86,9 +104,14 @@ const Footer = () => {
                 <span>Manaus - AM</span>
               </li>
             </ul>
-          </div>
+          </motion.div>
 
-          <div className="space-y-5">
+          <motion.div
+            className="space-y-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
             <h4 className="font-display font-bold text-[hsl(var(--dark-section-fg))] text-base">Serviços</h4>
             <ul className="space-y-3 text-sm text-[hsl(var(--dark-section-muted))]">
               {serviceLinks.map((l) => (
@@ -99,17 +122,22 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="border-t border-[hsl(var(--dark-section-border))] mt-14 pt-8 text-center">
+        <motion.div
+          className="border-t border-[hsl(var(--dark-section-border))] mt-14 pt-8 text-center"
+          initial={{ opacity: 0 }}
+          animate={isVisible ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
           <p className="text-sm text-[hsl(var(--dark-section-muted))]">
             © {new Date().getFullYear()} JD Telecom. Todos os direitos reservados. Grupo JD Telecom
           </p>
           <p className="text-xs text-[hsl(var(--dark-section-muted))]/60 mt-2">
             Desenvolvido por <span className="font-semibold text-[hsl(var(--dark-section-muted))]">SANNINS MARKETING LTDA</span>
           </p>
-        </div>
+        </motion.div>
       </div>
     </footer>
   );
