@@ -1,11 +1,23 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+interface SubscriberPreferences {
+  notifications_email: boolean;
+  notifications_sms: boolean;
+  notifications_whatsapp: boolean;
+  dark_mode: boolean;
+  language: string;
+}
+
 interface Subscriber {
   id: string;
   name: string;
   email: string;
   phone: string;
   address: string;
+  avatar: string;
+  cpf: string;
+  birthdate: string;
+  preferences: SubscriberPreferences;
   plan: {
     name: string;
     speed: string;
@@ -43,6 +55,16 @@ const MOCK_SUBSCRIBER: Subscriber = {
   email: "teste@jdtelecom.com",
   phone: "(92) 99123-4567",
   address: "Rua das Flores, 123 - Manaus, AM",
+  avatar: "https://api.dicebear.com/9.x/initials/svg?seed=JS&backgroundColor=0ea5e9",
+  cpf: "123.456.789-00",
+  birthdate: "15/03/1990",
+  preferences: {
+    notifications_email: true,
+    notifications_sms: false,
+    notifications_whatsapp: true,
+    dark_mode: true,
+    language: "pt-BR",
+  },
   plan: {
     name: "Turbo Fibra 300",
     speed: "300MB Fibra",
