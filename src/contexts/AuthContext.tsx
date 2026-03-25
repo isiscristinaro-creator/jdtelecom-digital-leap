@@ -1,11 +1,23 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+interface SubscriberPreferences {
+  notifications_email: boolean;
+  notifications_sms: boolean;
+  notifications_whatsapp: boolean;
+  dark_mode: boolean;
+  language: string;
+}
+
 interface Subscriber {
   id: string;
   name: string;
   email: string;
   phone: string;
   address: string;
+  avatar: string;
+  cpf: string;
+  birthdate: string;
+  preferences: SubscriberPreferences;
   plan: {
     name: string;
     speed: string;
