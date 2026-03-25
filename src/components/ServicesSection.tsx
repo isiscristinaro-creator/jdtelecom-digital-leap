@@ -70,7 +70,7 @@ const ServicesSection = () => {
                 whileHover={{ y: -10, scale: 1.02 }}
               >
                 {/* Gradient top */}
-                <div className={`bg-gradient-to-br ${s.color} h-44 flex items-center justify-center relative overflow-hidden`}>
+                <div className={`bg-gradient-to-br ${s.color} h-32 sm:h-44 flex items-center justify-center relative overflow-hidden`}>
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-500" />
                   {/* Floating glow */}
                   <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
