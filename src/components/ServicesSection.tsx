@@ -78,7 +78,7 @@ const ServicesSection = () => {
                     animate={{ y: [0, -5, 0] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
                   >
-                    <s.icon className="w-16 h-16 text-white/90 relative z-10 drop-shadow-lg" />
+                    <s.icon className="w-10 h-10 sm:w-16 sm:h-16 text-white/90 relative z-10 drop-shadow-lg" />
                   </motion.div>
                 </div>
                 {/* Dark bottom */}
