@@ -133,7 +133,7 @@ const SubscriberDashboard = () => {
 
         <div className="grid lg:grid-cols-3 gap-5">
           {/* Left column */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="lg:col-span-2 space-y-5 min-w-0">
             {/* Plan card */}
             <Card className="relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-8 translate-x-8" />
