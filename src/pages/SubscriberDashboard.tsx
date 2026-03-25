@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import {
   Wifi, LogOut, CreditCard, FileText, User, MessageCircle,
   Settings, CheckCircle, Clock, AlertTriangle, ChevronRight,
-  Phone, Mail, MapPin, Zap, Calendar, DollarSign, Shield, ArrowUpRight
+  Phone, Mail, MapPin, Zap, Calendar, DollarSign, Shield, ArrowUpRight,
+  Bell, BellOff, Smartphone, Globe
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { toast } from "sonner";
