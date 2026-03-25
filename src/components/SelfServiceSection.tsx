@@ -39,7 +39,7 @@ const SelfServiceSection = () => {
             <motion.a
               key={item.title}
               href={item.href}
-              className="group flex flex-col items-start text-left p-5 rounded-2xl border border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))]/50 hover:border-primary/30 hover:bg-[hsl(var(--dark-section-card))] transition-all duration-500 relative overflow-hidden"
+              className="group flex flex-col items-start text-left p-3 sm:p-5 rounded-2xl border border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))]/50 hover:border-primary/30 hover:bg-[hsl(var(--dark-section-card))] transition-all duration-500 relative overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.4, delay: i * 0.08 + 0.2 }}
