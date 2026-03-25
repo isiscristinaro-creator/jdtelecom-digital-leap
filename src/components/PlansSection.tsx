@@ -46,7 +46,7 @@ const PlansSection = () => {
           transition={{ duration: 0.6 }}
         >
           <div>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-3 leading-[1.1]">
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-3 leading-[1.1]">
               Aproveite nossas ofertas
             </h2>
             <p className="text-[hsl(var(--dark-section-muted))] text-lg">
