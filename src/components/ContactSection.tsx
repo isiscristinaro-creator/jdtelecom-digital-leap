@@ -25,7 +25,7 @@ const ContactSection = () => {
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-4 leading-[1.1]">
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground mb-4 leading-[1.1]">
             Fale <span className="text-gradient">conosco</span>
           </h2>
           <p className="text-muted-foreground text-lg md:text-xl">
