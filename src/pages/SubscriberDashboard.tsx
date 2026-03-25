@@ -113,7 +113,7 @@ const SubscriberDashboard = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-5 md:px-6 py-6 md:py-10 pb-28 max-w-6xl overflow-hidden">
+      <main className="container mx-auto px-4 sm:px-5 md:px-6 py-6 md:py-10 pb-28 max-w-6xl min-w-0">
         {/* Greeting with Avatar */}
         <div className="mb-8 flex items-center gap-4">
           <img
