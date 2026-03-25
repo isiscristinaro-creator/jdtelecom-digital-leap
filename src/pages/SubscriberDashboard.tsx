@@ -296,7 +296,43 @@ const SubscriberDashboard = () => {
               )}
             </Card>
 
-            {/* Support */}
+            {/* Preferences */}
+            <Card>
+              <CardHeader icon={Bell} title="Notificações" />
+              <div className="space-y-3">
+                {[
+                  { label: "Email", icon: Mail, key: "notifications_email" as const },
+                  { label: "SMS", icon: Smartphone, key: "notifications_sms" as const },
+                  { label: "WhatsApp", icon: MessageCircle, key: "notifications_whatsapp" as const },
+                ].map((item) => (
+                  <div key={item.key} className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4 text-primary" />
+                      <span className="text-sm text-[hsl(var(--dark-section-fg))]">{item.label}</span>
+                    </div>
+                    {subscriber.preferences[item.key] ? (
+                      <span className="flex items-center gap-1 text-xs font-semibold text-emerald-400">
+                        <Bell className="w-3 h-3" /> Ativo
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs font-semibold text-[hsl(var(--dark-section-muted))]">
+                        <BellOff className="w-3 h-3" /> Inativo
+                      </span>
+                    )}
+                  </div>
+                ))}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-[hsl(var(--dark-section-fg))]">Idioma</span>
+                  </div>
+                  <span className="text-xs font-semibold text-[hsl(var(--dark-section-muted))]">
+                    {subscriber.preferences.language === "pt-BR" ? "Português" : subscriber.preferences.language}
+                  </span>
+                </div>
+              </div>
+            </Card>
+
             <Card>
               <CardHeader icon={MessageCircle} title="Suporte" />
               <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-4">
