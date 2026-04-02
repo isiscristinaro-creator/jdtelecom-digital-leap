@@ -576,39 +576,6 @@ const Movel5G = () => {
         </div>
       </section>
 
-      {/* ═══════════ APP SECTION ═══════════ */}
-      <section className="py-16 sm:py-24 relative overflow-hidden" ref={appRef}>
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-primary/[0.04] blur-[140px] rounded-full" />
-        <ParticleField />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            <motion.div className="flex justify-center order-2 lg:order-1" initial={{ opacity: 0, x: -40 }} animate={appVisible ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.8 }}>
-              <div className="relative">
-                <motion.div className="absolute inset-[-15%] border border-primary/10 rounded-[40%]" animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} />
-                <div className="absolute inset-0 bg-primary/10 blur-[60px] rounded-full" />
-                <img src={appImg} alt="App JD Móvel" className="relative w-48 sm:w-56 lg:w-64 h-auto drop-shadow-2xl" loading="lazy" width={512} height={1024} />
-              </div>
-            </motion.div>
-            <motion.div className="order-1 lg:order-2" initial={{ opacity: 0, x: 40 }} animate={appVisible ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.8 }}>
-              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Smartphone className="w-4 h-4" /> Baixe o App</span>
-              <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">Tudo na palma da sua mão</h2>
-              <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8 max-w-lg">
-                Com o app da <strong className="text-white">JD Móvel</strong> você gerencia seus planos, acompanha seu consumo, renova créditos e muito mais. Disponível para Android e iOS.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-12 text-sm font-bold gap-2">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.55 4.3-3.74 4.25z"/></svg>
-                  App Store
-                </Button>
-                <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-12 text-sm font-bold gap-2">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M3.18 23.67c-.37-.2-.63-.55-.63-1.02V1.35C2.55.48 3.47.03 4.23.47l18.32 10.65c.76.44.76 1.32 0 1.76L4.23 23.53c-.34.2-.72.25-1.05.14zm1.8-19.39L13.63 12 4.98 19.72V4.28zm10.64 9.1L17.5 12l-1.88-1.38-3.67-2.68 5.67 5.44zm1.07-.76l2.43-1.42-2.43-1.42-1.32 1.42 1.32 1.42z"/></svg>
-                  Google Play
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════ PLANS ═══════════ */}
       <section id="planos" className="py-16 sm:py-24 relative" ref={plansRef}>
