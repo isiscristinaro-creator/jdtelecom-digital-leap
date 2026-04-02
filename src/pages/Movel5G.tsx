@@ -8,11 +8,15 @@ import {
   ChevronLeft, ChevronRight, Cpu, Wifi, Radio, Network
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import heroImg from "@/assets/movel-5g-hero-tech.png";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+
+/* ── Animation helpers ── */
+const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
+const viewportOnce = { once: true, amount: 0.15 as const };
 
 /* ── Plan data ── */
 const mobilePlans = [
@@ -117,7 +121,6 @@ const CyberGrid = () => (
       `,
       backgroundSize: "80px 80px",
     }} />
-    {/* Scan line */}
     <motion.div
       className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"
       animate={{ top: ["0%", "100%"] }}
@@ -201,7 +204,7 @@ const DataStreams = () => (
 const FaqItem = ({ q, a }: { q: string; a: string }) => {
   const [open, setOpen] = useState(false);
   return (
-    <motion.div className="border border-white/10 rounded-2xl overflow-hidden bg-white/[0.03] backdrop-blur-sm" initial={false}>
+    <div className="border border-white/10 rounded-2xl overflow-hidden bg-white/[0.03] backdrop-blur-sm">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left">
         <span className="text-sm sm:text-base font-semibold text-white pr-4">{q}</span>
         <ChevronDown className={`w-5 h-5 text-primary shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
@@ -209,13 +212,20 @@ const FaqItem = ({ q, a }: { q: string; a: string }) => {
       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
         <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{a}</p>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
 /* ── Plan Card ── */
-const PlanCard = ({ plan, visible, index, navigate }: { plan: typeof mobilePlans[0]; visible: boolean; index: number; navigate: (p: string) => void }) => (
-  <motion.div initial={{ opacity: 0, y: 30 }} animate={visible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: index * 0.08 }} className="relative h-full">
+const PlanCard = ({ plan, index, navigate }: { plan: typeof mobilePlans[0]; index: number; navigate: (p: string) => void }) => (
+  <motion.div
+    variants={fadeUp}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.1 }}
+    transition={{ duration: 0.5, delay: index * 0.08 }}
+    className="relative h-full"
+  >
     {plan.popular && (
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">⭐ MAIS POPULAR</div>
     )}
@@ -265,7 +275,7 @@ const PlanCard = ({ plan, visible, index, navigate }: { plan: typeof mobilePlans
 );
 
 /* ── Plan Carousel ── */
-const PlansCarousel = ({ plans, visible, navigate }: { plans: typeof mobilePlans; visible: boolean; navigate: (p: string) => void }) => {
+const PlansCarousel = ({ plans, navigate }: { plans: typeof mobilePlans; navigate: (p: string) => void }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -295,7 +305,7 @@ const PlansCarousel = ({ plans, visible, navigate }: { plans: typeof mobilePlans
   if (!isMobile) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
-        {plans.map((plan, i) => <PlanCard key={plan.name} plan={plan} visible={visible} index={i} navigate={navigate} />)}
+        {plans.map((plan, i) => <PlanCard key={plan.name} plan={plan} index={i} navigate={navigate} />)}
       </div>
     );
   }
@@ -305,7 +315,7 @@ const PlansCarousel = ({ plans, visible, navigate }: { plans: typeof mobilePlans
       <div ref={scrollRef} onScroll={updateCurrent} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 -mx-4 px-4" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {plans.map((plan, i) => (
           <div key={plan.name} className="snap-center shrink-0 w-[280px]">
-            <PlanCard plan={plan} visible={visible} index={i} navigate={navigate} />
+            <PlanCard plan={plan} index={i} navigate={navigate} />
           </div>
         ))}
       </div>
@@ -331,20 +341,19 @@ const PlansCarousel = ({ plans, visible, navigate }: { plans: typeof mobilePlans
 /* ── Coverage Map ── */
 const CoverageMapSection = () => {
   const [activeCity, setActiveCity] = useState<string | null>(null);
-  const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section id="cobertura" className="py-16 sm:py-24 border-y border-white/5 relative" ref={ref}>
+    <section id="cobertura" className="py-16 sm:py-24 border-y border-white/5 relative">
       <DataStreams />
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div className="text-center mb-10 sm:mb-14" initial={{ opacity: 0, y: 20 }} animate={isVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
+        <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
           <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><MapPin className="w-4 h-4" /> Cobertura Móvel</span>
           <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Onde estamos com <span className="text-primary">5G</span></h2>
           <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Cobertura crescente na região Norte, levando conexão 5G para mais cidades</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-8 items-start max-w-5xl mx-auto">
-          <motion.div className="lg:col-span-3" initial={{ opacity: 0, scale: 0.95 }} animate={isVisible ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.7, delay: 0.2 }}>
+          <motion.div className="lg:col-span-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.7, delay: 0.2 }}>
             <div className="relative bg-white/[0.03] border border-white/[0.08] rounded-3xl p-6 md:p-10 overflow-hidden">
               <NeuralNetwork />
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 blur-[80px] pointer-events-none" />
@@ -397,7 +406,7 @@ const CoverageMapSection = () => {
             </div>
           </motion.div>
 
-          <motion.div className="lg:col-span-2" initial={{ opacity: 0, x: 30 }} animate={isVisible ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.7, delay: 0.4 }}>
+          <motion.div className="lg:col-span-2" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.7, delay: 0.4 }}>
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               {coverageCities.map((city) => (
                 <button key={city.name} onMouseEnter={() => setActiveCity(city.name)} onMouseLeave={() => setActiveCity(null)}
@@ -425,22 +434,15 @@ const CoverageMapSection = () => {
 const Movel5G = () => {
   const [filter, setFilter] = useState<"all" | "start" | "turbo">("all");
   const navigate = useNavigate();
-  const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
-  const { ref: featRef, isVisible: featVisible } = useScrollAnimation();
-  const { ref: plansRef, isVisible: plansVisible } = useScrollAnimation();
-  const { ref: aboutRef, isVisible: aboutVisible } = useScrollAnimation();
-  const { ref: whyRef, isVisible: whyVisible } = useScrollAnimation();
-  const { ref: faqRef, isVisible: faqVisible } = useScrollAnimation();
 
   const filtered = mobilePlans.filter((p) => filter === "all" || p.tier.toLowerCase() === filter);
 
   return (
     <div className="min-h-screen bg-[hsl(220,20%,6%)] text-white overflow-x-hidden">
-      {/* Main site Navbar */}
       <Navbar />
 
       {/* ═══════════ HERO ═══════════ */}
-      <section id="inicio" className="relative pt-[128px] sm:pt-[132px] md:pt-[140px] pb-16 sm:pb-24 overflow-hidden" ref={heroRef}>
+      <section id="inicio" className="relative pt-[128px] sm:pt-[132px] md:pt-[140px] pb-16 sm:pb-24 overflow-hidden">
         <GlowingOrbs />
         <ParticleField />
         <CyberGrid />
@@ -448,12 +450,12 @@ const Movel5G = () => {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            <motion.div initial={{ opacity: 0, y: 40 }} animate={heroVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8 }}>
+            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               {/* AI Badge */}
               <motion.span
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 to-blue-500/10 border border-primary/30 text-primary text-xs font-bold px-4 py-2 rounded-full mb-6 backdrop-blur-sm"
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={heroVisible ? { opacity: 1, scale: 1 } : {}}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
                 <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
@@ -488,7 +490,6 @@ const Movel5G = () => {
                 </Button>
               </div>
 
-              {/* Tech stats row */}
               <div className="flex flex-wrap gap-6 text-xs sm:text-sm text-white/50">
                 {[
                   { icon: Check, label: "Internet Ultra Rápida" },
@@ -502,10 +503,9 @@ const Movel5G = () => {
               </div>
             </motion.div>
 
-            {/* Hero Image with tech effects */}
-            <motion.div className="flex justify-center lg:justify-end" initial={{ opacity: 0, scale: 0.8 }} animate={heroVisible ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 1, delay: 0.3 }}>
+            {/* Hero Image */}
+            <motion.div className="flex justify-center lg:justify-end" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3 }}>
               <div className="relative">
-                {/* Rotating ring */}
                 <motion.div
                   className="absolute inset-[-20%] border border-primary/10 rounded-full"
                   animate={{ rotate: 360 }}
@@ -516,11 +516,9 @@ const Movel5G = () => {
                   animate={{ rotate: -360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 />
-                {/* Glow */}
                 <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full" />
                 <img src={heroImg} alt="5G Mobile" className="relative w-64 sm:w-80 lg:w-96 h-auto drop-shadow-2xl" width={1024} height={1024} />
 
-                {/* Floating badge */}
                 <motion.div
                   className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-gradient-to-br from-primary to-orange-600 text-primary-foreground text-xl sm:text-2xl font-black px-4 py-2 rounded-2xl shadow-glow-lg"
                   animate={{ y: [0, -8, 0] }}
@@ -529,7 +527,6 @@ const Movel5G = () => {
                   5G
                 </motion.div>
 
-                {/* Speed indicator */}
                 <motion.div
                   className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-3 py-2 text-xs"
                   animate={{ y: [0, 5, 0] }}
@@ -548,7 +545,7 @@ const Movel5G = () => {
       </section>
 
       {/* ═══════════ FEATURES ROW ═══════════ */}
-      <section className="py-12 sm:py-16 border-y border-white/5 relative" ref={featRef}>
+      <section className="py-12 sm:py-16 border-y border-white/5 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -560,7 +557,8 @@ const Movel5G = () => {
             ].map((f, i) => (
               <motion.div key={f.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
-                initial={{ opacity: 0, y: 30 }} animate={featVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: i * 0.1 }} whileHover={{ y: -4 }}
+                variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}
+                transition={{ duration: 0.5, delay: i * 0.1 }} whileHover={{ y: -4 }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${f.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative z-10">
@@ -576,13 +574,12 @@ const Movel5G = () => {
         </div>
       </section>
 
-
       {/* ═══════════ PLANS ═══════════ */}
-      <section id="planos" className="py-16 sm:py-24 relative" ref={plansRef}>
+      <section id="planos" className="py-16 sm:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
         <CyberGrid />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="text-center mb-10 sm:mb-14" initial={{ opacity: 0, y: 20 }} animate={plansVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
+          <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Star className="w-4 h-4" /> Planos Premium</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, WhatsApp ilimitado e muito mais</p>
@@ -600,7 +597,7 @@ const Movel5G = () => {
             ))}
           </div>
 
-          <PlansCarousel plans={filtered} visible={plansVisible} navigate={navigate} />
+          <PlansCarousel plans={filtered} navigate={navigate} />
         </div>
       </section>
 
@@ -608,10 +605,10 @@ const Movel5G = () => {
       <CoverageMapSection />
 
       {/* ═══════════ ABOUT ═══════════ */}
-      <section id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative" ref={aboutRef}>
+      <section id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="max-w-3xl mx-auto text-center" initial={{ opacity: 0, y: 30 }} animate={aboutVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}>
+          <motion.div className="max-w-3xl mx-auto text-center" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.7 }}>
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Sparkles className="w-4 h-4" /> Sobre Nós</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-6">Conectando Pessoas e Simplicidade</h2>
             <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
@@ -622,10 +619,10 @@ const Movel5G = () => {
       </section>
 
       {/* ═══════════ WHY CHOOSE ═══════════ */}
-      <section className="py-16 sm:py-24 relative" ref={whyRef}>
+      <section className="py-16 sm:py-24 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="text-center mb-10 sm:mb-14" initial={{ opacity: 0, y: 20 }} animate={whyVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
+          <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Por que escolher a <span className="text-primary">JD Móvel</span>?</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Conectamos pessoas, sonhos e oportunidades.</p>
           </motion.div>
@@ -637,7 +634,8 @@ const Movel5G = () => {
             ].map((item, i) => (
               <motion.div key={item.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all overflow-hidden group"
-                initial={{ opacity: 0, y: 30 }} animate={whyVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: i * 0.15 }} whileHover={{ y: -4 }}
+                variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}
+                transition={{ duration: 0.5, delay: i * 0.15 }} whileHover={{ y: -4 }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative z-10">
@@ -652,15 +650,15 @@ const Movel5G = () => {
       </section>
 
       {/* ═══════════ FAQ ═══════════ */}
-      <section id="contato" className="py-16 sm:py-24 border-t border-white/5" ref={faqRef}>
+      <section id="contato" className="py-16 sm:py-24 border-t border-white/5">
         <div className="container mx-auto px-4">
-          <motion.div className="text-center mb-10 sm:mb-14" initial={{ opacity: 0, y: 20 }} animate={faqVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
+          <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Perguntas Frequentes</h2>
             <p className="text-white/50 text-sm sm:text-base">Tire suas dúvidas sobre nossos serviços</p>
           </motion.div>
           <div className="max-w-2xl mx-auto space-y-3">
             {faqs.map((faq, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 15 }} animate={faqVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.4, delay: i * 0.1 }}>
+              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.4, delay: i * 0.1 }}>
                 <FaqItem q={faq.q} a={faq.a} />
               </motion.div>
             ))}
@@ -674,20 +672,21 @@ const Movel5G = () => {
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
         <ParticleField />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Pronto para a revolução 5G?</h2>
-          <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Peça já o seu chip e entre na nova era digital com a JD Móvel.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full px-8 h-12 font-bold shadow-lg" onClick={() => navigate("/cadastro")}>
-              Pedir Meu Chip <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
-              <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer"><MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp</a>
-            </Button>
-          </div>
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Pronto para a revolução 5G?</h2>
+            <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Peça já o seu chip e entre na nova era digital com a JD Móvel.</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full px-8 h-12 font-bold shadow-lg" onClick={() => navigate("/cadastro")}>
+                Pedir Meu Chip <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
+                <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer"><MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp</a>
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Footer from main site */}
       <Footer />
       <WhatsAppButton />
     </div>
