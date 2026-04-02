@@ -27,9 +27,9 @@ const mobilePlans = [
 ];
 
 const faqs = [
-  { q: "É necessário pagar alguma taxa para aderir ao plano?", a: "Não há cobrança de taxa de adesão. Para aderir, o cliente deve adquirir e ativar o chip JD Móvel no aplicativo. A ativação é feita automaticamente após a primeira recarga." },
-  { q: "Como é feita a renovação do plano?", a: "A renovação é automática e ocorre no dia seguinte ao término da validade (30 dias). Para isso, efetue o pagamento da próxima assinatura via Pix, Boleto ou Cartão pelo app." },
-  { q: "Como faço a portabilidade para a JD Móvel?", a: "Utilize o app ou o chat para solicitar. Serão necessários: Nome, CPF, número que deseja manter e operadora antiga. Em até 5 dias úteis seu plano estará disponível." },
+  { q: "É necessário pagar alguma taxa para aderir ao plano?", a: "Não há cobrança de taxa de adesão. Para aderir, o cliente deve adquirir e ativar o chip JD Móvel. A ativação é feita automaticamente após a primeira recarga." },
+  { q: "Como é feita a renovação do plano?", a: "A renovação é automática e ocorre no dia seguinte ao término da validade (30 dias). Para isso, efetue o pagamento da próxima assinatura via Pix, Boleto ou Cartão pelo autoatendimento." },
+  { q: "Como faço a portabilidade para a JD Móvel?", a: "Utilize o chat ou WhatsApp para solicitar. Serão necessários: Nome, CPF, número que deseja manter e operadora antiga. Em até 5 dias úteis seu plano estará disponível." },
   { q: "É possível fazer ligações internacionais (DDI)?", a: "Não. Os benefícios de voz/sms não são válidos para ligações internacionais." },
 ];
 
