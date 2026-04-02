@@ -10,7 +10,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import heroImg from "@/assets/movel-5g-hero-tech.png";
-import appImg from "@/assets/movel-app-preview.png";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
