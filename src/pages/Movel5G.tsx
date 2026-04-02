@@ -14,9 +14,6 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 /* ── Animation helpers ── */
-const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
-const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
-const viewportOnce = { once: true, amount: 0.15 as const };
 
 /* ── Plan data ── */
 const mobilePlans = [
@@ -652,7 +649,7 @@ const Movel5G = () => {
           </motion.div>
           <div className="max-w-2xl mx-auto space-y-3">
             {faqs.map((faq, i) => (
-              <motion.div key={i}  transition={{ duration: 0.4, delay: i * 0.1 }}>
+              <div key={i}>
                 <FaqItem q={faq.q} a={faq.a} />
               </motion.div>
             ))}
