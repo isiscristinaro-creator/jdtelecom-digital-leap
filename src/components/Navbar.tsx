@@ -177,7 +177,15 @@ const Navbar = () => {
                 key={link.label}
                 href={link.href}
                 className="flex items-center gap-2 text-sm text-primary py-2"
-                onClick={(e) => handleAnchorClick(e, link.href)}
+                onClick={(e) => {
+                  if ('isRoute' in link && link.isRoute) {
+                    e.preventDefault();
+                    navigate(link.href);
+                    setIsOpen(false);
+                  } else {
+                    handleAnchorClick(e, link.href);
+                  }
+                }}
               >
                 <link.icon className="w-3.5 h-3.5" />
                 {link.label}
