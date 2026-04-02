@@ -346,14 +346,14 @@ const CoverageMapSection = () => {
     <section id="cobertura" className="py-16 sm:py-24 border-y border-white/5 relative">
       <DataStreams />
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
+        <div className="text-center mb-10 sm:mb-14">
           <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><MapPin className="w-4 h-4" /> Cobertura Móvel</span>
           <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Onde estamos com <span className="text-primary">5G</span></h2>
           <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Cobertura crescente na região Norte, levando conexão 5G para mais cidades</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-8 items-start max-w-5xl mx-auto">
-          <motion.div className="lg:col-span-3"  transition={{ duration: 0.7, delay: 0.2 }}>
+          <div className="lg:col-span-3">
             <div className="relative bg-white/[0.03] border border-white/[0.08] rounded-3xl p-6 md:p-10 overflow-hidden">
               <NeuralNetwork />
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 blur-[80px] pointer-events-none" />
@@ -406,7 +406,7 @@ const CoverageMapSection = () => {
             </div>
           </motion.div>
 
-          <motion.div className="lg:col-span-2"  transition={{ duration: 0.7, delay: 0.4 }}>
+          <div className="lg:col-span-2">
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               {coverageCities.map((city) => (
                 <button key={city.name} onMouseEnter={() => setActiveCity(city.name)} onMouseLeave={() => setActiveCity(null)}
@@ -579,7 +579,7 @@ const Movel5G = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
         <CyberGrid />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
+          <div className="text-center mb-10 sm:mb-14">
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Star className="w-4 h-4" /> Planos Premium</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, WhatsApp ilimitado e muito mais</p>
@@ -608,7 +608,7 @@ const Movel5G = () => {
       <section id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="max-w-3xl mx-auto text-center"  transition={{ duration: 0.7 }}>
+          <div className="max-w-3xl mx-auto text-center">
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Sparkles className="w-4 h-4" /> Sobre Nós</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-6">Conectando Pessoas e Simplicidade</h2>
             <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
@@ -622,7 +622,7 @@ const Movel5G = () => {
       <section className="py-16 sm:py-24 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
+          <div className="text-center mb-10 sm:mb-14">
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Por que escolher a <span className="text-primary">JD Móvel</span>?</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Conectamos pessoas, sonhos e oportunidades.</p>
           </motion.div>
@@ -652,7 +652,7 @@ const Movel5G = () => {
       {/* ═══════════ FAQ ═══════════ */}
       <section id="contato" className="py-16 sm:py-24 border-t border-white/5">
         <div className="container mx-auto px-4">
-          <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
+          <div className="text-center mb-10 sm:mb-14">
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Perguntas Frequentes</h2>
             <p className="text-white/50 text-sm sm:text-base">Tire suas dúvidas sobre nossos serviços</p>
           </motion.div>
