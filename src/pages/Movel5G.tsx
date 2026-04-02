@@ -585,7 +585,7 @@ const Movel5G = () => {
           <motion.div className="text-center mb-10 sm:mb-14" initial={{ opacity: 0, y: 20 }} animate={plansVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Star className="w-4 h-4" /> Planos Premium</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
-            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, apps ilimitados e muito mais</p>
+            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, WhatsApp ilimitado e muito mais</p>
           </motion.div>
 
           <div className="flex justify-center gap-2 mb-8 sm:mb-10">
