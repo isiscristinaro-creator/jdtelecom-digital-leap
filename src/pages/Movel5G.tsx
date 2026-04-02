@@ -1,0 +1,614 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  Signal, Smartphone, Phone, MessageCircle, Shield, Zap,
+  ChevronDown, Check, Globe, Music, Star, ArrowRight, Headphones,
+  CreditCard, BarChart3, Sparkles, Menu, X, User
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import heroImg from "@/assets/movel-5g-hero.png";
+import appImg from "@/assets/movel-app-preview.png";
+import logo from "@/assets/logo.png";
+import WhatsAppButton from "@/components/WhatsAppButton";
+
+/* ── Plan data ── */
+const mobilePlans = [
+  {
+    tier: "Start", name: "JD VOZ 1000MIN | 5GB", data: "5GB", minutes: "1000 Minutos",
+    price: "35", cents: "00", whatsapp: true, deezer: false, popular: false,
+  },
+  {
+    tier: "Start", name: "START 6 + DEEZER", data: "6GB", minutes: "100 Minutos",
+    price: "39", cents: "90", whatsapp: true, deezer: true, popular: false,
+  },
+  {
+    tier: "Start", name: "START 8 + DEEZER", data: "8GB", minutes: "Ilimitados",
+    price: "44", cents: "90", whatsapp: true, deezer: true, popular: false,
+  },
+  {
+    tier: "Start", name: "START 14 + DEEZER", data: "14GB", minutes: "Ilimitados",
+    price: "54", cents: "90", whatsapp: true, deezer: true, popular: true,
+  },
+  {
+    tier: "Turbo", name: "TURBO 21 + DEEZER", data: "21GB", minutes: "Ilimitados",
+    price: "64", cents: "90", whatsapp: true, deezer: true, popular: false,
+  },
+  {
+    tier: "Turbo", name: "TURBO 29 + DEEZER", data: "29GB", minutes: "Ilimitados",
+    price: "69", cents: "90", whatsapp: true, deezer: true, popular: false,
+  },
+  {
+    tier: "Turbo", name: "TURBO 39 + DEEZER", data: "39GB", minutes: "Ilimitados",
+    price: "89", cents: "90", whatsapp: true, deezer: true, popular: false,
+  },
+  {
+    tier: "Turbo", name: "TURBO 44 + DEEZER", data: "44GB", minutes: "Ilimitados",
+    price: "94", cents: "90", whatsapp: true, deezer: true, popular: false,
+  },
+];
+
+const faqs = [
+  {
+    q: "É necessário pagar alguma taxa para aderir ao plano?",
+    a: "Não há cobrança de taxa de adesão. Para aderir, o cliente deve adquirir e ativar o chip JD Móvel no aplicativo. A ativação é feita automaticamente após a primeira recarga.",
+  },
+  {
+    q: "Como é feita a renovação do plano?",
+    a: "A renovação é automática e ocorre no dia seguinte ao término da validade (30 dias). Para isso, efetue o pagamento da próxima assinatura via Pix, Boleto ou Cartão pelo app.",
+  },
+  {
+    q: "Como faço a portabilidade para a JD Móvel?",
+    a: "Utilize o app ou o chat para solicitar. Serão necessários: Nome, CPF, número que deseja manter e operadora antiga. Em até 5 dias úteis seu plano estará disponível.",
+  },
+  {
+    q: "É possível fazer ligações internacionais (DDI)?",
+    a: "Não. Os benefícios de voz/sms não são válidos para ligações internacionais.",
+  },
+];
+
+/* ── Sub-components ── */
+
+const MovelNavbar = () => {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const links = [
+    { label: "Início", href: "#inicio" },
+    { label: "Planos", href: "#planos" },
+    { label: "Sobre Nós", href: "#sobre" },
+    { label: "Contato", href: "#contato" },
+  ];
+
+  const scrollTo = (hash: string) => {
+    setOpen(false);
+    const el = document.querySelector(hash);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[hsl(220,20%,6%)] border-b border-white/10">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+        <a href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }} className="shrink-0">
+          <img src={logo} alt="JD Telecom" className="h-9 md:h-11 w-auto" />
+        </a>
+        <div className="hidden md:flex items-center gap-6">
+          {links.map((l) => (
+            <button key={l.label} onClick={() => scrollTo(l.href)} className="text-sm font-medium text-white/80 hover:text-primary transition-colors">
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div className="hidden md:flex items-center gap-3">
+          <Button size="sm" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full text-xs font-bold" onClick={() => scrollTo("#planos")}>
+            Pedir Chip
+          </Button>
+          <Button size="sm" className="bg-primary text-primary-foreground rounded-full text-xs font-bold" onClick={() => navigate("/assinante")}>
+            <User className="w-3.5 h-3.5 mr-1" /> Área do Cliente
+          </Button>
+        </div>
+        <button className="md:hidden text-white" onClick={() => setOpen(!open)}>
+          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+      {open && (
+        <div className="md:hidden bg-[hsl(220,20%,8%)] border-t border-white/10 px-4 pb-4">
+          {links.map((l) => (
+            <button key={l.label} onClick={() => scrollTo(l.href)} className="block w-full text-left py-3 text-white/80 hover:text-primary border-b border-white/5 text-sm font-medium">
+              {l.label}
+            </button>
+          ))}
+          <div className="flex flex-col gap-2 mt-3">
+            <Button className="bg-primary text-primary-foreground rounded-full h-11 font-bold" onClick={() => { setOpen(false); scrollTo("#planos"); }}>
+              Pedir Chip
+            </Button>
+            <Button variant="outline" className="border-primary text-primary rounded-full h-11 font-bold" onClick={() => navigate("/assinante")}>
+              <User className="w-4 h-4 mr-1" /> Área do Cliente
+            </Button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+const FaqItem = ({ q, a }: { q: string; a: string }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <motion.div
+      className="border border-white/10 rounded-2xl overflow-hidden bg-white/[0.03] backdrop-blur-sm"
+      initial={false}
+    >
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left">
+        <span className="text-sm sm:text-base font-semibold text-white pr-4">{q}</span>
+        <ChevronDown className={`w-5 h-5 text-primary shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        className="overflow-hidden"
+      >
+        <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{a}</p>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+/* ── Main Page ── */
+const Movel5G = () => {
+  const [filter, setFilter] = useState<"all" | "start" | "turbo">("all");
+  const navigate = useNavigate();
+  const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
+  const { ref: featRef, isVisible: featVisible } = useScrollAnimation();
+  const { ref: appRef, isVisible: appVisible } = useScrollAnimation();
+  const { ref: plansRef, isVisible: plansVisible } = useScrollAnimation();
+  const { ref: aboutRef, isVisible: aboutVisible } = useScrollAnimation();
+  const { ref: whyRef, isVisible: whyVisible } = useScrollAnimation();
+  const { ref: faqRef, isVisible: faqVisible } = useScrollAnimation();
+
+  const filtered = mobilePlans.filter(
+    (p) => filter === "all" || p.tier.toLowerCase() === filter
+  );
+
+  return (
+    <div className="min-h-screen bg-[hsl(220,20%,6%)] text-white overflow-x-hidden">
+      <MovelNavbar />
+
+      {/* ═══════════ HERO ═══════════ */}
+      <section id="inicio" className="relative pt-24 sm:pt-28 pb-16 sm:pb-24 overflow-hidden" ref={heroRef}>
+        {/* BG effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-primary/[0.08] blur-[150px] rounded-full" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-primary/[0.05] blur-[120px] rounded-full" />
+        </div>
+        {/* Grid pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
+          backgroundSize: "60px 60px"
+        }} />
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={heroVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.span
+                className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold px-4 py-2 rounded-full mb-6"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={heroVisible ? { opacity: 1, scale: 1 } : {}}
+                transition={{ delay: 0.2 }}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Nova Era Digital
+              </motion.span>
+
+              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] mb-6">
+                A ERA DIGITAL CHEGOU,{" "}
+                <span className="text-primary">VOCÊ ESTÁ PRONTO?</span>
+              </h1>
+
+              <p className="text-white/60 text-base sm:text-lg max-w-lg mb-8 leading-relaxed">
+                Conheça os planos da <strong className="text-primary font-bold">JD MÓVEL</strong> e aproveite liberdade total, com internet rápida, chamadas ilimitadas e muito mais.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <Button size="lg" className="bg-primary text-primary-foreground rounded-full px-8 text-sm font-bold h-12 shadow-glow" onClick={() => {
+                  const el = document.querySelector("#planos");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}>
+                  Pedir Chip <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm text-white/50">
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-primary" /> Internet Ultra Rápida</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-primary" /> Chamadas Ilimitadas</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-primary" /> Suporte 24/7</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="flex justify-center lg:justify-end"
+              initial={{ opacity: 0, scale: 0.8, rotateY: 15 }}
+              animate={heroVisible ? { opacity: 1, scale: 1, rotateY: 0 } : {}}
+              transition={{ duration: 1, delay: 0.3 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full" />
+                <img src={heroImg} alt="5G Mobile" className="relative w-64 sm:w-80 lg:w-96 h-auto" width={800} height={800} />
+                <motion.div
+                  className="absolute -top-4 -right-4 bg-primary text-primary-foreground text-xl sm:text-2xl font-black px-4 py-2 rounded-2xl shadow-glow-lg"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  5G
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ FEATURES ROW ═══════════ */}
+      <section className="py-12 sm:py-16 border-y border-white/5" ref={featRef}>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              { icon: Shield, title: "Segurança", desc: "Seus dados protegidos com criptografia avançada." },
+              { icon: Zap, title: "Gerencie Seus Planos", desc: "Controle tudo com facilidade direto pelo app." },
+              { icon: CreditCard, title: "Faturas", desc: "Renove seu plano com um só clique pelo app." },
+              { icon: BarChart3, title: "Acúmulo de Gigas", desc: "Acompanhe seus gigas acumulados em tempo real." },
+            ].map((f, i) => (
+              <motion.div
+                key={f.title}
+                className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group"
+                initial={{ opacity: 0, y: 30 }}
+                animate={featVisible ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -4 }}
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <f.icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-display text-sm sm:text-base font-bold mb-2">{f.title}</h3>
+                <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ APP SECTION ═══════════ */}
+      <section className="py-16 sm:py-24 relative overflow-hidden" ref={appRef}>
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-primary/[0.04] blur-[140px] rounded-full" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div
+              className="flex justify-center order-2 lg:order-1"
+              initial={{ opacity: 0, x: -40 }}
+              animate={appVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/10 blur-[60px] rounded-full" />
+                <img src={appImg} alt="App JD Móvel" className="relative w-48 sm:w-56 lg:w-64 h-auto" loading="lazy" width={512} height={1024} />
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="order-1 lg:order-2"
+              initial={{ opacity: 0, x: 40 }}
+              animate={appVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+                <Smartphone className="w-4 h-4" /> Baixe o App
+              </span>
+              <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">
+                Tudo na palma da sua mão
+              </h2>
+              <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8 max-w-lg">
+                Com o app da <strong className="text-white">JD Móvel</strong> você gerencia seus planos, acompanha seu consumo, renova créditos e muito mais. Disponível para Android e iOS.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-12 text-sm font-bold gap-2">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.55 4.3-3.74 4.25z"/></svg>
+                  App Store
+                </Button>
+                <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-12 text-sm font-bold gap-2">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M3.18 23.67c-.37-.2-.63-.55-.63-1.02V1.35C2.55.48 3.47.03 4.23.47l18.32 10.65c.76.44.76 1.32 0 1.76L4.23 23.53c-.34.2-.72.25-1.05.14zm1.8-19.39L13.63 12 4.98 19.72V4.28zm10.64 9.1L17.5 12l-1.88-1.38-3.67-2.68 5.67 5.44zm1.07-.76l2.43-1.42-2.43-1.42-1.32 1.42 1.32 1.42z"/></svg>
+                  Google Play
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ PLANS ═══════════ */}
+      <section id="planos" className="py-16 sm:py-24 relative" ref={plansRef}>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            className="text-center mb-10 sm:mb-14"
+            initial={{ opacity: 0, y: 20 }}
+            animate={plansVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+              <Star className="w-4 h-4" /> Planos Premium
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">
+              Escolha Seu Plano
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">
+              Internet ultra-rápida 5G, apps ilimitados e muito mais
+            </p>
+          </motion.div>
+
+          {/* Filter tabs */}
+          <div className="flex justify-center gap-2 mb-8 sm:mb-10">
+            {[
+              { label: "Todos", value: "all" as const, icon: Signal },
+              { label: "Start", value: "start" as const, icon: Zap },
+              { label: "Turbo", value: "turbo" as const, icon: Sparkles },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setFilter(tab.value)}
+                className={`flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+                  filter === tab.value
+                    ? "bg-primary text-primary-foreground shadow-glow"
+                    : "bg-white/[0.06] text-white/60 hover:bg-white/[0.1]"
+                }`}
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Plan cards grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
+            {filtered.map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 30 }}
+                animate={plansVisible ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                whileHover={{ y: -6 }}
+                className="relative"
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                    ⭐ MAIS POPULAR
+                  </div>
+                )}
+                <div className={`rounded-2xl overflow-hidden h-full flex flex-col border transition-all ${
+                  plan.popular
+                    ? "border-primary shadow-glow-lg bg-white/[0.06]"
+                    : "border-white/[0.08] bg-white/[0.03] hover:border-white/15"
+                }`}>
+                  {/* Tier badge */}
+                  <div className={`px-4 py-2 flex items-center gap-2 ${
+                    plan.tier === "Turbo"
+                      ? "bg-gradient-to-r from-primary/20 to-orange-500/10"
+                      : "bg-white/[0.03]"
+                  }`}>
+                    <Zap className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[10px] font-bold text-primary tracking-wider uppercase">{plan.tier}</span>
+                    {plan.tier === "Turbo" && <span className="text-[10px]">🔥</span>}
+                  </div>
+
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="font-display text-xs sm:text-sm font-bold mb-4 text-white/90 leading-tight min-h-[2rem]">
+                      {plan.name}
+                    </h3>
+
+                    {/* Data */}
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <Globe className="w-4 h-4 text-primary shrink-0" />
+                      <div>
+                        <span className="text-lg font-bold">{plan.data}</span>
+                        <span className="text-[10px] text-white/40 ml-1.5">INTERNET 5G</span>
+                      </div>
+                    </div>
+
+                    {/* WhatsApp */}
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <MessageCircle className="w-4 h-4 text-green-400 shrink-0" />
+                      <div>
+                        <span className="text-xs font-medium">WhatsApp Ilimitado</span>
+                        <p className="text-[10px] text-white/40">Sem descontar da franquia</p>
+                      </div>
+                    </div>
+
+                    {/* Minutes */}
+                    <div className="flex items-center gap-2.5 mb-5">
+                      <Phone className="w-4 h-4 text-primary shrink-0" />
+                      <div>
+                        <span className="text-xs font-medium">{plan.minutes}</span>
+                        <p className="text-[10px] text-white/40">Para todo Brasil</p>
+                      </div>
+                    </div>
+
+                    {/* Deezer badge */}
+                    {plan.deezer && (
+                      <div className="flex items-center gap-1.5 mb-5 bg-white/[0.04] rounded-lg px-3 py-1.5">
+                        <Music className="w-3 h-3 text-primary" />
+                        <span className="text-[10px] font-medium text-white/60">Deezer incluso</span>
+                      </div>
+                    )}
+
+                    <div className="mt-auto">
+                      <p className="text-[10px] text-white/40 mb-1">Por apenas</p>
+                      <div className="flex items-baseline mb-4">
+                        <span className="text-sm text-primary font-bold mr-1">R$</span>
+                        <span className="font-display text-3xl sm:text-4xl font-extrabold">{plan.price}</span>
+                        <span className="text-sm font-bold">.{plan.cents}</span>
+                        <span className="text-xs text-white/40 ml-1">/mês</span>
+                      </div>
+
+                      <Button
+                        className={`w-full rounded-xl h-11 text-sm font-bold ${
+                          plan.popular
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow"
+                            : "bg-white/10 text-white hover:bg-white/15"
+                        }`}
+                        onClick={() => navigate("/cadastro")}
+                      >
+                        Assinar Agora
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ ABOUT ═══════════ */}
+      <section id="sobre" className="py-16 sm:py-24 border-y border-white/5" ref={aboutRef}>
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={aboutVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7 }}
+          >
+            <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+              <Sparkles className="w-4 h-4" /> Sobre Nós
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-6">
+              Conectando Pessoas e Simplicidade
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
+              Somos diferentes de tudo que você já viu! Estamos comprometidos em revolucionar a maneira como você interage com a sua operadora através de uma abordagem completamente digital. Sem complicações! Com um atendimento personalizado, mais próximo das pessoas, fácil de usar e altamente eficaz.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ WHY CHOOSE ═══════════ */}
+      <section className="py-16 sm:py-24" ref={whyRef}>
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-10 sm:mb-14"
+            initial={{ opacity: 0, y: 20 }}
+            animate={whyVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">
+              Por que escolher a <span className="text-primary">JD Móvel</span>?
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">
+              Conectamos pessoas, sonhos e oportunidades.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            {[
+              { icon: Zap, title: "Internet de Alta Performance", desc: "Estabilidade e velocidade real para aproveitar cada segundo online." },
+              { icon: Headphones, title: "Atendimento Humano 24h", desc: "Nossa equipe está sempre pronta para ajudar você de verdade." },
+              { icon: Star, title: "Planos que Cabem no Bolso", desc: "Qualidade premium com o melhor custo-benefício do mercado." },
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all"
+                initial={{ opacity: 0, y: 30 }}
+                animate={whyVisible ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                whileHover={{ y: -4 }}
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-display text-sm sm:text-base font-bold mb-2">{item.title}</h3>
+                <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ FAQ ═══════════ */}
+      <section id="contato" className="py-16 sm:py-24 border-t border-white/5" ref={faqRef}>
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-10 sm:mb-14"
+            initial={{ opacity: 0, y: 20 }}
+            animate={faqVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">
+              Perguntas Frequentes
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base">
+              Tire suas dúvidas sobre nossos serviços
+            </p>
+          </motion.div>
+
+          <div className="max-w-2xl mx-auto space-y-3">
+            {faqs.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 15 }}
+                animate={faqVisible ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+              >
+                <FaqItem q={faq.q} a={faq.a} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ CTA FOOTER ═══════════ */}
+      <section className="py-16 sm:py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)`
+        }} />
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+            Pronto para a revolução 5G?
+          </h2>
+          <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">
+            Peça já o seu chip e entre na nova era digital com a JD Móvel.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full px-8 h-12 font-bold shadow-lg" onClick={() => navigate("/cadastro")}>
+              Pedir Meu Chip <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
+              <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 border-t border-white/5">
+        <div className="container mx-auto px-4 text-center">
+          <img src={logo} alt="JD Telecom" className="h-8 w-auto mx-auto mb-4 opacity-60" loading="lazy" />
+          <p className="text-xs text-white/30">
+            © {new Date().getFullYear()} JD Telecom. Todos os direitos reservados.
+          </p>
+          <button onClick={() => navigate("/")} className="text-xs text-primary/60 hover:text-primary mt-2 inline-block">
+            ← Voltar ao site principal
+          </button>
+        </div>
+      </footer>
+
+      <WhatsAppButton />
+    </div>
+  );
+};
+
+export default Movel5G;

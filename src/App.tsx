@@ -21,16 +21,17 @@ import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import AdminTeam from "./pages/admin/AdminTeam.tsx";
 import AdminLogs from "./pages/admin/AdminLogs.tsx";
 import Cadastro from "./pages/Cadastro.tsx";
+import Movel5G from "./pages/Movel5G.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
-const HIDE_CITY_ROUTES = ["/assinante", "/admin"];
+const HIDE_CITY_ROUTES = ["/assinante", "/admin", "/movel"];
 
 const RoutesWithCitySelector = () => {
   const location = useLocation();
   const hideCitySelector = HIDE_CITY_ROUTES.some(
-    (r) => location.pathname === r || location.pathname.startsWith("/admin/") || location.pathname.startsWith("/assinante/")
+    (r) => location.pathname === r || location.pathname.startsWith("/admin/") || location.pathname.startsWith("/assinante/") || location.pathname.startsWith("/movel")
   );
 
   return (
@@ -38,6 +39,7 @@ const RoutesWithCitySelector = () => {
       {!hideCitySelector && <CitySelector />}
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/movel" element={<Movel5G />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/assinante" element={<SubscriberLogin />} />
         <Route path="/assinante/dashboard" element={<SubscriberDashboard />} />

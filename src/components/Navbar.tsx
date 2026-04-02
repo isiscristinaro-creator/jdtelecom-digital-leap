@@ -40,7 +40,7 @@ const Navbar = () => {
 
   const subNavLinks = [
     { label: "Internet", href: "#planos", icon: Wifi },
-    { label: "Móvel 5G", href: "#chip", icon: Smartphone },
+    { label: "Móvel 5G", href: "/movel", icon: Smartphone, isRoute: true },
     { label: "Combos", href: "#planos", icon: Tv },
     { label: "Autoatendimento", href: "#autoatendimento", icon: Headphones },
   ];
@@ -140,7 +140,14 @@ const Navbar = () => {
               <a
                 key={link.label}
                 href={link.href}
-                onClick={(e) => handleAnchorClick(e, link.href)}
+                onClick={(e) => {
+                  if ('isRoute' in link && link.isRoute) {
+                    e.preventDefault();
+                    navigate(link.href);
+                  } else {
+                    handleAnchorClick(e, link.href);
+                  }
+                }}
                 className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 <link.icon className="w-3.5 h-3.5" />
@@ -170,7 +177,15 @@ const Navbar = () => {
                 key={link.label}
                 href={link.href}
                 className="flex items-center gap-2 text-sm text-primary py-2"
-                onClick={(e) => handleAnchorClick(e, link.href)}
+                onClick={(e) => {
+                  if ('isRoute' in link && link.isRoute) {
+                    e.preventDefault();
+                    navigate(link.href);
+                    setIsOpen(false);
+                  } else {
+                    handleAnchorClick(e, link.href);
+                  }
+                }}
               >
                 <link.icon className="w-3.5 h-3.5" />
                 {link.label}
