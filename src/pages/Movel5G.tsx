@@ -427,7 +427,6 @@ const Movel5G = () => {
   const navigate = useNavigate();
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
   const { ref: featRef, isVisible: featVisible } = useScrollAnimation();
-  const { ref: appRef, isVisible: appVisible } = useScrollAnimation();
   const { ref: plansRef, isVisible: plansVisible } = useScrollAnimation();
   const { ref: aboutRef, isVisible: aboutVisible } = useScrollAnimation();
   const { ref: whyRef, isVisible: whyVisible } = useScrollAnimation();
