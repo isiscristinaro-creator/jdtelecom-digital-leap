@@ -40,7 +40,7 @@ const Navbar = () => {
 
   const subNavLinks = [
     { label: "Internet", href: "#planos", icon: Wifi },
-    { label: "Móvel 5G", href: "#chip", icon: Smartphone },
+    { label: "Móvel 5G", href: "/movel", icon: Smartphone, isRoute: true },
     { label: "Combos", href: "#planos", icon: Tv },
     { label: "Autoatendimento", href: "#autoatendimento", icon: Headphones },
   ];
