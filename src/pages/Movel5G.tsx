@@ -551,7 +551,7 @@ const Movel5G = () => {
       <section className="py-12 sm:py-16 border-y border-white/5 relative" ref={featRef}>
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
               { icon: Shield, title: "Segurança", desc: "Seus dados protegidos com criptografia avançada.", color: "from-blue-500/20 to-primary/10" },
               { icon: Zap, title: "Gerencie Seus Planos", desc: "Controle tudo com facilidade direto pelo app.", color: "from-primary/20 to-yellow-500/10" },
