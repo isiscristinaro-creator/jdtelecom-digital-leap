@@ -346,14 +346,14 @@ const CoverageMapSection = () => {
     <section id="cobertura" className="py-16 sm:py-24 border-y border-white/5 relative">
       <DataStreams />
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
+        <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
           <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><MapPin className="w-4 h-4" /> Cobertura Móvel</span>
           <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Onde estamos com <span className="text-primary">5G</span></h2>
           <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Cobertura crescente na região Norte, levando conexão 5G para mais cidades</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-8 items-start max-w-5xl mx-auto">
-          <motion.div className="lg:col-span-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.7, delay: 0.2 }}>
+          <motion.div className="lg:col-span-3"  transition={{ duration: 0.7, delay: 0.2 }}>
             <div className="relative bg-white/[0.03] border border-white/[0.08] rounded-3xl p-6 md:p-10 overflow-hidden">
               <NeuralNetwork />
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 blur-[80px] pointer-events-none" />
@@ -406,7 +406,7 @@ const CoverageMapSection = () => {
             </div>
           </motion.div>
 
-          <motion.div className="lg:col-span-2" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.7, delay: 0.4 }}>
+          <motion.div className="lg:col-span-2"  transition={{ duration: 0.7, delay: 0.4 }}>
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               {coverageCities.map((city) => (
                 <button key={city.name} onMouseEnter={() => setActiveCity(city.name)} onMouseLeave={() => setActiveCity(null)}
@@ -557,7 +557,7 @@ const Movel5G = () => {
             ].map((f, i) => (
               <motion.div key={f.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
-                variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}
+                
                 transition={{ duration: 0.5, delay: i * 0.1 }} whileHover={{ y: -4 }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${f.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
@@ -579,7 +579,7 @@ const Movel5G = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
         <CyberGrid />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
+          <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Star className="w-4 h-4" /> Planos Premium</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, WhatsApp ilimitado e muito mais</p>
@@ -608,7 +608,7 @@ const Movel5G = () => {
       <section id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="max-w-3xl mx-auto text-center" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.7 }}>
+          <motion.div className="max-w-3xl mx-auto text-center"  transition={{ duration: 0.7 }}>
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Sparkles className="w-4 h-4" /> Sobre Nós</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-6">Conectando Pessoas e Simplicidade</h2>
             <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
@@ -622,7 +622,7 @@ const Movel5G = () => {
       <section className="py-16 sm:py-24 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
+          <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Por que escolher a <span className="text-primary">JD Móvel</span>?</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Conectamos pessoas, sonhos e oportunidades.</p>
           </motion.div>
@@ -634,7 +634,7 @@ const Movel5G = () => {
             ].map((item, i) => (
               <motion.div key={item.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all overflow-hidden group"
-                variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}
+                
                 transition={{ duration: 0.5, delay: i * 0.15 }} whileHover={{ y: -4 }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
@@ -652,13 +652,13 @@ const Movel5G = () => {
       {/* ═══════════ FAQ ═══════════ */}
       <section id="contato" className="py-16 sm:py-24 border-t border-white/5">
         <div className="container mx-auto px-4">
-          <motion.div className="text-center mb-10 sm:mb-14" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
+          <motion.div className="text-center mb-10 sm:mb-14"  transition={{ duration: 0.6 }}>
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Perguntas Frequentes</h2>
             <p className="text-white/50 text-sm sm:text-base">Tire suas dúvidas sobre nossos serviços</p>
           </motion.div>
           <div className="max-w-2xl mx-auto space-y-3">
             {faqs.map((faq, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.4, delay: i * 0.1 }}>
+              <motion.div key={i}  transition={{ duration: 0.4, delay: i * 0.1 }}>
                 <FaqItem q={faq.q} a={faq.a} />
               </motion.div>
             ))}
@@ -672,7 +672,7 @@ const Movel5G = () => {
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
         <ParticleField />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce} transition={{ duration: 0.6 }}>
+          <motion.div  transition={{ duration: 0.6 }}>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Pronto para a revolução 5G?</h2>
             <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Peça já o seu chip e entre na nova era digital com a JD Móvel.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
