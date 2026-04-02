@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-  Signal, Smartphone, Phone, MessageCircle, Shield, Zap,
+  Signal, Phone, MessageCircle, Shield, Zap,
   ChevronDown, Check, Globe, Music, Star, ArrowRight, Headphones,
   CreditCard, BarChart3, Sparkles, MapPin, CheckCircle,
   ChevronLeft, ChevronRight, Cpu, Wifi, Radio, Network
