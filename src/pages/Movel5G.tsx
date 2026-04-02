@@ -553,10 +553,10 @@ const Movel5G = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: Shield, title: "Segurança", desc: "Seus dados protegidos com criptografia avançada.", color: "from-blue-500/20 to-primary/10" },
-              { icon: Zap, title: "Gerencie Seus Planos", desc: "Controle tudo com facilidade direto pelo app.", color: "from-primary/20 to-yellow-500/10" },
-              { icon: CreditCard, title: "Faturas", desc: "Renove seu plano com um só clique pelo app.", color: "from-green-500/20 to-primary/10" },
-              { icon: BarChart3, title: "Acúmulo de Gigas", desc: "Acompanhe seus gigas acumulados em tempo real.", color: "from-purple-500/20 to-primary/10" },
+              { icon: Shield, title: "Segurança", desc: "Dados protegidos com criptografia avançada.", color: "from-blue-500/20 to-primary/10" },
+              { icon: Zap, title: "Gestão Fácil", desc: "Controle tudo pelo autoatendimento online.", color: "from-primary/20 to-yellow-500/10" },
+              { icon: CreditCard, title: "Faturas Simples", desc: "Renove seu plano com praticidade total.", color: "from-green-500/20 to-primary/10" },
+              { icon: BarChart3, title: "Acúmulo de Gigas", desc: "Acompanhe seus gigas em tempo real.", color: "from-purple-500/20 to-primary/10" },
             ].map((f, i) => (
               <motion.div key={f.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
