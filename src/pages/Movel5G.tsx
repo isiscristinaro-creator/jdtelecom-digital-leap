@@ -483,7 +483,7 @@ const Movel5G = () => {
                   <span className="relative z-10 flex items-center gap-2">Pedir Chip <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
                   <motion.div className="absolute inset-0 bg-gradient-to-r from-primary via-orange-400 to-primary bg-[length:200%_auto]" animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} style={{ opacity: 0.3 }} />
                 </Button>
-                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 rounded-full px-8 h-12 font-bold backdrop-blur-sm" onClick={() => document.querySelector("#cobertura")?.scrollIntoView({ behavior: "smooth" })}>
+                <Button size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 rounded-full px-8 h-12 font-bold backdrop-blur-sm" onClick={() => document.querySelector("#cobertura")?.scrollIntoView({ behavior: "smooth" })}>
                   Ver Cobertura
                 </Button>
               </div>
