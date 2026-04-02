@@ -555,10 +555,7 @@ const Movel5G = () => {
               { icon: CreditCard, title: "Faturas Simples", desc: "Renove seu plano com praticidade total.", color: "from-green-500/20 to-primary/10" },
               { icon: BarChart3, title: "Acúmulo de Gigas", desc: "Acompanhe seus gigas em tempo real.", color: "from-purple-500/20 to-primary/10" },
             ].map((f, i) => (
-              <motion.div key={f.title}
-                className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
-                
-                transition={{ duration: 0.5, delay: i * 0.1 }} whileHover={{ y: -4 }}
+              <div key={f.title} className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${f.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative z-10">
@@ -632,10 +629,7 @@ const Movel5G = () => {
               { icon: Headphones, title: "Atendimento Humano 24h", desc: "Nossa equipe está sempre pronta para ajudar você de verdade.", color: "from-blue-500/20 to-primary/10" },
               { icon: Star, title: "Planos que Cabem no Bolso", desc: "Qualidade premium com o melhor custo-benefício do mercado.", color: "from-green-500/20 to-primary/10" },
             ].map((item, i) => (
-              <motion.div key={item.title}
-                className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all overflow-hidden group"
-                
-                transition={{ duration: 0.5, delay: i * 0.15 }} whileHover={{ y: -4 }}
+              <div key={item.title} className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all overflow-hidden group"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative z-10">
@@ -672,7 +666,7 @@ const Movel5G = () => {
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
         <ParticleField />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div  transition={{ duration: 0.6 }}>
+          <div>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Pronto para a revolução 5G?</h2>
             <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Peça já o seu chip e entre na nova era digital com a JD Móvel.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
