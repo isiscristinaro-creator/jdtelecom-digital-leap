@@ -26,12 +26,12 @@ import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
-const HIDE_CITY_ROUTES = ["/assinante", "/admin"];
+const HIDE_CITY_ROUTES = ["/assinante", "/admin", "/movel"];
 
 const RoutesWithCitySelector = () => {
   const location = useLocation();
   const hideCitySelector = HIDE_CITY_ROUTES.some(
-    (r) => location.pathname === r || location.pathname.startsWith("/admin/") || location.pathname.startsWith("/assinante/")
+    (r) => location.pathname === r || location.pathname.startsWith("/admin/") || location.pathname.startsWith("/assinante/") || location.pathname.startsWith("/movel")
   );
 
   return (
