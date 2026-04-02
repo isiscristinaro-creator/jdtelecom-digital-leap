@@ -256,7 +256,7 @@ const PlanCard = ({ plan, visible, index, navigate }: { plan: typeof mobilePlans
             <span className="text-sm font-bold">.{plan.cents}</span>
             <span className="text-xs text-white/40 ml-1">/mês</span>
           </div>
-          <Button className={`w-full rounded-xl h-11 text-sm font-bold ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow" : "bg-white/10 text-white hover:bg-white/15"}`} onClick={() => navigate("/cadastro")}>
+          <Button className={`w-full rounded-xl h-11 text-sm font-bold ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow" : "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30"}`} onClick={() => navigate("/cadastro")}>
             Assinar Agora
           </Button>
         </div>
