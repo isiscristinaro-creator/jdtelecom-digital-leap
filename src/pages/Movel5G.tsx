@@ -172,7 +172,7 @@ const FloatingTechIcons = () => {
           transition={{ duration: 8, repeat: Infinity, delay, ease: "easeInOut" }}
         >
           <Icon className="w-8 h-8 sm:w-12 sm:h-12" />
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -208,7 +208,7 @@ const FaqItem = ({ q, a }: { q: string; a: string }) => {
       </button>
       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
         <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{a}</p>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -268,7 +268,7 @@ const PlanCard = ({ plan, index, navigate }: { plan: typeof mobilePlans[0]; inde
         </div>
       </div>
     </div>
-  </motion.div>
+  </div>
 );
 
 /* ── Plan Carousel ── */
@@ -347,7 +347,7 @@ const CoverageMapSection = () => {
           <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><MapPin className="w-4 h-4" /> Cobertura Móvel</span>
           <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Onde estamos com <span className="text-primary">5G</span></h2>
           <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Cobertura crescente na região Norte, levando conexão 5G para mais cidades</p>
-        </motion.div>
+        </div>
 
         <div className="grid lg:grid-cols-5 gap-8 items-start max-w-5xl mx-auto">
           <div className="lg:col-span-3">
@@ -401,7 +401,7 @@ const CoverageMapSection = () => {
                 <div className="flex items-center gap-2"><div className="w-6 h-px bg-primary opacity-40" /><span className="text-xs text-white/40">Rede</span></div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           <div className="lg:col-span-2">
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
@@ -420,7 +420,7 @@ const CoverageMapSection = () => {
                 </button>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
@@ -457,7 +457,7 @@ const Movel5G = () => {
               >
                 <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
                   <Sparkles className="w-3.5 h-3.5" />
-                </motion.div>
+                </div>
                 Tecnologia de Última Geração
               </motion.span>
 
@@ -498,7 +498,7 @@ const Movel5G = () => {
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Hero Image */}
             <motion.div className="flex justify-center lg:justify-end" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3 }}>
@@ -522,7 +522,7 @@ const Movel5G = () => {
                   transition={{ duration: 3, repeat: Infinity }}
                 >
                   5G
-                </motion.div>
+                </div>
 
                 <motion.div
                   className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-3 py-2 text-xs"
@@ -534,9 +534,9 @@ const Movel5G = () => {
                     <span className="font-bold text-white">1Gbps</span>
                   </div>
                   <p className="text-white/40 text-[9px]">Velocidade máx.</p>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -562,7 +562,7 @@ const Movel5G = () => {
                   <h3 className="font-display text-sm sm:text-base font-bold mb-2">{f.title}</h3>
                   <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{f.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -577,7 +577,7 @@ const Movel5G = () => {
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Star className="w-4 h-4" /> Planos Premium</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, WhatsApp ilimitado e muito mais</p>
-          </motion.div>
+          </div>
 
           <div className="flex justify-center gap-2 mb-8 sm:mb-10">
             {[
@@ -608,7 +608,7 @@ const Movel5G = () => {
             <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8">
               Somos diferentes de tudo que você já viu! Estamos comprometidos em revolucionar a maneira como você interage com a sua operadora através de uma abordagem completamente digital. Sem complicações! Com um atendimento personalizado, mais próximo das pessoas, fácil de usar e altamente eficaz.
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -619,7 +619,7 @@ const Movel5G = () => {
           <div className="text-center mb-10 sm:mb-14">
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Por que escolher a <span className="text-primary">JD Móvel</span>?</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Conectamos pessoas, sonhos e oportunidades.</p>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {[
               { icon: Zap, title: "Internet de Alta Performance", desc: "Estabilidade e velocidade real para aproveitar cada segundo online.", color: "from-primary/20 to-yellow-500/10" },
@@ -634,7 +634,7 @@ const Movel5G = () => {
                   <h3 className="font-display text-sm sm:text-base font-bold mb-2">{item.title}</h3>
                   <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{item.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -646,12 +646,12 @@ const Movel5G = () => {
           <div className="text-center mb-10 sm:mb-14">
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Perguntas Frequentes</h2>
             <p className="text-white/50 text-sm sm:text-base">Tire suas dúvidas sobre nossos serviços</p>
-          </motion.div>
+          </div>
           <div className="max-w-2xl mx-auto space-y-3">
             {faqs.map((faq, i) => (
               <div key={i}>
                 <FaqItem q={faq.q} a={faq.a} />
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -674,7 +674,7 @@ const Movel5G = () => {
                 <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer"><MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp</a>
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
