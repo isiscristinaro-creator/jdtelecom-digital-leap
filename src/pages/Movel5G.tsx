@@ -2,9 +2,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-  Signal, Smartphone, Wifi, Phone, MessageCircle, Shield, Zap,
+  Signal, Smartphone, Phone, MessageCircle, Shield, Zap,
   ChevronDown, Check, Globe, Music, Star, ArrowRight, Headphones,
-  CreditCard, BarChart3, Sparkles, Menu, X, User, MapPin
+  CreditCard, BarChart3, Sparkles, Menu, X, User
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
