@@ -219,10 +219,10 @@ const FaqItem = ({ q, a }: { q: string; a: string }) => {
 /* ── Plan Card ── */
 const PlanCard = ({ plan, index, navigate }: { plan: typeof mobilePlans[0]; index: number; navigate: (p: string) => void }) => (
   <motion.div
-    variants={fadeUp}
-    initial="hidden"
-    whileInView="visible"
-    viewport={{ once: true, amount: 0.1 }}
+    
+    
+    
+    
     transition={{ duration: 0.5, delay: index * 0.08 }}
     className="relative h-full"
   >
