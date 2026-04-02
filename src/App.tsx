@@ -39,6 +39,7 @@ const RoutesWithCitySelector = () => {
       {!hideCitySelector && <CitySelector />}
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/movel" element={<Movel5G />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/assinante" element={<SubscriberLogin />} />
         <Route path="/assinante/dashboard" element={<SubscriberDashboard />} />
