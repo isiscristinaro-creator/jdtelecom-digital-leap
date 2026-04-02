@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-  Signal, Smartphone, Phone, MessageCircle, Shield, Zap,
+  Signal, Phone, MessageCircle, Shield, Zap,
   ChevronDown, Check, Globe, Music, Star, ArrowRight, Headphones,
   CreditCard, BarChart3, Sparkles, MapPin, CheckCircle,
   ChevronLeft, ChevronRight, Cpu, Wifi, Radio, Network
@@ -10,7 +10,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import heroImg from "@/assets/movel-5g-hero-tech.png";
-import appImg from "@/assets/movel-app-preview.png";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -28,9 +27,9 @@ const mobilePlans = [
 ];
 
 const faqs = [
-  { q: "É necessário pagar alguma taxa para aderir ao plano?", a: "Não há cobrança de taxa de adesão. Para aderir, o cliente deve adquirir e ativar o chip JD Móvel no aplicativo. A ativação é feita automaticamente após a primeira recarga." },
-  { q: "Como é feita a renovação do plano?", a: "A renovação é automática e ocorre no dia seguinte ao término da validade (30 dias). Para isso, efetue o pagamento da próxima assinatura via Pix, Boleto ou Cartão pelo app." },
-  { q: "Como faço a portabilidade para a JD Móvel?", a: "Utilize o app ou o chat para solicitar. Serão necessários: Nome, CPF, número que deseja manter e operadora antiga. Em até 5 dias úteis seu plano estará disponível." },
+  { q: "É necessário pagar alguma taxa para aderir ao plano?", a: "Não há cobrança de taxa de adesão. Para aderir, o cliente deve adquirir e ativar o chip JD Móvel. A ativação é feita automaticamente após a primeira recarga." },
+  { q: "Como é feita a renovação do plano?", a: "A renovação é automática e ocorre no dia seguinte ao término da validade (30 dias). Para isso, efetue o pagamento da próxima assinatura via Pix, Boleto ou Cartão pelo autoatendimento." },
+  { q: "Como faço a portabilidade para a JD Móvel?", a: "Utilize o chat ou WhatsApp para solicitar. Serão necessários: Nome, CPF, número que deseja manter e operadora antiga. Em até 5 dias úteis seu plano estará disponível." },
   { q: "É possível fazer ligações internacionais (DDI)?", a: "Não. Os benefícios de voz/sms não são válidos para ligações internacionais." },
 ];
 
@@ -256,7 +255,7 @@ const PlanCard = ({ plan, visible, index, navigate }: { plan: typeof mobilePlans
             <span className="text-sm font-bold">.{plan.cents}</span>
             <span className="text-xs text-white/40 ml-1">/mês</span>
           </div>
-          <Button className={`w-full rounded-xl h-11 text-sm font-bold ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow" : "bg-white/10 text-white hover:bg-white/15"}`} onClick={() => navigate("/cadastro")}>
+          <Button className={`w-full rounded-xl h-11 text-sm font-bold ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow" : "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30"}`} onClick={() => navigate("/cadastro")}>
             Assinar Agora
           </Button>
         </div>
@@ -428,7 +427,6 @@ const Movel5G = () => {
   const navigate = useNavigate();
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
   const { ref: featRef, isVisible: featVisible } = useScrollAnimation();
-  const { ref: appRef, isVisible: appVisible } = useScrollAnimation();
   const { ref: plansRef, isVisible: plansVisible } = useScrollAnimation();
   const { ref: aboutRef, isVisible: aboutVisible } = useScrollAnimation();
   const { ref: whyRef, isVisible: whyVisible } = useScrollAnimation();
@@ -485,7 +483,7 @@ const Movel5G = () => {
                   <span className="relative z-10 flex items-center gap-2">Pedir Chip <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
                   <motion.div className="absolute inset-0 bg-gradient-to-r from-primary via-orange-400 to-primary bg-[length:200%_auto]" animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} style={{ opacity: 0.3 }} />
                 </Button>
-                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 rounded-full px-8 h-12 font-bold backdrop-blur-sm" onClick={() => document.querySelector("#cobertura")?.scrollIntoView({ behavior: "smooth" })}>
+                <Button size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 rounded-full px-8 h-12 font-bold backdrop-blur-sm" onClick={() => document.querySelector("#cobertura")?.scrollIntoView({ behavior: "smooth" })}>
                   Ver Cobertura
                 </Button>
               </div>
@@ -553,12 +551,12 @@ const Movel5G = () => {
       <section className="py-12 sm:py-16 border-y border-white/5 relative" ref={featRef}>
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: Shield, title: "Segurança", desc: "Seus dados protegidos com criptografia avançada.", color: "from-blue-500/20 to-primary/10" },
-              { icon: Zap, title: "Gerencie Seus Planos", desc: "Controle tudo com facilidade direto pelo app.", color: "from-primary/20 to-yellow-500/10" },
-              { icon: CreditCard, title: "Faturas", desc: "Renove seu plano com um só clique pelo app.", color: "from-green-500/20 to-primary/10" },
-              { icon: BarChart3, title: "Acúmulo de Gigas", desc: "Acompanhe seus gigas acumulados em tempo real.", color: "from-purple-500/20 to-primary/10" },
+              { icon: Shield, title: "Segurança", desc: "Dados protegidos com criptografia avançada.", color: "from-blue-500/20 to-primary/10" },
+              { icon: Zap, title: "Gestão Fácil", desc: "Controle tudo pelo autoatendimento online.", color: "from-primary/20 to-yellow-500/10" },
+              { icon: CreditCard, title: "Faturas Simples", desc: "Renove seu plano com praticidade total.", color: "from-green-500/20 to-primary/10" },
+              { icon: BarChart3, title: "Acúmulo de Gigas", desc: "Acompanhe seus gigas em tempo real.", color: "from-purple-500/20 to-primary/10" },
             ].map((f, i) => (
               <motion.div key={f.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
@@ -578,39 +576,6 @@ const Movel5G = () => {
         </div>
       </section>
 
-      {/* ═══════════ APP SECTION ═══════════ */}
-      <section className="py-16 sm:py-24 relative overflow-hidden" ref={appRef}>
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-primary/[0.04] blur-[140px] rounded-full" />
-        <ParticleField />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            <motion.div className="flex justify-center order-2 lg:order-1" initial={{ opacity: 0, x: -40 }} animate={appVisible ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.8 }}>
-              <div className="relative">
-                <motion.div className="absolute inset-[-15%] border border-primary/10 rounded-[40%]" animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} />
-                <div className="absolute inset-0 bg-primary/10 blur-[60px] rounded-full" />
-                <img src={appImg} alt="App JD Móvel" className="relative w-48 sm:w-56 lg:w-64 h-auto drop-shadow-2xl" loading="lazy" width={512} height={1024} />
-              </div>
-            </motion.div>
-            <motion.div className="order-1 lg:order-2" initial={{ opacity: 0, x: 40 }} animate={appVisible ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.8 }}>
-              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Smartphone className="w-4 h-4" /> Baixe o App</span>
-              <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">Tudo na palma da sua mão</h2>
-              <p className="text-white/50 text-sm sm:text-base leading-relaxed mb-8 max-w-lg">
-                Com o app da <strong className="text-white">JD Móvel</strong> você gerencia seus planos, acompanha seu consumo, renova créditos e muito mais. Disponível para Android e iOS.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-12 text-sm font-bold gap-2">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.55 4.3-3.74 4.25z"/></svg>
-                  App Store
-                </Button>
-                <Button className="bg-white text-black hover:bg-white/90 rounded-xl px-5 h-12 text-sm font-bold gap-2">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M3.18 23.67c-.37-.2-.63-.55-.63-1.02V1.35C2.55.48 3.47.03 4.23.47l18.32 10.65c.76.44.76 1.32 0 1.76L4.23 23.53c-.34.2-.72.25-1.05.14zm1.8-19.39L13.63 12 4.98 19.72V4.28zm10.64 9.1L17.5 12l-1.88-1.38-3.67-2.68 5.67 5.44zm1.07-.76l2.43-1.42-2.43-1.42-1.32 1.42 1.32 1.42z"/></svg>
-                  Google Play
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════ PLANS ═══════════ */}
       <section id="planos" className="py-16 sm:py-24 relative" ref={plansRef}>
@@ -620,7 +585,7 @@ const Movel5G = () => {
           <motion.div className="text-center mb-10 sm:mb-14" initial={{ opacity: 0, y: 20 }} animate={plansVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4"><Star className="w-4 h-4" /> Planos Premium</span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
-            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, apps ilimitados e muito mais</p>
+            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet ultra-rápida 5G, WhatsApp ilimitado e muito mais</p>
           </motion.div>
 
           <div className="flex justify-center gap-2 mb-8 sm:mb-10">
