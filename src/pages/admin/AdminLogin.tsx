@@ -29,10 +29,10 @@ const AdminLogin = () => {
     setError("");
     if (!email.trim() || !password.trim()) { setError("Preencha todos os campos."); return; }
     setLoading(true);
-    const success = await login(email.trim(), password);
+    const result = await login(email.trim(), password);
     setLoading(false);
-    if (success) navigate("/admin/dashboard", { replace: true });
-    else setError("Credenciais inválidas.");
+    if (result.success) navigate("/admin/dashboard", { replace: true });
+    else setError(result.error || "Credenciais inválidas.");
   };
 
   return (
@@ -50,11 +50,6 @@ const AdminLogin = () => {
             <h1 className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))]">Painel Administrativo</h1>
           </div>
           <p className="text-sm text-[hsl(var(--dark-section-muted))]">Acesso restrito à equipe de gestão</p>
-          <div className="mt-3 bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-xl px-4 py-2.5 text-left max-w-xs mx-auto">
-            <p className="text-[10px] text-[hsl(var(--dark-section-muted))] font-semibold uppercase tracking-wider mb-1">Credenciais de teste</p>
-            <p className="text-xs text-[hsl(var(--dark-section-fg))]">admin@jdtelecom.com</p>
-            <p className="text-xs text-[hsl(var(--dark-section-muted))]">Jd@T3l3c0m2024!</p>
-          </div>
         </div>
 
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-6 md:p-8 shadow-xl">
