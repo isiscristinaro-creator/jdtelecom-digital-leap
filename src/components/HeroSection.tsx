@@ -1,17 +1,34 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import heroBanner from "@/assets/hero-banner.png";
 import bannerGames from "@/assets/banner-games.png";
 import bannerSocial from "@/assets/banner-social.png";
 
-const banners = [heroBanner, bannerGames, bannerSocial];
+const staticBanners = [heroBanner, bannerGames, bannerSocial];
 const SWIPE_THRESHOLD = 50;
 
 const HeroSection = () => {
+  const [banners, setBanners] = useState<string[]>(staticBanners);
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const dragStartX = useRef<number | null>(null);
   const didSwipe = useRef(false);
+
+  // Fetch active banners from DB and prepend them
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("banners")
+        .select("imagem_url")
+        .eq("ativo", true)
+        .order("created_at", { ascending: false });
+      if (data?.length) {
+        const dbUrls = data.map((b: any) => b.imagem_url).filter(Boolean);
+        if (dbUrls.length) setBanners([...dbUrls, ...staticBanners]);
+      }
+    })();
+  }, []);
 
   const goTo = useCallback((index: number) => {
     if (isTransitioning) return;
@@ -22,18 +39,18 @@ const HeroSection = () => {
 
   const next = useCallback(() => {
     goTo((current + 1) % banners.length);
-  }, [current, goTo]);
+  }, [current, goTo, banners.length]);
 
   const prev = useCallback(() => {
     goTo((current - 1 + banners.length) % banners.length);
-  }, [current, goTo]);
+  }, [current, goTo, banners.length]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [banners.length]);
 
   const finishDrag = (clientX: number) => {
     if (dragStartX.current === null) return;
@@ -85,7 +102,6 @@ const HeroSection = () => {
             ))}
           </div>
         </div>
-
 
         {/* Dots */}
         <motion.div
