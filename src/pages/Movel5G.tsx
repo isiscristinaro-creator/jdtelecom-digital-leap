@@ -5,7 +5,7 @@ import {
   Signal, Phone, MessageCircle, Shield, Zap,
   ChevronDown, Check, Globe, Music, Star, ArrowRight, Headphones,
   CreditCard, BarChart3, Sparkles, MapPin, CheckCircle,
-  ChevronLeft, ChevronRight, Cpu, Wifi, Radio, Network
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import heroImg from "@/assets/movel-5g-hero-tech.png";
