@@ -16,7 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -34,6 +35,21 @@ const alertColors = {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [financeiroOpen, setFinanceiroOpen] = useState(false);
+  const { admin } = useAdminAuth();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const greeting = (() => {
+    const h = currentTime.getHours();
+    if (h < 12) return "Bom dia";
+    if (h < 18) return "Boa tarde";
+    return "Boa noite";
+  })();
+
   const summaryCards = [
     { label: "Total de Clientes", value: totalClients.toLocaleString(), icon: Users, color: "text-primary" },
     { label: "Clientes Ativos", value: activeClients.toLocaleString(), icon: UserCheck, color: "text-emerald-400" },
@@ -72,8 +88,12 @@ const AdminDashboard = () => {
     <div className="admin-page space-y-6 w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Dashboard</h1>
-          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">Visão geral da JD Telecom</p>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
+            {greeting}, {admin?.name?.split(" ")[0] || "Admin"} 👋
+          </h1>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">
+            {currentTime.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} — Visão geral da JD Telecom
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button onClick={handleExportClients} size="sm"
