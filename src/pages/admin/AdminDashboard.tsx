@@ -328,20 +328,41 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* KPIs & Metas */}
+      {/* KPIs & Metas (Editable) */}
       {(() => {
-        const metaReceita = stats.mrr > 0 ? stats.mrr * 1.1 : 50000;
-        const metaClientes = stats.totalClients > 0 ? Math.ceil(stats.totalClients * 1.15) : 100;
-        const metaNovos30 = 10;
-        const pctReceita = Math.min(100, Math.round((stats.mrr / metaReceita) * 100));
-        const pctClientes = Math.min(100, Math.round((stats.totalClients / metaClientes) * 100));
-        const pctNovos = Math.min(100, Math.round((stats.newLast30 / metaNovos30) * 100));
+        const metaReceita = getGoal("meta_receita");
+        const metaClientes = getGoal("meta_clientes");
+        const metaNovos30 = getGoal("meta_novos_30d");
+        const pctReceita = metaReceita > 0 ? Math.min(100, Math.round((stats.mrr / metaReceita) * 100)) : 0;
+        const pctClientes = metaClientes > 0 ? Math.min(100, Math.round((stats.totalClients / metaClientes) * 100)) : 0;
+        const pctNovos = metaNovos30 > 0 ? Math.min(100, Math.round((stats.newLast30 / metaNovos30) * 100)) : 0;
 
         const kpis = [
-          { label: "Meta Receita Mensal", current: fmt(stats.mrr), target: fmt(metaReceita), pct: pctReceita, color: "bg-emerald-500" },
-          { label: "Meta Clientes Total", current: String(stats.totalClients), target: String(metaClientes), pct: pctClientes, color: "bg-primary" },
-          { label: "Novos Clientes (30d)", current: String(stats.newLast30), target: String(metaNovos30), pct: pctNovos, color: "bg-blue-500" },
+          { key: "meta_receita", label: "Meta Receita Mensal", current: fmt(stats.mrr), target: fmt(metaReceita), rawTarget: metaReceita, pct: pctReceita, color: "bg-emerald-500", isCurrency: true },
+          { key: "meta_clientes", label: "Meta Clientes Total", current: String(stats.totalClients), target: String(metaClientes), rawTarget: metaClientes, pct: pctClientes, color: "bg-primary", isCurrency: false },
+          { key: "meta_novos_30d", label: "Novos Clientes (30d)", current: String(stats.newLast30), target: String(metaNovos30), rawTarget: metaNovos30, pct: pctNovos, color: "bg-blue-500", isCurrency: false },
         ];
+
+        // KPI Notifications
+        kpis.forEach(k => {
+          const notifKey = `${k.key}_${k.pct >= 100 ? "100" : k.pct < 50 ? "50" : ""}`;
+          if (notifKey.endsWith("_")) return;
+          if (!kpiNotifiedRef.current.has(notifKey)) {
+            kpiNotifiedRef.current.add(notifKey);
+            if (k.pct >= 100) {
+              toast.success(`🎯 ${k.label}: Meta atingida! (${k.pct}%)`, { duration: 6000 });
+            } else if (k.pct < 50 && k.rawTarget > 0) {
+              toast.warning(`⚠️ ${k.label}: Abaixo de 50% da meta (${k.pct}%)`, { duration: 6000 });
+            }
+          }
+        });
+
+        const handleSaveKpi = (key: string) => {
+          const val = parseFloat(editValue);
+          if (isNaN(val) || val <= 0) { toast.error("Valor inválido"); return; }
+          updateGoal(key, val);
+          setEditingKpi(null);
+        };
 
         return (
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
@@ -350,11 +371,36 @@ const AdminDashboard = () => {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {kpis.map(k => (
-                <div key={k.label} className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 space-y-3">
+                <div key={k.key} className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 space-y-3">
                   <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">{k.label}</p>
                   <div className="flex items-end justify-between">
                     <p className="font-display text-2xl font-bold text-[hsl(var(--dark-section-fg))]">{k.current}</p>
-                    <p className="text-xs text-[hsl(var(--dark-section-muted))]">/ {k.target}</p>
+                    {editingKpi === k.key ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={editValue}
+                          onChange={e => setEditValue(e.target.value)}
+                          onKeyDown={e => e.key === "Enter" && handleSaveKpi(k.key)}
+                          className="w-20 h-7 bg-[hsl(var(--dark-section))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-lg px-2 text-xs"
+                          autoFocus
+                        />
+                        <button onClick={() => handleSaveKpi(k.key)} className="text-emerald-400 hover:text-emerald-300">
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setEditingKpi(null)} className="text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => { setEditingKpi(k.key); setEditValue(String(k.rawTarget)); }}
+                        className="flex items-center gap-1 text-xs text-[hsl(var(--dark-section-muted))] hover:text-primary transition-colors group"
+                      >
+                        <span>/ {k.target}</span>
+                        <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    )}
                   </div>
                   <div className="w-full h-2 rounded-full bg-[hsl(var(--dark-section-border))]">
                     <div className={`h-full rounded-full ${k.color} transition-all duration-700`} style={{ width: `${k.pct}%` }} />
