@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend,
-  LineChart, Line
+  LineChart, Line, ReferenceLine
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
