@@ -323,7 +323,48 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Atendimentos Metrics */}
+      {/* KPIs & Metas */}
+      {(() => {
+        const metaReceita = stats.mrr > 0 ? stats.mrr * 1.1 : 50000;
+        const metaClientes = stats.totalClients > 0 ? Math.ceil(stats.totalClients * 1.15) : 100;
+        const metaNovos30 = 10;
+        const pctReceita = Math.min(100, Math.round((stats.mrr / metaReceita) * 100));
+        const pctClientes = Math.min(100, Math.round((stats.totalClients / metaClientes) * 100));
+        const pctNovos = Math.min(100, Math.round((stats.newLast30 / metaNovos30) * 100));
+
+        const kpis = [
+          { label: "Meta Receita Mensal", current: fmt(stats.mrr), target: fmt(metaReceita), pct: pctReceita, color: "bg-emerald-500" },
+          { label: "Meta Clientes Total", current: String(stats.totalClients), target: String(metaClientes), pct: pctClientes, color: "bg-primary" },
+          { label: "Novos Clientes (30d)", current: String(stats.newLast30), target: String(metaNovos30), pct: pctNovos, color: "bg-blue-500" },
+        ];
+
+        return (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <Target className="w-4 h-4 text-primary" /> Metas & KPIs
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {kpis.map(k => (
+                <div key={k.label} className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 space-y-3">
+                  <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">{k.label}</p>
+                  <div className="flex items-end justify-between">
+                    <p className="font-display text-2xl font-bold text-[hsl(var(--dark-section-fg))]">{k.current}</p>
+                    <p className="text-xs text-[hsl(var(--dark-section-muted))]">/ {k.target}</p>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[hsl(var(--dark-section-border))]">
+                    <div className={`h-full rounded-full ${k.color} transition-all duration-700`} style={{ width: `${k.pct}%` }} />
+                  </div>
+                  <p className={`text-xs font-bold ${k.pct >= 100 ? "text-emerald-400" : k.pct >= 70 ? "text-primary" : "text-amber-400"}`}>
+                    {k.pct}% {k.pct >= 100 ? "✓ Meta atingida!" : "da meta"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Atendimentos Metrics + Chart */}
       {serviceRecords.length > 0 && (() => {
         const byType: Record<string, number> = {};
         const byAgent: Record<string, number> = {};
@@ -339,76 +380,123 @@ const AdminDashboard = () => {
         const last30 = serviceRecords.filter(r => new Date(r.created_at) >= d30).length;
         const last7 = serviceRecords.filter(r => new Date(r.created_at) >= d7).length;
 
+        // Temporal chart data (monthly)
+        const monthlyRecords: Record<string, Record<string, number>> = {};
+        serviceRecords.forEach(r => {
+          const d = new Date(r.created_at);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+          if (!monthlyRecords[key]) monthlyRecords[key] = {};
+          monthlyRecords[key][r.type] = (monthlyRecords[key][r.type] || 0) + 1;
+        });
+        const allTypes = Object.keys(byType);
+        const temporalData = Object.entries(monthlyRecords)
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([m, types]) => {
+            const [y, mo] = m.split("-");
+            const entry: any = { mes: `${mo}/${y.slice(2)}`, total: 0 };
+            allTypes.forEach(t => { entry[t] = types[t] || 0; entry.total += types[t] || 0; });
+            return entry;
+          });
+
         const typeColors: Record<string, string> = {
           "Suporte Técnico": "text-blue-400 bg-blue-500/10",
           "Financeiro": "text-amber-400 bg-amber-500/10",
           "Comercial": "text-purple-400 bg-purple-500/10",
         };
+        const chartTypeColors: Record<string, string> = {
+          "Suporte Técnico": "hsl(210,80%,55%)",
+          "Financeiro": "hsl(40,90%,50%)",
+          "Comercial": "hsl(270,70%,55%)",
+        };
 
         return (
-          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
-              <Headphones className="w-4 h-4 text-primary" /> Métricas de Atendimentos
-            </h3>
+          <>
+            {/* Temporal Chart */}
+            {temporalData.length > 1 && (
+              <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+                <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+                  <Headphones className="w-4 h-4 text-primary" /> Evolução de Atendimentos
+                </h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={temporalData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                    <XAxis dataKey="mes" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                    <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
+                    {allTypes.map(t => (
+                      <Bar key={t} dataKey={t} fill={chartTypeColors[t] || "hsl(220,60%,50%)"} radius={[4, 4, 0, 0]} stackId="a" name={t} />
+                    ))}
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-              <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
-                <p className="font-display text-xl font-bold text-primary">{serviceRecords.length}</p>
-                <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Total de Atendimentos</p>
-              </div>
-              <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
-                <p className="font-display text-xl font-bold text-emerald-400">{last30}</p>
-                <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Últimos 30 dias</p>
-              </div>
-              <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
-                <p className="font-display text-xl font-bold text-blue-400">{last7}</p>
-                <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Últimos 7 dias</p>
-              </div>
-            </div>
+            {/* Metrics Cards */}
+            <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+              <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+                <Headphones className="w-4 h-4 text-primary" /> Métricas de Atendimentos
+              </h3>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Por Tipo</p>
-                <div className="space-y-2">
-                  {typeData.map(([type, count]) => {
-                    const pct = Math.round((count / serviceRecords.length) * 100);
-                    const colors = typeColors[type] || "text-slate-400 bg-slate-500/10";
-                    return (
-                      <div key={type}>
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${colors}`}>{type}</span>
-                          <span className="text-[hsl(var(--dark-section-fg))] font-bold text-xs">{count} ({pct}%)</span>
-                        </div>
-                        <div className="w-full h-1.5 rounded-full bg-[hsl(var(--dark-section))]/50">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                  <p className="font-display text-xl font-bold text-primary">{serviceRecords.length}</p>
+                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Total de Atendimentos</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                  <p className="font-display text-xl font-bold text-emerald-400">{last30}</p>
+                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Últimos 30 dias</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                  <p className="font-display text-xl font-bold text-blue-400">{last7}</p>
+                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Últimos 7 dias</p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Agentes mais ativos</p>
-                <div className="space-y-2">
-                  {agentData.map(([agent, count], i) => (
-                    <div key={agent} className="flex items-center justify-between text-sm py-2 px-3 rounded-xl bg-[hsl(var(--dark-section))]/30">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? "bg-primary text-primary-foreground" : "bg-[hsl(var(--dark-section))]/50 text-[hsl(var(--dark-section-muted))]"}`}>
-                          {i + 1}
-                        </span>
-                        <span className="text-[hsl(var(--dark-section-fg))] font-medium">{agent}</span>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Por Tipo</p>
+                  <div className="space-y-2">
+                    {typeData.map(([type, count]) => {
+                      const pct = Math.round((count / serviceRecords.length) * 100);
+                      const colors = typeColors[type] || "text-slate-400 bg-slate-500/10";
+                      return (
+                        <div key={type}>
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${colors}`}>{type}</span>
+                            <span className="text-[hsl(var(--dark-section-fg))] font-bold text-xs">{count} ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-[hsl(var(--dark-section))]/50">
+                            <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Agentes mais ativos</p>
+                  <div className="space-y-2">
+                    {agentData.map(([agent, count], i) => (
+                      <div key={agent} className="flex items-center justify-between text-sm py-2 px-3 rounded-xl bg-[hsl(var(--dark-section))]/30">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? "bg-primary text-primary-foreground" : "bg-[hsl(var(--dark-section))]/50 text-[hsl(var(--dark-section-muted))]"}`}>
+                            {i + 1}
+                          </span>
+                          <span className="text-[hsl(var(--dark-section-fg))] font-medium">{agent}</span>
+                        </div>
+                        <span className="text-primary font-bold">{count}</span>
                       </div>
-                      <span className="text-primary font-bold">{count}</span>
-                    </div>
-                  ))}
-                  {agentData.length === 0 && (
-                    <p className="text-xs text-[hsl(var(--dark-section-muted))] text-center py-4">Nenhum agente registrado</p>
-                  )}
+                    ))}
+                    {agentData.length === 0 && (
+                      <p className="text-xs text-[hsl(var(--dark-section-muted))] text-center py-4">Nenhum agente registrado</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </>
         );
       })()}
 
