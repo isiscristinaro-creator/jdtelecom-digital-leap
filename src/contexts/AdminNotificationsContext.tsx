@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface AdminNotification {
   id: string;
@@ -67,6 +68,18 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  const addNotification = useCallback((notif: Omit<AdminNotification, "id" | "read" | "createdAt">) => {
+    setNotifications((prev) => [
+      {
+        id: String(Date.now()) + Math.random().toString(36).slice(2),
+        ...notif,
+        read: false,
+        createdAt: new Date(),
+      },
+      ...prev,
+    ]);
+  }, []);
+
   const markAsRead = useCallback((id: string) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   }, []);
@@ -79,27 +92,88 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Simulate a new notification every 2 minutes
+  // Supabase Realtime: listen for new pedidos
   useEffect(() => {
-    const messages = [
-      { title: "Novo pagamento recebido", message: "André Lima pagou R$ 349,90.", type: "success" as const },
-      { title: "Alerta de inadimplência", message: "3 novos clientes inadimplentes detectados.", type: "warning" as const },
-      { title: "Chamado de suporte", message: "Novo chamado técnico aberto por Roberto Almeida.", type: "info" as const },
-    ];
-    const timer = setInterval(() => {
-      const msg = messages[Math.floor(Math.random() * messages.length)];
-      setNotifications((prev) => [
-        {
-          id: String(Date.now()),
-          ...msg,
-          read: false,
-          createdAt: new Date(),
-        },
-        ...prev,
-      ]);
-    }, 120000);
-    return () => clearInterval(timer);
-  }, []);
+    const channel = supabase
+      .channel("realtime-pedidos")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "pedidos" },
+        (payload) => {
+          const p = payload.new as any;
+          addNotification({
+            title: "Novo pedido recebido",
+            message: `Pedido de ${p.cliente_email || "cliente"} — R$ ${Number(p.valor || 0).toFixed(2)}`,
+            type: "success",
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "pedidos" },
+        (payload) => {
+          const p = payload.new as any;
+          if (p.status === "cancelado") {
+            addNotification({
+              title: "Pedido cancelado",
+              message: `Pedido de ${p.cliente_email || "cliente"} foi cancelado.`,
+              type: "warning",
+            });
+          } else if (p.status === "pago") {
+            addNotification({
+              title: "Pagamento confirmado",
+              message: `Pedido de ${p.cliente_email || "cliente"} — R$ ${Number(p.valor || 0).toFixed(2)} pago.`,
+              type: "success",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [addNotification]);
+
+  // Supabase Realtime: listen for new service_records (atendimentos)
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime-atendimentos")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "service_records" },
+        (payload) => {
+          const r = payload.new as any;
+          addNotification({
+            title: "Novo atendimento registrado",
+            message: `${r.type || "Atendimento"} por ${r.agent || "agente"}: ${(r.description || "").slice(0, 60)}`,
+            type: "info",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [addNotification]);
+
+  // Supabase Realtime: listen for new clients
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime-clients")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "clients" },
+        (payload) => {
+          const c = payload.new as any;
+          addNotification({
+            title: "Novo cliente cadastrado",
+            message: `${c.name || "Cliente"} acabou de se cadastrar.`,
+            type: "success",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [addNotification]);
 
   return (
     <AdminNotificationsContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, dismissNotification }}>
