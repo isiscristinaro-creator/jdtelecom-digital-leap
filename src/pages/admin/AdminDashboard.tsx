@@ -417,40 +417,99 @@ const AdminDashboard = () => {
         );
       })()}
 
-      {/* KPI Trend Chart */}
+      {/* KPI Trend Chart with Period Filter & Meta vs Real */}
       {kpiHistory.length > 1 && (() => {
-        // Build trend data from history (reverse to chronological order)
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - trendPeriod);
+        const filtered = kpiHistory.filter(e => new Date(e.changed_at) >= cutoff);
+
+        // Build trend data from filtered history
         const trendMap: Record<string, Record<string, number>> = {};
-        [...kpiHistory].reverse().forEach(entry => {
+        [...filtered].reverse().forEach(entry => {
           const d = new Date(entry.changed_at);
           const dateKey = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
           if (!trendMap[dateKey]) trendMap[dateKey] = {};
           trendMap[dateKey][entry.label] = entry.new_value;
         });
-        const trendLabels = [...new Set(kpiHistory.map(e => e.label))];
+        const trendLabels = [...new Set(filtered.map(e => e.label))];
         const trendData = Object.entries(trendMap).map(([date, vals]) => ({
           data: date,
           ...vals,
         }));
         const trendColors = ["hsl(160,70%,45%)", "hsl(24,95%,50%)", "hsl(210,80%,55%)"];
 
+        // Meta vs Real comparison data
+        const metaVsReal = [
+          { name: "Receita", meta: getGoal("meta_receita"), real: stats.mrr },
+          { name: "Clientes", meta: getGoal("meta_clientes"), real: stats.totalClients },
+          { name: "Novos 30d", meta: getGoal("meta_novos_30d"), real: stats.newLast30 },
+        ];
+
+        const periodButtons = [
+          { label: "7d", value: 7 as const },
+          { label: "30d", value: 30 as const },
+          { label: "90d", value: 90 as const },
+        ];
+
         return (
-          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" /> Tendência de Metas
-            </h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
-                <XAxis dataKey="data" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
-                <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
-                <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
-                {trendLabels.map((label, i) => (
-                  <Line key={label} type="monotone" dataKey={label} stroke={trendColors[i % trendColors.length]} strokeWidth={2} dot={{ r: 4 }} name={label} />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Trend Line Chart */}
+            <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" /> Tendência de Metas
+                </h3>
+                <div className="flex gap-1">
+                  {periodButtons.map(pb => (
+                    <button
+                      key={pb.value}
+                      onClick={() => setTrendPeriod(pb.value)}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-colors ${
+                        trendPeriod === pb.value
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-[hsl(var(--dark-section))]/50 text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]"
+                      }`}
+                    >
+                      {pb.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {trendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                    <XAxis dataKey="data" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                    <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
+                    {trendLabels.map((label, i) => (
+                      <Line key={label} type="monotone" dataKey={label} stroke={trendColors[i % trendColors.length]} strokeWidth={2} dot={{ r: 4 }} name={label} />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-xs text-[hsl(var(--dark-section-muted))] text-center py-12">Sem dados no período selecionado</p>
+              )}
+            </div>
+
+            {/* Meta vs Real Bar Chart */}
+            <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+              <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+                <Target className="w-4 h-4 text-primary" /> Meta vs Real
+              </h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={metaVsReal} barGap={4}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                  <XAxis dataKey="name" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                  <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                  <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                  <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
+                  <Bar dataKey="meta" fill="hsl(220,60%,50%)" radius={[4, 4, 0, 0]} name="Meta" />
+                  <Bar dataKey="real" fill="hsl(160,70%,45%)" radius={[4, 4, 0, 0]} name="Real" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         );
       })()}
