@@ -19,19 +19,27 @@ const useFadeUp = () => {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.classList.add("movel-section-hidden");
+    el.style.opacity = "0";
+    el.style.transform = "translateY(32px)";
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          el.classList.remove("movel-section-hidden");
-          el.classList.add("movel-section-visible");
+          el.style.opacity = "";
+          el.style.transform = "";
+          el.classList.add("movel-section-animate");
           obs.disconnect();
         }
       },
-      { threshold: 0.08 }
+      { threshold: 0.05, rootMargin: "0px 0px 80px 0px" }
     );
     obs.observe(el);
-    return () => obs.disconnect();
+    // Safety: if not triggered in 2s, force visible
+    const safety = setTimeout(() => {
+      el.style.opacity = "";
+      el.style.transform = "";
+      obs.disconnect();
+    }, 2000);
+    return () => { obs.disconnect(); clearTimeout(safety); };
   }, []);
   return ref;
 };
