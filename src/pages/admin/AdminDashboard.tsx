@@ -35,6 +35,7 @@ const AdminDashboard = () => {
   const [editingKpi, setEditingKpi] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const kpiNotifiedRef = useRef<Set<string>>(new Set());
+  const [trendPeriod, setTrendPeriod] = useState<7 | 30 | 90>(30);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
