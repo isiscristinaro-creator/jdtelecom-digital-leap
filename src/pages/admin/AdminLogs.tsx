@@ -1,11 +1,20 @@
 import { useState, useMemo } from "react";
-import { Search, Download, FileText } from "lucide-react";
+import { Search, Download, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { mockLogs, categoryLabels, type SystemLog } from "@/data/adminLogsData";
+import { useSystemLogs } from "@/hooks/useSupabaseData";
 import { exportToExcel } from "@/utils/exportUtils";
 
-const categoryColors: Record<SystemLog["category"], string> = {
+const categoryLabels: Record<string, string> = {
+  login: "Login",
+  cliente: "Cliente",
+  plano: "Plano",
+  pagamento: "Pagamento",
+  equipe: "Equipe",
+  sistema: "Sistema",
+};
+
+const categoryColors: Record<string, string> = {
   login: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   cliente: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   plano: "bg-purple-500/10 text-purple-400 border-purple-500/20",
@@ -15,6 +24,7 @@ const categoryColors: Record<SystemLog["category"], string> = {
 };
 
 const AdminLogs = () => {
+  const { logs, loading } = useSystemLogs();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("Todos");
   const [page, setPage] = useState(0);
@@ -23,26 +33,34 @@ const AdminLogs = () => {
   const categories = ["Todos", ...Object.keys(categoryLabels)];
 
   const filtered = useMemo(() => {
-    return mockLogs.filter(l => {
-      const matchSearch = !search || l.user.toLowerCase().includes(search.toLowerCase()) || l.action.toLowerCase().includes(search.toLowerCase()) || l.details.toLowerCase().includes(search.toLowerCase());
+    return logs.filter(l => {
+      const matchSearch = !search || l.user_name.toLowerCase().includes(search.toLowerCase()) || l.action.toLowerCase().includes(search.toLowerCase()) || l.details.toLowerCase().includes(search.toLowerCase());
       const matchCat = catFilter === "Todos" || l.category === catFilter;
       return matchSearch && matchCat;
     });
-  }, [search, catFilter]);
+  }, [logs, search, catFilter]);
 
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
 
   const handleExport = () => {
     exportToExcel(filtered.map(l => ({
-      "Data/Hora": l.datetime,
-      Usuário: l.user,
-      Categoria: categoryLabels[l.category],
+      "Data/Hora": new Date(l.created_at).toLocaleString("pt-BR"),
+      Usuário: l.user_name,
+      Categoria: categoryLabels[l.category] || l.category,
       Ação: l.action,
       Detalhes: l.details,
-      IP: l.ip,
+      IP: l.ip_address,
     })), `logs-sistema-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: "Logs do Sistema" });
   };
+
+  if (loading) {
+    return (
+      <div className="admin-page flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page space-y-6 w-full overflow-hidden">
@@ -66,7 +84,7 @@ const AdminLogs = () => {
           {categories.map(c => (
             <button key={c} onClick={() => { setCatFilter(c); setPage(0); }}
               className={`w-full sm:w-auto px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${catFilter === c ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"}`}>
-              {c === "Todos" ? c : categoryLabels[c as SystemLog["category"]]}
+              {c === "Todos" ? c : categoryLabels[c] || c}
             </button>
           ))}
         </div>
@@ -88,16 +106,16 @@ const AdminLogs = () => {
             <tbody>
               {paginated.map(l => (
                 <tr key={l.id} className="border-b border-[hsl(var(--dark-section-border))]/50 hover:bg-[hsl(var(--dark-section))]/30 transition-colors">
-                  <td className="py-3 px-4 text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">{l.datetime}</td>
-                  <td className="py-3 px-4 text-[hsl(var(--dark-section-fg))] font-medium text-xs">{l.user}</td>
+                  <td className="py-3 px-4 text-xs text-[hsl(var(--dark-section-muted))] whitespace-nowrap">{new Date(l.created_at).toLocaleString("pt-BR")}</td>
+                  <td className="py-3 px-4 text-[hsl(var(--dark-section-fg))] font-medium text-xs">{l.user_name}</td>
                   <td className="py-3 px-4 hidden md:table-cell">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full border text-[10px] font-semibold ${categoryColors[l.category]}`}>
-                      {categoryLabels[l.category]}
+                    <span className={`inline-flex px-2 py-0.5 rounded-full border text-[10px] font-semibold ${categoryColors[l.category] || "bg-slate-500/10 text-slate-400 border-slate-500/20"}`}>
+                      {categoryLabels[l.category] || l.category}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-[hsl(var(--dark-section-fg))] text-xs">{l.action}</td>
                   <td className="py-3 px-4 text-[hsl(var(--dark-section-muted))] text-xs hidden lg:table-cell max-w-[250px] truncate">{l.details}</td>
-                  <td className="py-3 px-4 text-right text-[hsl(var(--dark-section-muted))] text-xs hidden xl:table-cell font-mono">{l.ip}</td>
+                  <td className="py-3 px-4 text-right text-[hsl(var(--dark-section-muted))] text-xs hidden xl:table-cell font-mono">{l.ip_address}</td>
                 </tr>
               ))}
             </tbody>

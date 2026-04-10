@@ -1,14 +1,8 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  totalClients, activeClients, inadimplenteClients, canceledClients,
-  mrr, totalRevenue, ticketMedio, forecastRevenue,
-  growthData, planDistribution, newClientsLast7, newClientsLast30, growthRate,
-  alerts, mockPlans, mockClients
-} from "@/data/adminMockData";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -18,6 +12,7 @@ import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
+import { useDashboardStats, usePlans, useClients } from "@/hooks/useSupabaseData";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -25,18 +20,14 @@ const fmtK = (v: number) => `R$ ${(v / 1000).toFixed(0)}k`;
 
 const COLORS = ["hsl(24,95%,50%)", "hsl(15,90%,42%)", "hsl(350,80%,55%)", "hsl(40,90%,50%)", "hsl(200,80%,50%)"];
 
-const alertIcons = { warning: AlertTriangle, danger: AlertCircle, info: Info };
-const alertColors = {
-  warning: "bg-amber-500/10 border-amber-500/20 text-amber-400",
-  danger: "bg-red-500/10 border-red-500/20 text-red-400",
-  info: "bg-blue-500/10 border-blue-500/20 text-blue-400",
-};
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [financeiroOpen, setFinanceiroOpen] = useState(false);
   const { admin } = useAdminAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const { stats, loading: statsLoading } = useDashboardStats();
+  const { plans } = usePlans();
+  const { clients } = useClients();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -50,39 +41,60 @@ const AdminDashboard = () => {
     return "Boa noite";
   })();
 
+  // Build chart data from plans
+  const planDistribution = plans.map(p => ({ name: p.speed, value: p.active_clients }));
+
+  // Alerts based on real stats
+  const alerts = [
+    ...(stats.inadimplentes > 0 ? [{ type: "warning" as const, message: `${stats.inadimplentes} clientes inadimplentes precisam de atenção` }] : []),
+    ...(stats.cancelados > 0 ? [{ type: "danger" as const, message: `${stats.cancelados} clientes cancelados` }] : []),
+    ...(stats.growthRate > 0 ? [{ type: "info" as const, message: `Crescimento de ${stats.growthRate}% nos últimos 30 dias` }] : []),
+  ];
+
+  const alertIcons = { warning: AlertTriangle, danger: AlertCircle, info: Info };
+  const alertColors = {
+    warning: "bg-amber-500/10 border-amber-500/20 text-amber-400",
+    danger: "bg-red-500/10 border-red-500/20 text-red-400",
+    info: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+  };
+
   const summaryCards = [
-    { label: "Total de Clientes", value: totalClients.toLocaleString(), icon: Users, color: "text-primary" },
-    { label: "Clientes Ativos", value: activeClients.toLocaleString(), icon: UserCheck, color: "text-emerald-400" },
-    { label: "Inadimplentes", value: inadimplenteClients.toLocaleString(), icon: AlertTriangle, color: "text-amber-400" },
-    { label: "Cancelados", value: canceledClients.toLocaleString(), icon: UserX, color: "text-red-400" },
+    { label: "Total de Clientes", value: stats.totalClients.toLocaleString(), icon: Users, color: "text-primary" },
+    { label: "Clientes Ativos", value: stats.activeClients.toLocaleString(), icon: UserCheck, color: "text-emerald-400" },
+    { label: "Inadimplentes", value: stats.inadimplentes.toLocaleString(), icon: AlertTriangle, color: "text-amber-400" },
+    { label: "Cancelados", value: stats.cancelados.toLocaleString(), icon: UserX, color: "text-red-400" },
   ];
 
   const financeCards = [
-    { label: "Receita Mensal (MRR)", value: fmt(mrr), icon: DollarSign },
-    { label: "Receita Anual", value: fmt(totalRevenue), icon: TrendingUp },
-    { label: "Ticket Médio", value: fmt(ticketMedio), icon: BarChart3 },
-    { label: "Faturamento Previsto", value: fmt(forecastRevenue), icon: ArrowUpRight },
+    { label: "Receita Mensal (MRR)", value: fmt(stats.mrr), icon: DollarSign },
+    { label: "Receita Anual", value: fmt(stats.totalRevenue), icon: TrendingUp },
+    { label: "Ticket Médio", value: fmt(stats.ticketMedio), icon: BarChart3 },
+    { label: "Faturamento Previsto", value: fmt(stats.forecast), icon: ArrowUpRight },
   ];
 
   const salesCards = [
-    { label: "Novos (7 dias)", value: newClientsLast7 },
-    { label: "Novos (30 dias)", value: newClientsLast30 },
-    { label: "Crescimento", value: `${growthRate}%` },
+    { label: "Novos (7 dias)", value: stats.newLast7 },
+    { label: "Novos (30 dias)", value: stats.newLast30 },
+    { label: "Crescimento", value: `${stats.growthRate}%` },
   ];
 
   const handleExportClients = () => {
-    const data = mockClients.map(c => ({
-      Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan,
-      "Valor (R$)": c.price.toFixed(2), Status: c.status, "Cliente desde": c.joinDate,
+    const data = clients.map(c => ({
+      Nome: c.name, Email: c.email, Telefone: c.phone, Plano: c.plan_name || "",
+      "Valor (R$)": (c.plan_price || 0).toFixed(2), Status: c.status, "Cliente desde": c.join_date,
     }));
     if (!data.length) { toast.error("Nenhum dado para exportar"); return; }
     exportToCSV(data, "clientes_completo_jdtelecom");
     toast.success(`${data.length} clientes exportados com sucesso`);
   };
 
-  const handleExportFinanceiro = () => {
-    setFinanceiroOpen(true);
-  };
+  if (statsLoading) {
+    return (
+      <div className="admin-page flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page space-y-6 w-full overflow-hidden">
@@ -100,27 +112,27 @@ const AdminDashboard = () => {
             className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/20 rounded-xl text-xs flex-1 sm:flex-none">
             <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Clientes
           </Button>
-          <Button onClick={handleExportFinanceiro} size="sm"
+          <Button onClick={() => setFinanceiroOpen(true)} size="sm"
             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs flex-1 sm:flex-none">
             <Download className="w-3.5 h-3.5 mr-1.5" /> Financeiro
           </Button>
         </div>
       </div>
 
-      {/* Alerts */}
-      <div className="space-y-2">
-        {alerts.map((a, i) => {
-          const Icon = alertIcons[a.type];
-          return (
-            <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${alertColors[a.type]}`}>
-              <Icon className="w-4 h-4 shrink-0" />
-              <p className="text-sm">{a.message}</p>
-            </div>
-          );
-        })}
-      </div>
+      {alerts.length > 0 && (
+        <div className="space-y-2">
+          {alerts.map((a, i) => {
+            const Icon = alertIcons[a.type];
+            return (
+              <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${alertColors[a.type]}`}>
+                <Icon className="w-4 h-4 shrink-0" />
+                <p className="text-sm">{a.message}</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Quick actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Ver Inadimplentes", action: () => navigate("/admin/clientes"), icon: AlertTriangle, color: "text-amber-400 bg-amber-500/10" },
@@ -138,7 +150,6 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {summaryCards.map((c) => (
           <div key={c.label} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-4 md:p-5">
@@ -153,7 +164,6 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Financial */}
       <div>
         <h2 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))] mb-3 flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-primary" /> Financeiro
@@ -169,7 +179,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Sales + Plans summary */}
       <div className="grid md:grid-cols-2 gap-4">
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
@@ -190,48 +199,23 @@ const AdminDashboard = () => {
             <Package className="w-4 h-4 text-primary" /> Planos Ativos
           </h3>
           <div className="space-y-2">
-            {mockPlans.slice(0, 3).map((p) => (
+            {plans.slice(0, 5).map((p) => (
               <div key={p.id} className="flex items-center justify-between text-sm">
                 <span className="text-[hsl(var(--dark-section-muted))]">{p.name}</span>
-                <span className="font-bold text-[hsl(var(--dark-section-fg))]">{p.activeClients}</span>
+                <span className="font-bold text-[hsl(var(--dark-section-fg))]">{p.active_clients}</span>
               </div>
             ))}
-            <p className="text-xs text-primary font-medium pt-1">
-              Mais vendido: {mockPlans.reduce((a, b) => a.activeClients > b.activeClients ? a : b).name}
-            </p>
+            {plans.length > 0 && (
+              <p className="text-xs text-primary font-medium pt-1">
+                Mais vendido: {plans.reduce((a, b) => a.active_clients > b.active_clients ? a : b).name}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-4">
+      {planDistribution.length > 0 && (
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-          <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4">Crescimento de Clientes</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={growthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
-              <XAxis dataKey="month" tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
-              <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
-              <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
-              <Line type="monotone" dataKey="clients" stroke="hsl(24,95%,50%)" strokeWidth={3} dot={{ fill: "hsl(24,95%,50%)", r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-          <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4">Receita Mensal</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={growthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
-              <XAxis dataKey="month" tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
-              <YAxis tickFormatter={fmtK} tick={{ fill: "hsl(220,10%,55%)", fontSize: 12 }} axisLine={false} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
-              <Bar dataKey="revenue" fill="hsl(24,95%,50%)" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5 lg:col-span-2">
           <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4">Distribuição por Plano</h3>
           <div className="flex flex-col md:flex-row items-center gap-6">
             <ResponsiveContainer width="100%" height={250} className="max-w-[300px]">
@@ -255,7 +239,8 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+      )}
+
       <ExportFinanceiroModal open={financeiroOpen} onOpenChange={setFinanceiroOpen} />
     </div>
   );
