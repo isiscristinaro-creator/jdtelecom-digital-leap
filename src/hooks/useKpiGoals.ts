@@ -15,9 +15,20 @@ const DEFAULT_GOALS: KpiGoal[] = [
 ];
 
 const STORAGE_KEY = "jd_kpi_goals";
+const HISTORY_KEY = "jd_kpi_history";
+
+export interface KpiHistoryEntry {
+  key: string;
+  label: string;
+  old_value: number;
+  new_value: number;
+  changed_by: string;
+  changed_at: string;
+}
 
 export function useKpiGoals() {
   const [goals, setGoals] = useState<KpiGoal[]>(DEFAULT_GOALS);
+  const [history, setHistory] = useState<KpiHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [dbAvailable, setDbAvailable] = useState(false);
 
