@@ -1,132 +1,121 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { User, Session } from "@supabase/supabase-js";
 
-interface SubscriberPreferences {
-  notifications_email: boolean;
-  notifications_sms: boolean;
-  notifications_whatsapp: boolean;
-  dark_mode: boolean;
-  language: string;
-}
-
-interface Subscriber {
+interface Profile {
   id: string;
-  name: string;
   email: string;
-  phone: string;
-  address: string;
-  avatar: string;
-  cpf: string;
-  birthdate: string;
-  preferences: SubscriberPreferences;
-  plan: {
-    name: string;
-    speed: string;
-    status: "Ativo" | "Suspenso" | "Cancelado";
-    price: string;
-  };
-  billing: {
-    nextDue: string;
-    dueDate: string;
-    status: "Pago" | "Pendente";
-    amount: string;
-  };
-  history: Array<{
-    id: string;
-    date: string;
-    amount: string;
-    status: "Pago" | "Pendente" | "Atrasado";
-    description: string;
-  }>;
+  full_name: string | null;
+  phone: string | null;
+  avatar_url: string | null;
 }
 
 interface AuthContextType {
-  subscriber: Subscriber | null;
+  user: User | null;
+  profile: Profile | null;
+  session: Session | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  updateSubscriber: (data: Partial<Subscriber>) => void;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, fullName?: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  updateProfile: (data: Partial<Profile>) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const MOCK_SUBSCRIBER: Subscriber = {
-  id: "1",
-  name: "João Silva",
-  email: "teste@jdtelecom.com",
-  phone: "(92) 99123-4567",
-  address: "Rua das Flores, 123 - Manaus, AM",
-  avatar: "https://api.dicebear.com/9.x/initials/svg?seed=JS&backgroundColor=0ea5e9",
-  cpf: "123.456.789-00",
-  birthdate: "15/03/1990",
-  preferences: {
-    notifications_email: true,
-    notifications_sms: false,
-    notifications_whatsapp: true,
-    dark_mode: true,
-    language: "pt-BR",
-  },
-  plan: {
-    name: "Turbo Fibra 300",
-    speed: "300MB Fibra",
-    status: "Ativo",
-    price: "R$ 139,90",
-  },
-  billing: {
-    nextDue: "Abril 2026",
-    dueDate: "15/04/2026",
-    status: "Pendente",
-    amount: "R$ 139,90",
-  },
-  history: [
-    { id: "1", date: "15/03/2026", amount: "R$ 139,90", status: "Pago", description: "Mensalidade Março" },
-    { id: "2", date: "15/02/2026", amount: "R$ 139,90", status: "Pago", description: "Mensalidade Fevereiro" },
-    { id: "3", date: "15/01/2026", amount: "R$ 139,90", status: "Pago", description: "Mensalidade Janeiro" },
-    { id: "4", date: "15/12/2025", amount: "R$ 139,90", status: "Pago", description: "Mensalidade Dezembro" },
-    { id: "5", date: "15/11/2025", amount: "R$ 129,90", status: "Pago", description: "Mensalidade Novembro" },
-    { id: "6", date: "15/10/2025", amount: "R$ 129,90", status: "Atrasado", description: "Mensalidade Outubro" },
-  ],
-};
-
-const SESSION_KEY = "jd_subscriber_session";
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [subscriber, setSubscriber] = useState<Subscriber | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const saved = localStorage.getItem(SESSION_KEY);
-    if (saved) {
-      try {
-        setSubscriber(JSON.parse(saved));
-      } catch {
-        localStorage.removeItem(SESSION_KEY);
-      }
-    }
+  const fetchProfile = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+    if (data) setProfile(data);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    await new Promise((r) => setTimeout(r, 800));
-    if (email === "teste@jdtelecom.com" && password === "123456") {
-      setSubscriber(MOCK_SUBSCRIBER);
-      localStorage.setItem(SESSION_KEY, JSON.stringify(MOCK_SUBSCRIBER));
-      return true;
-    }
-    return false;
-  };
+  useEffect(() => {
+    // Set up auth listener BEFORE getting session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, sess) => {
+        setSession(sess);
+        setUser(sess?.user ?? null);
+        if (sess?.user) {
+          // Use setTimeout to avoid deadlock with Supabase client
+          setTimeout(() => fetchProfile(sess.user.id), 0);
+        } else {
+          setProfile(null);
+        }
+        setLoading(false);
+      }
+    );
 
-  const logout = () => {
-    setSubscriber(null);
-    localStorage.removeItem(SESSION_KEY);
-  };
+    supabase.auth.getSession().then(({ data: { session: sess } }) => {
+      setSession(sess);
+      setUser(sess?.user ?? null);
+      if (sess?.user) fetchProfile(sess.user.id);
+      setLoading(false);
+    });
 
-  const updateSubscriber = (data: Partial<Subscriber>) => {
-    if (!subscriber) return;
-    const updated = { ...subscriber, ...data };
-    setSubscriber(updated);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
-  };
+    return () => subscription.unsubscribe();
+  }, [fetchProfile]);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  }, []);
+
+  const signup = useCallback(async (email: string, password: string, fullName?: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: { full_name: fullName },
+      },
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  }, []);
+
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setProfile(null);
+    setSession(null);
+  }, []);
+
+  const updateProfile = useCallback(async (data: Partial<Profile>) => {
+    if (!user) return { success: false, error: "Não autenticado" };
+    const { error } = await supabase
+      .from("profiles")
+      .update({ ...data, updated_at: new Date().toISOString() })
+      .eq("id", user.id);
+    if (error) return { success: false, error: error.message };
+    await fetchProfile(user.id);
+    return { success: true };
+  }, [user, fetchProfile]);
 
   return (
-    <AuthContext.Provider value={{ subscriber, isAuthenticated: !!subscriber, login, logout, updateSubscriber }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        session,
+        isAuthenticated: !!session,
+        loading,
+        login,
+        signup,
+        logout,
+        updateProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
