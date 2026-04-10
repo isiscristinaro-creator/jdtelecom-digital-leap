@@ -72,6 +72,41 @@ export interface DbServiceRecord {
   created_at: string;
 }
 
+export interface DbProduto {
+  id: string;
+  nome: string;
+  descricao: string;
+  preco: number;
+  imagem_url: string;
+  categoria: string;
+  ativo: boolean;
+  created_at: string;
+}
+
+export interface DbPedido {
+  id: string;
+  cliente_email: string;
+  valor: number;
+  status: string;
+  created_at: string;
+}
+
+export interface DbBanner {
+  id: string;
+  titulo: string;
+  imagem_url: string;
+  ativo: boolean;
+  created_at: string;
+}
+
+export interface DbTestemunho {
+  id: string;
+  nome: string;
+  mensagem: string;
+  ativo: boolean;
+  created_at: string;
+}
+
 // ==================== HOOKS ====================
 
 export function usePlans() {
@@ -313,4 +348,157 @@ export function useDashboardStats() {
   }, []);
 
   return { stats, loading };
+}
+
+// ==================== PRODUTOS ====================
+
+export function useProdutos() {
+  const [produtos, setProdutos] = useState<DbProduto[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("produtos").select("*").order("created_at", { ascending: false });
+    if (error) toast.error("Erro ao carregar produtos: " + error.message);
+    else setProdutos(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const create = async (p: Omit<DbProduto, "id" | "created_at">) => {
+    const { error } = await supabase.from("produtos").insert(p);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Produto criado!"); await fetchData(); return true;
+  };
+
+  const update = async (id: string, data: Partial<DbProduto>) => {
+    const { error } = await supabase.from("produtos").update(data).eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Produto atualizado!"); await fetchData(); return true;
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("produtos").delete().eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Produto removido!"); await fetchData(); return true;
+  };
+
+  return { produtos, loading, refetch: fetchData, create, update, remove };
+}
+
+// ==================== PEDIDOS ====================
+
+export function usePedidos() {
+  const [pedidos, setPedidos] = useState<DbPedido[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("pedidos").select("*").order("created_at", { ascending: false });
+    if (error) toast.error("Erro ao carregar pedidos: " + error.message);
+    else setPedidos(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const create = async (p: Omit<DbPedido, "id" | "created_at">) => {
+    const { error } = await supabase.from("pedidos").insert(p);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Pedido criado!"); await fetchData(); return true;
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("pedidos").update({ status }).eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Status atualizado!"); await fetchData(); return true;
+  };
+
+  return { pedidos, loading, refetch: fetchData, create, updateStatus };
+}
+
+// ==================== BANNERS ====================
+
+export function useBanners() {
+  const [banners, setBanners] = useState<DbBanner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("banners").select("*").order("created_at", { ascending: false });
+    if (error) toast.error("Erro ao carregar banners: " + error.message);
+    else setBanners(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const create = async (b: Omit<DbBanner, "id" | "created_at">) => {
+    const { error } = await supabase.from("banners").insert(b);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Banner criado!"); await fetchData(); return true;
+  };
+
+  const update = async (id: string, data: Partial<DbBanner>) => {
+    const { error } = await supabase.from("banners").update(data).eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Banner atualizado!"); await fetchData(); return true;
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("banners").delete().eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Banner removido!"); await fetchData(); return true;
+  };
+
+  return { banners, loading, refetch: fetchData, create, update, remove };
+}
+
+// ==================== TESTEMUNHOS ====================
+
+export function useTestemunhos() {
+  const [testemunhos, setTestemunhos] = useState<DbTestemunho[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("testemunhos").select("*").order("created_at", { ascending: false });
+    if (error) toast.error("Erro ao carregar testemunhos: " + error.message);
+    else setTestemunhos(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const create = async (t: Omit<DbTestemunho, "id" | "created_at">) => {
+    const { error } = await supabase.from("testemunhos").insert(t);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Testemunho criado!"); await fetchData(); return true;
+  };
+
+  const update = async (id: string, data: Partial<DbTestemunho>) => {
+    const { error } = await supabase.from("testemunhos").update(data).eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Testemunho atualizado!"); await fetchData(); return true;
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("testemunhos").delete().eq("id", id);
+    if (error) { toast.error(error.message); return false; }
+    toast.success("Testemunho removido!"); await fetchData(); return true;
+  };
+
+  return { testemunhos, loading, refetch: fetchData, create, update, remove };
+}
+
+// ==================== STORAGE UPLOAD ====================
+
+export async function uploadImage(bucket: string, file: File): Promise<string | null> {
+  const ext = file.name.split(".").pop();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage.from(bucket).upload(path, file);
+  if (error) { toast.error("Erro no upload: " + error.message); return null; }
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
 }

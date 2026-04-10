@@ -4,6 +4,7 @@ import { useAdminNotifications } from "@/contexts/AdminNotificationsContext";
 import { useState, useRef, useEffect } from "react";
 import {
   LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText, Shield, Bell, CheckCheck, Trash2
+  , ShoppingBag, Image, MessageSquare, ClipboardList
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -21,6 +22,10 @@ const navItems = [
   { label: "Relatórios", href: "/admin/relatorios", icon: BarChart3 },
   { label: "Equipe", href: "/admin/equipe", icon: UsersRound },
   { label: "Logs", href: "/admin/logs", icon: ScrollText },
+  { label: "Produtos", href: "/admin/produtos", icon: ShoppingBag },
+  { label: "Pedidos", href: "/admin/pedidos", icon: ClipboardList },
+  { label: "Banners", href: "/admin/banners", icon: Image },
+  { label: "Testemunhos", href: "/admin/testemunhos", icon: MessageSquare },
   { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
 ];
 
