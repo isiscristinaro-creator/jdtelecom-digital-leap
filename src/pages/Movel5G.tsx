@@ -13,6 +13,37 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
+/* Hook: observe element and add visible class once in viewport */
+const useFadeUp = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(32px)";
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.style.opacity = "";
+          el.style.transform = "";
+          el.classList.add("movel-section-animate");
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.05, rootMargin: "0px 0px 80px 0px" }
+    );
+    obs.observe(el);
+    // Safety: if not triggered in 2s, force visible
+    const safety = setTimeout(() => {
+      el.style.opacity = "";
+      el.style.transform = "";
+      obs.disconnect();
+    }, 2000);
+    return () => { obs.disconnect(); clearTimeout(safety); };
+  }, []);
+  return ref;
+};
+
 const mobilePlans = [
   { tier: "Start", name: "JD VOZ 1000MIN | 5GB", data: "5GB", minutes: "1000 Minutos", price: "35", cents: "00", whatsapp: true, deezer: false, popular: false },
   { tier: "Start", name: "START 6 + DEEZER", data: "6GB", minutes: "100 Minutos", price: "39", cents: "90", whatsapp: true, deezer: true, popular: false },
@@ -231,6 +262,13 @@ const Movel5G = () => {
   const [filter, setFilter] = useState<"all" | "start" | "turbo">("all");
   const navigate = useNavigate();
   const filtered = mobilePlans.filter((p) => filter === "all" || p.tier.toLowerCase() === filter);
+  const featuresRef = useFadeUp();
+  const plansRef = useFadeUp();
+  const coverageRef = useFadeUp();
+  const aboutRef = useFadeUp();
+  const whyRef = useFadeUp();
+  const faqRef = useFadeUp();
+  const ctaRef = useFadeUp();
 
   return (
     <div className="min-h-screen bg-[hsl(220,20%,6%)] text-white overflow-x-hidden">
@@ -285,7 +323,7 @@ const Movel5G = () => {
       </section>
 
       {/* FEATURES */}
-      <section className="py-12 sm:py-16 border-y border-white/5 relative">
+      <section ref={featuresRef} className="py-12 sm:py-16 border-y border-white/5 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -309,7 +347,7 @@ const Movel5G = () => {
       </section>
 
       {/* PLANS */}
-      <section id="planos" className="py-16 sm:py-24 relative">
+      <section ref={plansRef} id="planos" className="py-16 sm:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
         <CyberGrid />
         <div className="container mx-auto px-4 relative z-10">
@@ -330,10 +368,12 @@ const Movel5G = () => {
       </section>
 
       {/* COVERAGE */}
-      <CoverageMapSection />
+      <div ref={coverageRef}>
+        <CoverageMapSection />
+      </div>
 
       {/* ABOUT */}
-      <section id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
+      <section ref={aboutRef} id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
@@ -345,7 +385,7 @@ const Movel5G = () => {
       </section>
 
       {/* WHY CHOOSE */}
-      <section className="py-16 sm:py-24 relative">
+      <section ref={whyRef} className="py-16 sm:py-24 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-10 sm:mb-14">
@@ -372,7 +412,7 @@ const Movel5G = () => {
       </section>
 
       {/* FAQ */}
-      <section id="contato" className="py-16 sm:py-24 border-t border-white/5">
+      <section ref={faqRef} id="contato" className="py-16 sm:py-24 border-t border-white/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-14">
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Perguntas Frequentes</h2>
@@ -385,7 +425,7 @@ const Movel5G = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 relative overflow-hidden">
+      <section ref={ctaRef} className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
         <ParticleField />
@@ -394,7 +434,7 @@ const Movel5G = () => {
           <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Peça já o seu chip e entre na nova era digital com a JD Móvel.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full px-8 h-12 font-bold shadow-lg" onClick={() => navigate("/cadastro")}>Pedir Meu Chip <ArrowRight className="w-4 h-4 ml-1" /></Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
+            <Button size="lg" className="bg-transparent border-2 border-white/40 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
               <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer"><MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp</a>
             </Button>
           </div>
