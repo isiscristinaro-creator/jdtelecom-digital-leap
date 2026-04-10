@@ -1,12 +1,12 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend,
-  LineChart, Line
+  LineChart, Line, ReferenceLine
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
@@ -539,7 +539,148 @@ const AdminDashboard = () => {
         );
       })()}
 
-      {/* KPI Change History */}
+      {/* Predictive Analysis */}
+      {(() => {
+        const metaReceita = getGoal("meta_receita");
+        const metaClientes = getGoal("meta_clientes");
+        const metaNovos = getGoal("meta_novos_30d");
+
+        // Calculate monthly growth rates from client data
+        const monthlyGrowth = (() => {
+          if (clientGrowthData.length < 2) return 0;
+          const last = clientGrowthData[clientGrowthData.length - 1];
+          const prev = clientGrowthData[clientGrowthData.length - 2];
+          if (!prev || prev.total === 0) return 0;
+          return (last.total - prev.total) / prev.total;
+        })();
+
+        // Revenue growth rate from payment data
+        const revenueGrowth = (() => {
+          if (revenueData.length < 2) return 0;
+          const last = revenueData[revenueData.length - 1];
+          const prev = revenueData[revenueData.length - 2];
+          if (!prev || prev.pago === 0) return 0;
+          return (last.pago - prev.pago) / prev.pago;
+        })();
+
+        // Project months to reach target
+        const projectMonths = (current: number, target: number, growthRate: number): number | null => {
+          if (current >= target) return 0;
+          if (growthRate <= 0) return null; // Will never reach
+          // Using compound growth: current * (1 + rate)^n = target
+          return Math.ceil(Math.log(target / current) / Math.log(1 + growthRate));
+        };
+
+        const predictions = [
+          {
+            label: "Receita Mensal",
+            current: stats.mrr,
+            target: metaReceita,
+            pct: metaReceita > 0 ? Math.round((stats.mrr / metaReceita) * 100) : 0,
+            growth: revenueGrowth,
+            months: projectMonths(stats.mrr, metaReceita, revenueGrowth),
+            format: (v: number) => fmt(v),
+          },
+          {
+            label: "Clientes Total",
+            current: stats.totalClients,
+            target: metaClientes,
+            pct: metaClientes > 0 ? Math.round((stats.totalClients / metaClientes) * 100) : 0,
+            growth: monthlyGrowth,
+            months: projectMonths(stats.totalClients, metaClientes, monthlyGrowth),
+            format: (v: number) => String(v),
+          },
+          {
+            label: "Novos Clientes 30d",
+            current: stats.newLast30,
+            target: metaNovos,
+            pct: metaNovos > 0 ? Math.round((stats.newLast30 / metaNovos) * 100) : 0,
+            growth: monthlyGrowth,
+            months: projectMonths(stats.newLast30, metaNovos, monthlyGrowth),
+            format: (v: number) => String(v),
+          },
+        ];
+
+        // Build projection chart data (next 6 months)
+        const projectionData = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date();
+          d.setMonth(d.getMonth() + i);
+          const label = d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+          return {
+            mes: label,
+            receita: Math.round(stats.mrr * Math.pow(1 + (revenueGrowth || 0.02), i)),
+            clientes: Math.round(stats.totalClients * Math.pow(1 + (monthlyGrowth || 0.05), i)),
+            metaReceita,
+            metaClientes,
+          };
+        });
+
+        return (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" /> Análise Preditiva
+            </h3>
+
+            {/* Prediction Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+              {predictions.map(p => {
+                const statusColor = p.pct >= 100
+                  ? "text-emerald-400"
+                  : p.months !== null && p.months <= 3
+                    ? "text-primary"
+                    : p.months === null
+                      ? "text-red-400"
+                      : "text-amber-400";
+                return (
+                  <div key={p.label} className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 space-y-2">
+                    <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">{p.label}</p>
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-lg font-bold text-[hsl(var(--dark-section-fg))]">{p.format(p.current)}</span>
+                      <span className="text-xs text-[hsl(var(--dark-section-muted))]">→ {p.format(p.target)}</span>
+                    </div>
+                    <p className={`text-xs font-bold ${statusColor}`}>
+                      {p.pct >= 100 ? (
+                        "✓ Meta atingida!"
+                      ) : p.months === null ? (
+                        "⚠️ Crescimento insuficiente"
+                      ) : p.months === 0 ? (
+                        "✓ Meta atingida!"
+                      ) : (
+                        `📈 ~${p.months} ${p.months === 1 ? "mês" : "meses"} para atingir`
+                      )}
+                    </p>
+                    <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">
+                      Taxa: {(p.growth * 100).toFixed(1)}%/mês
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Projection Chart */}
+            <div>
+              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Projeção de Receita (6 meses)</p>
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={projectionData}>
+                  <defs>
+                    <linearGradient id="colorProj" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(24,95%,50%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(24,95%,50%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                  <XAxis dataKey="mes" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} />
+                  <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} formatter={(v: number) => [fmt(v), ""]} />
+                  <Area type="monotone" dataKey="receita" stroke="hsl(24,95%,50%)" fill="url(#colorProj)" strokeWidth={2} name="Receita Projetada" />
+                  <ReferenceLine y={metaReceita} stroke="hsl(160,70%,45%)" strokeWidth={2} strokeDasharray="8 4" label={{ value: "Meta", fill: "hsl(160,70%,45%)", fontSize: 10, position: "right" }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      })()}
+
       {kpiHistory.length > 0 && (
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
