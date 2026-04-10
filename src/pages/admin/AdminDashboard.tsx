@@ -673,7 +673,7 @@ const AdminDashboard = () => {
                   <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
                   <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} formatter={(v: number) => [fmt(v), ""]} />
                   <Area type="monotone" dataKey="receita" stroke="hsl(24,95%,50%)" fill="url(#colorProj)" strokeWidth={2} name="Receita Projetada" />
-                  <Line type="monotone" dataKey="metaReceita" stroke="hsl(160,70%,45%)" strokeWidth={2} strokeDasharray="8 4" dot={false} name="Meta Receita" />
+                  <ReferenceLine y={metaReceita} stroke="hsl(160,70%,45%)" strokeWidth={2} strokeDasharray="8 4" label={{ value: "Meta", fill: "hsl(160,70%,45%)", fontSize: 10, position: "right" }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
