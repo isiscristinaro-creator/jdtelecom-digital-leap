@@ -5,12 +5,20 @@ import { AdminNotificationsProvider } from "@/contexts/AdminNotificationsContext
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 const AdminLayout = () => {
-  const { isAuthenticated } = useAdminAuth();
+  const { isAuthenticated, loading } = useAdminAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) navigate("/admin", { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (!loading && !isAuthenticated) navigate("/admin", { replace: true });
+  }, [isAuthenticated, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[hsl(var(--dark-section))] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) return null;
 
