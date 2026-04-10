@@ -434,7 +434,7 @@ const Movel5G = () => {
           <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Peça já o seu chip e entre na nova era digital com a JD Móvel.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full px-8 h-12 font-bold shadow-lg" onClick={() => navigate("/cadastro")}>Pedir Meu Chip <ArrowRight className="w-4 h-4 ml-1" /></Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
+            <Button size="lg" className="bg-transparent border-2 border-white/40 text-white hover:bg-white/10 rounded-full px-8 h-12 font-bold" asChild>
               <a href="https://wa.me/558005945678" target="_blank" rel="noopener noreferrer"><MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp</a>
             </Button>
           </div>
