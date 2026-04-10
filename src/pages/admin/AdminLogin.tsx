@@ -13,7 +13,7 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated } = useAdminAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +21,14 @@ const AdminLogin = () => {
       navigate("/admin/dashboard", { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[hsl(var(--dark-section))] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   if (isAuthenticated) return null;
 

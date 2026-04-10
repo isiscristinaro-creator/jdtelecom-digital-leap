@@ -31,33 +31,77 @@ const statusIcons = {
   Cancelado: AlertTriangle,
 };
 
+// Mock data until subscriber tables are created in Supabase
+const MOCK_PLAN = {
+  name: "Turbo Fibra 300",
+  speed: "300MB Fibra",
+  status: "Ativo" as const,
+  price: "R$ 139,90",
+};
+
+const MOCK_BILLING = {
+  nextDue: "Abril 2026",
+  dueDate: "15/04/2026",
+  status: "Pendente" as const,
+  amount: "R$ 139,90",
+};
+
+const MOCK_HISTORY = [
+  { id: "1", date: "15/03/2026", amount: "R$ 139,90", status: "Pago" as const, description: "Mensalidade Março" },
+  { id: "2", date: "15/02/2026", amount: "R$ 139,90", status: "Pago" as const, description: "Mensalidade Fevereiro" },
+  { id: "3", date: "15/01/2026", amount: "R$ 139,90", status: "Pago" as const, description: "Mensalidade Janeiro" },
+  { id: "4", date: "15/12/2025", amount: "R$ 139,90", status: "Pago" as const, description: "Mensalidade Dezembro" },
+  { id: "5", date: "15/11/2025", amount: "R$ 129,90", status: "Pago" as const, description: "Mensalidade Novembro" },
+  { id: "6", date: "15/10/2025", amount: "R$ 129,90", status: "Atrasado" as const, description: "Mensalidade Outubro" },
+];
+
+const MOCK_PREFERENCES = {
+  notifications_email: true,
+  notifications_sms: false,
+  notifications_whatsapp: true,
+  dark_mode: true,
+  language: "pt-BR",
+};
+
 const SubscriberDashboard = () => {
-  const { subscriber, isAuthenticated, logout, updateSubscriber } = useAuth();
+  const { user, profile, isAuthenticated, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ name: "", phone: "", address: "" });
+  const [preferences, setPreferences] = useState(MOCK_PREFERENCES);
+
+  const displayName = profile?.full_name || user?.email || "Assinante";
+  const displayEmail = user?.email || "";
+  const displayPhone = profile?.phone || "(92) 99123-4567";
+  const displayAvatar = profile?.avatar_url || `https://api.dicebear.com/9.x/initials/svg?seed=${displayName}&backgroundColor=0ea5e9`;
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       navigate("/assinante", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   useEffect(() => {
-    if (subscriber) {
-      setEditData({ name: subscriber.name, phone: subscriber.phone, address: subscriber.address });
-    }
-  }, [subscriber]);
+    setEditData({ name: displayName, phone: displayPhone, address: "Rua das Flores, 123 - Manaus, AM" });
+  }, [displayName, displayPhone]);
 
-  if (!subscriber) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[hsl(var(--dark-section))] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
-  const handleLogout = () => {
-    logout();
+  if (!isAuthenticated) return null;
+
+  const handleLogout = async () => {
+    await logout();
     navigate("/assinante", { replace: true });
   };
 
   const handleSaveEdit = () => {
-    updateSubscriber(editData);
+    toast.success("Dados atualizados com sucesso!");
     setEditMode(false);
   };
 
@@ -99,7 +143,7 @@ const SubscriberDashboard = () => {
             <span className="hidden sm:inline text-xs font-medium text-primary">Área do Assinante</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden md:inline text-sm text-[hsl(var(--dark-section-muted))]">{subscriber.email}</span>
+            <span className="hidden md:inline text-sm text-[hsl(var(--dark-section-muted))]">{displayEmail}</span>
             <Button
               variant="ghost"
               size="sm"
@@ -117,13 +161,13 @@ const SubscriberDashboard = () => {
         {/* Greeting with Avatar */}
         <div className="mb-8 flex items-center gap-4">
           <img
-            src={subscriber.avatar}
-            alt={subscriber.name}
+            src={displayAvatar}
+            alt={displayName}
             className="w-14 h-14 rounded-full border-2 border-primary/30 bg-[hsl(var(--dark-section-card))]"
           />
           <div>
             <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
-              Olá, {subscriber.name.split(" ")[0]} 👋
+              Olá, {displayName.split(" ")[0]} 👋
             </h1>
             <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-0.5">
               Seja bem-vindo à sua área do assinante
@@ -141,19 +185,19 @@ const SubscriberDashboard = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h4 className="font-display text-xl sm:text-2xl font-bold text-[hsl(var(--dark-section-fg))]">
-                    {subscriber.plan.name}
+                    {MOCK_PLAN.name}
                   </h4>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                     <div className="flex items-center gap-1.5 text-sm text-[hsl(var(--dark-section-muted))]">
                       <Zap className="w-4 h-4 text-primary" />
-                      {subscriber.plan.speed}
+                      {MOCK_PLAN.speed}
                     </div>
-                    <StatusBadge status={subscriber.plan.status} />
+                    <StatusBadge status={MOCK_PLAN.status} />
                   </div>
                 </div>
                 <div className="sm:text-right">
                   <p className="text-xs text-[hsl(var(--dark-section-muted))]">Valor mensal</p>
-                  <p className="font-display text-2xl font-extrabold text-primary">{subscriber.plan.price}</p>
+                  <p className="font-display text-2xl font-extrabold text-primary">{MOCK_PLAN.price}</p>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))]">
@@ -174,19 +218,19 @@ const SubscriberDashboard = () => {
               <div className="flex flex-col gap-3 bg-[hsl(var(--dark-section))]/50 rounded-xl p-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-[hsl(var(--dark-section-fg))]">
-                    Próxima fatura — {subscriber.billing.nextDue}
+                    Próxima fatura — {MOCK_BILLING.nextDue}
                   </p>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--dark-section-muted))]">
                       <Calendar className="w-3.5 h-3.5" />
-                      Vencimento: {subscriber.billing.dueDate}
+                      Vencimento: {MOCK_BILLING.dueDate}
                     </span>
-                    <StatusBadge status={subscriber.billing.status} />
+                    <StatusBadge status={MOCK_BILLING.status} />
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[hsl(var(--dark-section-border))]/50">
                   <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))]">
-                    {subscriber.billing.amount}
+                    {MOCK_BILLING.amount}
                   </p>
                   <Button
                     size="sm"
@@ -213,7 +257,7 @@ const SubscriberDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {subscriber.history.map((item) => (
+                    {MOCK_HISTORY.map((item) => (
                       <tr key={item.id} className="border-b border-[hsl(var(--dark-section-border))]/50 hover:bg-[hsl(var(--dark-section))]/30 transition-colors">
                         <td className="py-3 px-2 text-[hsl(var(--dark-section-fg))]">{item.description}</td>
                         <td className="py-3 px-2 text-[hsl(var(--dark-section-muted))]">{item.date}</td>
@@ -271,19 +315,19 @@ const SubscriberDashboard = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <User className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-[hsl(var(--dark-section-fg))]">{subscriber.name}</span>
+                    <span className="text-[hsl(var(--dark-section-fg))]">{displayName}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-[hsl(var(--dark-section-muted))] break-all">{subscriber.email}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))] break-all">{displayEmail}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Phone className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-[hsl(var(--dark-section-muted))]">{subscriber.phone}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))]">{displayPhone}</span>
                   </div>
                   <div className="flex items-start gap-2 text-sm">
                     <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span className="text-[hsl(var(--dark-section-muted))] break-words">{subscriber.address}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))] break-words">Rua das Flores, 123 - Manaus, AM</span>
                   </div>
                   <Button
                     size="sm"
@@ -308,10 +352,8 @@ const SubscriberDashboard = () => {
                   <button
                     key={item.key}
                     onClick={() => {
-                      const newVal = !subscriber.preferences[item.key];
-                      updateSubscriber({
-                        preferences: { ...subscriber.preferences, [item.key]: newVal },
-                      });
+                      const newVal = !preferences[item.key];
+                      setPreferences(prev => ({ ...prev, [item.key]: newVal }));
                       toast.success(`${item.label} ${newVal ? "ativado" : "desativado"}`);
                     }}
                     className="w-full flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 hover:bg-primary/5 transition-colors group"
@@ -320,8 +362,8 @@ const SubscriberDashboard = () => {
                       <item.icon className="w-4 h-4 text-primary" />
                       <span className="text-sm text-[hsl(var(--dark-section-fg))]">{item.label}</span>
                     </div>
-                    <div className={`relative w-10 h-5 rounded-full transition-colors ${subscriber.preferences[item.key] ? "bg-primary" : "bg-[hsl(var(--dark-section-border))]"}`}>
-                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${subscriber.preferences[item.key] ? "translate-x-5" : "translate-x-0.5"}`} />
+                    <div className={`relative w-10 h-5 rounded-full transition-colors ${preferences[item.key] ? "bg-primary" : "bg-[hsl(var(--dark-section-border))]"}`}>
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${preferences[item.key] ? "translate-x-5" : "translate-x-0.5"}`} />
                     </div>
                   </button>
                 ))}
@@ -331,7 +373,7 @@ const SubscriberDashboard = () => {
                     <span className="text-sm text-[hsl(var(--dark-section-fg))]">Idioma</span>
                   </div>
                   <span className="text-xs font-semibold text-[hsl(var(--dark-section-muted))]">
-                    {subscriber.preferences.language === "pt-BR" ? "Português" : subscriber.preferences.language}
+                    {preferences.language === "pt-BR" ? "Português" : preferences.language}
                   </span>
                 </div>
               </div>
