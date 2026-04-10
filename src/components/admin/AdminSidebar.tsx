@@ -31,12 +31,6 @@ const typeColors: Record<string, string> = {
   success: "bg-emerald-500",
 };
 
-const typeTextColors: Record<string, string> = {
-  info: "text-blue-400",
-  warning: "text-amber-400",
-  danger: "text-red-400",
-  success: "text-emerald-400",
-};
 
 function timeAgo(date: Date) {
   const diff = Math.floor((Date.now() - date.getTime()) / 1000);
