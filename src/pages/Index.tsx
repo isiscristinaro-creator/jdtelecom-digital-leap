@@ -8,6 +8,7 @@ import BenefitsSection from "@/components/BenefitsSection";
 import ChipInstructionsSection from "@/components/ChipInstructionsSection";
 import CoverageSection from "@/components/CoverageSection";
 import SelfServiceSection from "@/components/SelfServiceSection";
+import TestemunhosSection from "@/components/TestemunhosSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -26,6 +27,7 @@ const Index = () => {
       <ChipInstructionsSection />
       <CoverageSection />
       <SelfServiceSection />
+      <TestemunhosSection />
       <ContactSection />
       <Footer />
       <WhatsAppButton />
