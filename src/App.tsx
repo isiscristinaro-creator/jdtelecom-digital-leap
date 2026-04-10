@@ -10,6 +10,7 @@ import CitySelector from "@/components/CitySelector";
 import Index from "./pages/Index.tsx";
 import SubscriberLogin from "./pages/SubscriberLogin.tsx";
 import SubscriberDashboard from "./pages/SubscriberDashboard.tsx";
+import SubscriberItems from "./pages/SubscriberItems.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
 import AdminLayout from "./pages/admin/AdminLayout.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
