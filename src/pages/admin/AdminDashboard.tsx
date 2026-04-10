@@ -30,7 +30,7 @@ const AdminDashboard = () => {
   const { clients } = useClients();
   const { payments } = usePayments();
   const { records: serviceRecords } = useAllServiceRecords();
-  const { getGoal, updateGoal } = useKpiGoals();
+  const { getGoal, updateGoal, history: kpiHistory } = useKpiGoals();
   const [editingKpi, setEditingKpi] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const kpiNotifiedRef = useRef<Set<string>>(new Set());
