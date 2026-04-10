@@ -1,6 +1,6 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText, SlidersHorizontal
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText
 } from "lucide-react";
 import { toast } from "sonner";
 import {
