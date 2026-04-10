@@ -134,6 +134,40 @@ const AdminDashboard = () => {
     toast.success(`${data.length} clientes exportados com sucesso`);
   };
 
+  const handleExportPdf = async () => {
+    if (!dashboardRef.current) return;
+    setExportingPdf(true);
+    try {
+      const html2canvas = (await import("html2canvas-pro")).default;
+      const { jsPDF } = await import("jspdf");
+      const canvas = await html2canvas(dashboardRef.current, {
+        scale: 1.5,
+        useCORS: true,
+        backgroundColor: "#0f1117",
+        logging: false,
+      });
+      const imgData = canvas.toDataURL("image/jpeg", 0.85);
+      const imgW = canvas.width;
+      const imgH = canvas.height;
+      const pdfW = 297; // A4 landscape width mm
+      const pdfH = 210;
+      const ratio = pdfW / imgW;
+      const totalHeight = imgH * ratio;
+      const pages = Math.ceil(totalHeight / pdfH);
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      for (let i = 0; i < pages; i++) {
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, -(i * pdfH), pdfW, totalHeight);
+      }
+      pdf.save(`dashboard-jdtelecom-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("Dashboard exportado em PDF!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao exportar PDF");
+    }
+    setExportingPdf(false);
+  };
+
   if (statsLoading) {
     return (
       <div className="admin-page flex items-center justify-center min-h-[400px]">
@@ -143,8 +177,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-page space-y-6 w-full overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div ref={dashboardRef} className="admin-page space-y-6 w-full overflow-hidden">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
             {greeting}, {admin?.name?.split(" ")[0] || "Admin"} 👋
