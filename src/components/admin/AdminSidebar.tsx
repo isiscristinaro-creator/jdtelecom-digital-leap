@@ -4,7 +4,7 @@ import { useAdminNotifications } from "@/contexts/AdminNotificationsContext";
 import { useState, useRef, useEffect } from "react";
 import {
   LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText, Shield, Bell, CheckCheck, Trash2
-  , ShoppingBag, Image, MessageSquare, ClipboardList
+  , ShoppingBag, Image, MessageSquare, ClipboardList, Headphones
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -26,6 +26,7 @@ const navItems = [
   { label: "Pedidos", href: "/admin/pedidos", icon: ClipboardList },
   { label: "Banners", href: "/admin/banners", icon: Image },
   { label: "Testemunhos", href: "/admin/testemunhos", icon: MessageSquare },
+  { label: "Atendimentos", href: "/admin/atendimentos", icon: Headphones },
   { label: "Configurações", href: "/admin/configuracoes", icon: Settings },
 ];
 
