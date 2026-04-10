@@ -8,6 +8,15 @@ export interface KpiGoal {
   target_value: number;
 }
 
+export interface KpiHistoryEntry {
+  key: string;
+  label: string;
+  old_value: number;
+  new_value: number;
+  changed_by: string;
+  changed_at: string;
+}
+
 const DEFAULT_GOALS: KpiGoal[] = [
   { key: "meta_receita", label: "Meta Receita Mensal", target_value: 50000 },
   { key: "meta_clientes", label: "Meta Clientes Total", target_value: 100 },
@@ -15,9 +24,11 @@ const DEFAULT_GOALS: KpiGoal[] = [
 ];
 
 const STORAGE_KEY = "jd_kpi_goals";
+const HISTORY_KEY = "jd_kpi_history";
 
 export function useKpiGoals() {
   const [goals, setGoals] = useState<KpiGoal[]>(DEFAULT_GOALS);
+  const [history, setHistory] = useState<KpiHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [dbAvailable, setDbAvailable] = useState(false);
 
@@ -53,9 +64,32 @@ export function useKpiGoals() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchGoals(); }, [fetchGoals]);
+  const fetchHistory = useCallback(() => {
+    try {
+      const saved = localStorage.getItem(HISTORY_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setHistory(parsed);
+        }
+      }
+    } catch {}
+  }, []);
 
-  const updateGoal = useCallback(async (key: string, target_value: number) => {
+  useEffect(() => { fetchGoals(); fetchHistory(); }, [fetchGoals, fetchHistory]);
+
+  const addHistoryEntry = useCallback((entry: KpiHistoryEntry) => {
+    setHistory(prev => {
+      const updated = [entry, ...prev].slice(0, 50); // keep last 50
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const updateGoal = useCallback(async (key: string, target_value: number, changedBy?: string) => {
+    const currentGoal = goals.find(g => g.key === key);
+    const oldValue = currentGoal?.target_value ?? 0;
+
     // Optimistic update
     setGoals(prev => prev.map(g => g.key === key ? { ...g, target_value } : g));
 
@@ -72,16 +106,26 @@ export function useKpiGoals() {
       }
     }
 
+    // Save history entry
+    addHistoryEntry({
+      key,
+      label: currentGoal?.label ?? key,
+      old_value: oldValue,
+      new_value: target_value,
+      changed_by: changedBy || "Admin",
+      changed_at: new Date().toISOString(),
+    });
+
     // Always save to localStorage as backup
     const updated = goals.map(g => g.key === key ? { ...g, target_value } : g);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     toast.success("Meta atualizada!");
     return true;
-  }, [dbAvailable, goals, fetchGoals]);
+  }, [dbAvailable, goals, fetchGoals, addHistoryEntry]);
 
   const getGoal = useCallback((key: string) => {
     return goals.find(g => g.key === key)?.target_value ?? DEFAULT_GOALS.find(g => g.key === key)?.target_value ?? 0;
   }, [goals]);
 
-  return { goals, loading, updateGoal, getGoal, dbAvailable };
+  return { goals, history, loading, updateGoal, getGoal, dbAvailable };
 }
