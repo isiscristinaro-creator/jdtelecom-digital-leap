@@ -98,19 +98,26 @@ const AdminPayments = () => {
         ))}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))]" />
           <Input placeholder="Buscar por cliente..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] pl-10 h-10 rounded-xl" />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {["Todos", "Pago", "Pendente", "Atrasado"].map((s) => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(0); }}
-              className={`w-full sm:w-auto px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
-                statusFilter === s ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
-              }`}>{s}</button>
-          ))}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex gap-2 flex-wrap">
+            {["Todos", "Pago", "Pendente", "Atrasado"].map((s) => (
+              <button key={s} onClick={() => { setStatusFilter(s); setPage(0); }}
+                className={`w-full sm:w-auto px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                  statusFilter === s ? "bg-primary text-primary-foreground border-primary" : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"
+                }`}>{s}</button>
+            ))}
+          </div>
+          <select value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(0); }}
+            className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full sm:w-auto">
+            <option value="Todos">Todos os planos</option>
+            {plans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+          </select>
         </div>
       </div>
 
