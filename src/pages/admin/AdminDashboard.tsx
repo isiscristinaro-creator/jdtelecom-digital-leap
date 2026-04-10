@@ -1,6 +1,6 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -36,6 +36,9 @@ const AdminDashboard = () => {
   const [editValue, setEditValue] = useState("");
   const kpiNotifiedRef = useRef<Set<string>>(new Set());
   const [trendPeriod, setTrendPeriod] = useState<7 | 30 | 90>(30);
+  const [whatIfGrowth, setWhatIfGrowth] = useState<number | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const dashboardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -131,6 +134,40 @@ const AdminDashboard = () => {
     toast.success(`${data.length} clientes exportados com sucesso`);
   };
 
+  const handleExportPdf = async () => {
+    if (!dashboardRef.current) return;
+    setExportingPdf(true);
+    try {
+      const html2canvas = (await import("html2canvas-pro")).default;
+      const { jsPDF } = await import("jspdf");
+      const canvas = await html2canvas(dashboardRef.current, {
+        scale: 1.5,
+        useCORS: true,
+        backgroundColor: "#0f1117",
+        logging: false,
+      });
+      const imgData = canvas.toDataURL("image/jpeg", 0.85);
+      const imgW = canvas.width;
+      const imgH = canvas.height;
+      const pdfW = 297; // A4 landscape width mm
+      const pdfH = 210;
+      const ratio = pdfW / imgW;
+      const totalHeight = imgH * ratio;
+      const pages = Math.ceil(totalHeight / pdfH);
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      for (let i = 0; i < pages; i++) {
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, -(i * pdfH), pdfW, totalHeight);
+      }
+      pdf.save(`dashboard-jdtelecom-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("Dashboard exportado em PDF!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao exportar PDF");
+    }
+    setExportingPdf(false);
+  };
+
   if (statsLoading) {
     return (
       <div className="admin-page flex items-center justify-center min-h-[400px]">
@@ -140,7 +177,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-page space-y-6 w-full overflow-hidden">
+    <div ref={dashboardRef} className="admin-page space-y-6 w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
@@ -158,6 +195,10 @@ const AdminDashboard = () => {
           <Button onClick={() => setFinanceiroOpen(true)} size="sm"
             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs flex-1 sm:flex-none">
             <Download className="w-3.5 h-3.5 mr-1.5" /> Financeiro
+          </Button>
+          <Button onClick={handleExportPdf} size="sm" disabled={exportingPdf}
+            className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs flex-1 sm:flex-none">
+            {exportingPdf ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <FileText className="w-3.5 h-3.5 mr-1.5" />} PDF
           </Button>
         </div>
       </div>
@@ -539,13 +580,12 @@ const AdminDashboard = () => {
         );
       })()}
 
-      {/* Predictive Analysis */}
+      {/* Predictive Analysis with What-If */}
       {(() => {
         const metaReceita = getGoal("meta_receita");
         const metaClientes = getGoal("meta_clientes");
         const metaNovos = getGoal("meta_novos_30d");
 
-        // Calculate monthly growth rates from client data
         const monthlyGrowth = (() => {
           if (clientGrowthData.length < 2) return 0;
           const last = clientGrowthData[clientGrowthData.length - 1];
@@ -554,7 +594,6 @@ const AdminDashboard = () => {
           return (last.total - prev.total) / prev.total;
         })();
 
-        // Revenue growth rate from payment data
         const revenueGrowth = (() => {
           if (revenueData.length < 2) return 0;
           const last = revenueData[revenueData.length - 1];
@@ -563,11 +602,13 @@ const AdminDashboard = () => {
           return (last.pago - prev.pago) / prev.pago;
         })();
 
-        // Project months to reach target
+        // What-if overrides
+        const simRevGrowth = whatIfGrowth !== null ? whatIfGrowth / 100 : revenueGrowth;
+        const simClientGrowth = whatIfGrowth !== null ? whatIfGrowth / 100 : monthlyGrowth;
+
         const projectMonths = (current: number, target: number, growthRate: number): number | null => {
           if (current >= target) return 0;
-          if (growthRate <= 0) return null; // Will never reach
-          // Using compound growth: current * (1 + rate)^n = target
+          if (growthRate <= 0) return null;
           return Math.ceil(Math.log(target / current) / Math.log(1 + growthRate));
         };
 
@@ -577,8 +618,9 @@ const AdminDashboard = () => {
             current: stats.mrr,
             target: metaReceita,
             pct: metaReceita > 0 ? Math.round((stats.mrr / metaReceita) * 100) : 0,
-            growth: revenueGrowth,
-            months: projectMonths(stats.mrr, metaReceita, revenueGrowth),
+            growth: simRevGrowth,
+            realGrowth: revenueGrowth,
+            months: projectMonths(stats.mrr, metaReceita, simRevGrowth),
             format: (v: number) => fmt(v),
           },
           {
@@ -586,8 +628,9 @@ const AdminDashboard = () => {
             current: stats.totalClients,
             target: metaClientes,
             pct: metaClientes > 0 ? Math.round((stats.totalClients / metaClientes) * 100) : 0,
-            growth: monthlyGrowth,
-            months: projectMonths(stats.totalClients, metaClientes, monthlyGrowth),
+            growth: simClientGrowth,
+            realGrowth: monthlyGrowth,
+            months: projectMonths(stats.totalClients, metaClientes, simClientGrowth),
             format: (v: number) => String(v),
           },
           {
@@ -595,13 +638,14 @@ const AdminDashboard = () => {
             current: stats.newLast30,
             target: metaNovos,
             pct: metaNovos > 0 ? Math.round((stats.newLast30 / metaNovos) * 100) : 0,
-            growth: monthlyGrowth,
-            months: projectMonths(stats.newLast30, metaNovos, monthlyGrowth),
+            growth: simClientGrowth,
+            realGrowth: monthlyGrowth,
+            months: projectMonths(stats.newLast30, metaNovos, simClientGrowth),
             format: (v: number) => String(v),
           },
         ];
 
-        // Build projection chart data (next 6 months)
+        // Projection data with both real and what-if lines
         const projectionData = Array.from({ length: 7 }, (_, i) => {
           const d = new Date();
           d.setMonth(d.getMonth() + i);
@@ -609,17 +653,57 @@ const AdminDashboard = () => {
           return {
             mes: label,
             receita: Math.round(stats.mrr * Math.pow(1 + (revenueGrowth || 0.02), i)),
-            clientes: Math.round(stats.totalClients * Math.pow(1 + (monthlyGrowth || 0.05), i)),
+            ...(whatIfGrowth !== null ? { receitaWhatIf: Math.round(stats.mrr * Math.pow(1 + simRevGrowth, i)) } : {}),
             metaReceita,
-            metaClientes,
           };
         });
 
         return (
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" /> Análise Preditiva
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" /> Análise Preditiva
+              </h3>
+            </div>
+
+            {/* What-If Slider */}
+            <div className="mb-5 p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 border border-[hsl(var(--dark-section-border))]">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
+                  🔮 Cenário What-If — Simular taxa de crescimento
+                </p>
+                {whatIfGrowth !== null && (
+                  <button
+                    onClick={() => setWhatIfGrowth(null)}
+                    className="text-[10px] text-[hsl(var(--dark-section-muted))] hover:text-primary px-2 py-1 rounded-lg bg-[hsl(var(--dark-section))]/50"
+                  >
+                    Resetar para real
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-[10px] text-[hsl(var(--dark-section-muted))] w-8">0%</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={50}
+                  step={1}
+                  value={whatIfGrowth ?? Math.round(Math.max(revenueGrowth, monthlyGrowth) * 100)}
+                  onChange={(e) => setWhatIfGrowth(Number(e.target.value))}
+                  className="flex-1 h-2 rounded-full appearance-none cursor-pointer accent-primary"
+                  style={{ background: `linear-gradient(to right, hsl(24,95%,50%) ${((whatIfGrowth ?? Math.round(Math.max(revenueGrowth, monthlyGrowth) * 100)) / 50) * 100}%, hsl(220,14%,22%) 0%)` }}
+                />
+                <span className="text-[10px] text-[hsl(var(--dark-section-muted))] w-8">50%</span>
+                <span className="text-sm font-bold text-primary min-w-[48px] text-right">
+                  {whatIfGrowth !== null ? `${whatIfGrowth}%` : `${Math.round(Math.max(revenueGrowth, monthlyGrowth) * 100)}%`}
+                </span>
+              </div>
+              {whatIfGrowth !== null && (
+                <p className="text-[10px] text-amber-400 mt-2">
+                  ⚡ Simulando com {whatIfGrowth}%/mês (real: {(Math.max(revenueGrowth, monthlyGrowth) * 100).toFixed(1)}%/mês)
+                </p>
+              )}
+            </div>
 
             {/* Prediction Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
@@ -651,6 +735,7 @@ const AdminDashboard = () => {
                     </p>
                     <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">
                       Taxa: {(p.growth * 100).toFixed(1)}%/mês
+                      {whatIfGrowth !== null && <span className="text-amber-400 ml-1">(real: {(p.realGrowth * 100).toFixed(1)}%)</span>}
                     </p>
                   </div>
                 );
@@ -659,7 +744,9 @@ const AdminDashboard = () => {
 
             {/* Projection Chart */}
             <div>
-              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Projeção de Receita (6 meses)</p>
+              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
+                Projeção de Receita (6 meses) {whatIfGrowth !== null && <span className="text-amber-400">— Cenário What-If</span>}
+              </p>
               <ResponsiveContainer width="100%" height={220}>
                 <AreaChart data={projectionData}>
                   <defs>
@@ -667,12 +754,20 @@ const AdminDashboard = () => {
                       <stop offset="5%" stopColor="hsl(24,95%,50%)" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="hsl(24,95%,50%)" stopOpacity={0} />
                     </linearGradient>
+                    <linearGradient id="colorWhatIf" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(45,90%,50%)" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="hsl(45,90%,50%)" stopOpacity={0} />
+                    </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
                   <XAxis dataKey="mes" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} />
                   <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
                   <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} formatter={(v: number) => [fmt(v), ""]} />
-                  <Area type="monotone" dataKey="receita" stroke="hsl(24,95%,50%)" fill="url(#colorProj)" strokeWidth={2} name="Receita Projetada" />
+                  <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 11 }} />
+                  <Area type="monotone" dataKey="receita" stroke="hsl(24,95%,50%)" fill="url(#colorProj)" strokeWidth={2} name="Projeção Real" />
+                  {whatIfGrowth !== null && (
+                    <Area type="monotone" dataKey="receitaWhatIf" stroke="hsl(45,90%,50%)" fill="url(#colorWhatIf)" strokeWidth={2} strokeDasharray="6 3" name={`What-If (${whatIfGrowth}%)`} />
+                  )}
                   <ReferenceLine y={metaReceita} stroke="hsl(160,70%,45%)" strokeWidth={2} strokeDasharray="8 4" label={{ value: "Meta", fill: "hsl(160,70%,45%)", fontSize: 10, position: "right" }} />
                 </AreaChart>
               </ResponsiveContainer>
