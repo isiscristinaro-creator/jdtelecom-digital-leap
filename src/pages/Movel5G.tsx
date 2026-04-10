@@ -13,6 +13,29 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
+/* Hook: observe element and add visible class once in viewport */
+const useFadeUp = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.classList.add("movel-section-hidden");
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.remove("movel-section-hidden");
+          el.classList.add("movel-section-visible");
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.08 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+};
+
 const mobilePlans = [
   { tier: "Start", name: "JD VOZ 1000MIN | 5GB", data: "5GB", minutes: "1000 Minutos", price: "35", cents: "00", whatsapp: true, deezer: false, popular: false },
   { tier: "Start", name: "START 6 + DEEZER", data: "6GB", minutes: "100 Minutos", price: "39", cents: "90", whatsapp: true, deezer: true, popular: false },

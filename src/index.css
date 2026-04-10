@@ -114,6 +114,31 @@
     box-shadow: var(--shadow-elevated);
   }
 
+  /* Scroll-triggered fade-up animation */
+  @keyframes movel-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(32px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .movel-section-hidden {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  .movel-section-visible {
+    animation: movel-fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .movel-delay-1 { animation-delay: 0.1s; }
+  .movel-delay-2 { animation-delay: 0.2s; }
+  .movel-delay-3 { animation-delay: 0.3s; }
+
   .bg-dark-section {
     background-color: hsl(var(--dark-section));
     color: hsl(var(--dark-section-fg));
