@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Quote, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 interface Testemunho {
   id: string;
@@ -13,7 +12,7 @@ interface Testemunho {
 const TestemunhosSection = () => {
   const [testemunhos, setTestemunhos] = useState<Testemunho[]>([]);
   const [current, setCurrent] = useState(0);
-  const { ref, isVisible } = useScrollAnimation();
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -22,7 +21,10 @@ const TestemunhosSection = () => {
         .select("id, nome, mensagem")
         .eq("ativo", true)
         .order("created_at", { ascending: false });
-      if (data?.length) setTestemunhos(data);
+      if (data?.length) {
+        setTestemunhos(data);
+        setLoaded(true);
+      }
     })();
   }, []);
 
