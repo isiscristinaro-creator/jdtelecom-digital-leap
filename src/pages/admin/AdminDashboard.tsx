@@ -5,10 +5,11 @@ import {
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend,
+  LineChart, Line
 } from "recharts";
 import { Button } from "@/components/ui/button";
-import { exportToCSV } from "@/utils/exportUtils";
+import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
