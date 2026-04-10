@@ -415,6 +415,39 @@ const AdminDashboard = () => {
         );
       })()}
 
+      {/* KPI Change History */}
+      {kpiHistory.length > 0 && (
+        <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+          <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+            <History className="w-4 h-4 text-primary" /> Histórico de Alterações de Metas
+          </h3>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {kpiHistory.slice(0, 20).map((entry, i) => {
+              const date = new Date(entry.changed_at);
+              const fmtDate = date.toLocaleDateString("pt-BR") + " " + date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+              const isRevenue = entry.key === "meta_receita";
+              const fmtVal = (v: number) => isRevenue ? fmt(v) : String(v);
+              return (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--dark-section))]/50 text-sm">
+                  <Clock className="w-4 h-4 text-[hsl(var(--dark-section-muted))] shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[hsl(var(--dark-section-fg))] font-medium">{entry.label}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))]"> alterada de </span>
+                    <span className="text-amber-400 font-semibold">{fmtVal(entry.old_value)}</span>
+                    <span className="text-[hsl(var(--dark-section-muted))]"> para </span>
+                    <span className="text-emerald-400 font-semibold">{fmtVal(entry.new_value)}</span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-xs text-primary font-medium">{entry.changed_by}</p>
+                    <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">{fmtDate}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Atendimentos Metrics + Chart */}
       {serviceRecords.length > 0 && (() => {
         const byType: Record<string, number> = {};
