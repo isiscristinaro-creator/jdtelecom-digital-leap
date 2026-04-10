@@ -6,6 +6,8 @@ import { usePedidos } from "@/hooks/useSupabaseData";
 import { exportToExcel, exportToCSV } from "@/utils/exportUtils";
 import { toast } from "sonner";
 
+const ITEMS_PER_PAGE = 15;
+
 const statusColors: Record<string, string> = {
   pendente: "bg-amber-500/10 text-amber-400",
   pago: "bg-emerald-500/10 text-emerald-400",
@@ -18,8 +20,10 @@ const AdminPedidos = () => {
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = useMemo(() => {
+    setCurrentPage(1);
     let list = [...pedidos];
     if (statusFilter !== "Todos") list = list.filter(p => p.status === statusFilter.toLowerCase());
     if (search) list = list.filter(p => p.cliente_email.toLowerCase().includes(search.toLowerCase()));
@@ -34,6 +38,9 @@ const AdminPedidos = () => {
     return list;
   }, [pedidos, statusFilter, search, dataInicial, dataFinal]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedItems = filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
   const totalValor = filtered.reduce((s, p) => s + p.valor, 0);
 
   if (loading) return <div className="admin-page flex items-center justify-center min-h-[400px]"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
@@ -55,6 +62,20 @@ const AdminPedidos = () => {
     if (!data.length) { toast.error("Nenhum dado"); return; }
     exportToCSV(data, `pedidos-jdtelecom`);
     toast.success(`${data.length} pedidos exportados`);
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (safePage > 3) pages.push("...");
+      for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) pages.push(i);
+      if (safePage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
   };
 
   return (
@@ -116,7 +137,7 @@ const AdminPedidos = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(p => (
+              {paginatedItems.map(p => (
                 <tr key={p.id} className="border-b border-[hsl(var(--dark-section-border))]/50 hover:bg-[hsl(var(--dark-section))]/30">
                   <td className="px-4 py-3 text-[hsl(var(--dark-section-fg))]">{p.cliente_email}</td>
                   <td className="px-4 py-3 font-bold text-primary">R$ {p.valor.toFixed(2)}</td>
@@ -147,6 +168,35 @@ const AdminPedidos = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[hsl(var(--dark-section-border))]">
+            <p className="text-xs text-[hsl(var(--dark-section-muted))]">
+              {(safePage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(safePage * ITEMS_PER_PAGE, filtered.length)} de {filtered.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={safePage === 1}
+                className="p-1.5 rounded-lg text-[hsl(var(--dark-section-muted))] hover:bg-[hsl(var(--dark-section))]/50 disabled:opacity-30">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {getPageNumbers().map((pg, i) =>
+                pg === "..." ? (
+                  <span key={`e${i}`} className="px-2 text-xs text-[hsl(var(--dark-section-muted))]">…</span>
+                ) : (
+                  <button key={pg} onClick={() => setCurrentPage(pg as number)}
+                    className={`min-w-[32px] h-8 rounded-lg text-xs font-semibold transition-all ${
+                      safePage === pg ? "bg-primary text-primary-foreground" : "text-[hsl(var(--dark-section-muted))] hover:bg-[hsl(var(--dark-section))]/50"
+                    }`}>{pg}</button>
+                )
+              )}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}
+                className="p-1.5 rounded-lg text-[hsl(var(--dark-section-muted))] hover:bg-[hsl(var(--dark-section))]/50 disabled:opacity-30">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
