@@ -1,11 +1,11 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend, LineChart, Line
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
