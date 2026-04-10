@@ -438,12 +438,16 @@ const AdminDashboard = () => {
         }));
         const trendColors = ["hsl(160,70%,45%)", "hsl(24,95%,50%)", "hsl(210,80%,55%)"];
 
-        // Meta vs Real comparison data
+        // Meta vs Real comparison data with alert flags
         const metaVsReal = [
           { name: "Receita", meta: getGoal("meta_receita"), real: stats.mrr },
           { name: "Clientes", meta: getGoal("meta_clientes"), real: stats.totalClients },
           { name: "Novos 30d", meta: getGoal("meta_novos_30d"), real: stats.newLast30 },
-        ];
+        ].map(item => ({
+          ...item,
+          pct: item.meta > 0 ? Math.round((item.real / item.meta) * 100) : 0,
+          alert: item.meta > 0 && (item.real / item.meta) < 0.5,
+        }));
 
         const periodButtons = [
           { label: "7d", value: 7 as const },
