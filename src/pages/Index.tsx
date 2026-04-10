@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import BannersSection from "@/components/BannersSection";
 import StatsSection from "@/components/StatsSection";
 import PlansSection from "@/components/PlansSection";
 import QuickActionsBar from "@/components/QuickActionsBar";
