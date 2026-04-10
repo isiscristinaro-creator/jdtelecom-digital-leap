@@ -323,6 +323,95 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Atendimentos Metrics */}
+      {serviceRecords.length > 0 && (() => {
+        const byType: Record<string, number> = {};
+        const byAgent: Record<string, number> = {};
+        serviceRecords.forEach(r => {
+          byType[r.type] = (byType[r.type] || 0) + 1;
+          byAgent[r.agent] = (byAgent[r.agent] || 0) + 1;
+        });
+        const typeData = Object.entries(byType).sort((a, b) => b[1] - a[1]);
+        const agentData = Object.entries(byAgent).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const now = new Date();
+        const d30 = new Date(now); d30.setDate(d30.getDate() - 30);
+        const d7 = new Date(now); d7.setDate(d7.getDate() - 7);
+        const last30 = serviceRecords.filter(r => new Date(r.created_at) >= d30).length;
+        const last7 = serviceRecords.filter(r => new Date(r.created_at) >= d7).length;
+
+        const typeColors: Record<string, string> = {
+          "Suporte Técnico": "text-blue-400 bg-blue-500/10",
+          "Financeiro": "text-amber-400 bg-amber-500/10",
+          "Comercial": "text-purple-400 bg-purple-500/10",
+        };
+
+        return (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <Headphones className="w-4 h-4 text-primary" /> Métricas de Atendimentos
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+              <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                <p className="font-display text-xl font-bold text-primary">{serviceRecords.length}</p>
+                <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Total de Atendimentos</p>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                <p className="font-display text-xl font-bold text-emerald-400">{last30}</p>
+                <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Últimos 30 dias</p>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-[hsl(var(--dark-section))]/50">
+                <p className="font-display text-xl font-bold text-blue-400">{last7}</p>
+                <p className="text-[10px] text-[hsl(var(--dark-section-muted))] mt-1">Últimos 7 dias</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Por Tipo</p>
+                <div className="space-y-2">
+                  {typeData.map(([type, count]) => {
+                    const pct = Math.round((count / serviceRecords.length) * 100);
+                    const colors = typeColors[type] || "text-slate-400 bg-slate-500/10";
+                    return (
+                      <div key={type}>
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${colors}`}>{type}</span>
+                          <span className="text-[hsl(var(--dark-section-fg))] font-bold text-xs">{count} ({pct}%)</span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-[hsl(var(--dark-section))]/50">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">Agentes mais ativos</p>
+                <div className="space-y-2">
+                  {agentData.map(([agent, count], i) => (
+                    <div key={agent} className="flex items-center justify-between text-sm py-2 px-3 rounded-xl bg-[hsl(var(--dark-section))]/30">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? "bg-primary text-primary-foreground" : "bg-[hsl(var(--dark-section))]/50 text-[hsl(var(--dark-section-muted))]"}`}>
+                          {i + 1}
+                        </span>
+                        <span className="text-[hsl(var(--dark-section-fg))] font-medium">{agent}</span>
+                      </div>
+                      <span className="text-primary font-bold">{count}</span>
+                    </div>
+                  ))}
+                  {agentData.length === 0 && (
+                    <p className="text-xs text-[hsl(var(--dark-section-muted))] text-center py-4">Nenhum agente registrado</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       <ExportFinanceiroModal open={financeiroOpen} onOpenChange={setFinanceiroOpen} />
     </div>
   );
