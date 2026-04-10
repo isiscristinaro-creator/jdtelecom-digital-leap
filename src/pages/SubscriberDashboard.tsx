@@ -8,7 +8,7 @@ import {
   Wifi, LogOut, CreditCard, FileText, User, MessageCircle,
   Settings, CheckCircle, Clock, AlertTriangle, ChevronRight,
   Phone, Mail, MapPin, Zap, Calendar, DollarSign, Shield, ArrowUpRight,
-  Bell, Smartphone, Globe
+  Bell, Smartphone, Globe, Package
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { toast } from "sonner";
@@ -200,14 +200,22 @@ const SubscriberDashboard = () => {
                   <p className="font-display text-2xl font-extrabold text-primary">{MOCK_PLAN.price}</p>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))]">
+              <div className="mt-4 pt-4 border-t border-[hsl(var(--dark-section-border))] flex flex-wrap gap-2">
                 <Button
                   size="sm"
-                  className="w-full sm:w-auto bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl whitespace-normal text-xs sm:text-sm leading-tight h-auto min-h-10 py-2"
+                  className="bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl whitespace-normal text-xs sm:text-sm leading-tight h-auto min-h-10 py-2"
                   onClick={() => toast.info("Funcionalidade de troca de plano será disponibilizada em breve.")}
                 >
                   <ArrowUpRight className="w-4 h-4 mr-1" />
                   Trocar de plano
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl whitespace-normal text-xs sm:text-sm leading-tight h-auto min-h-10 py-2"
+                  onClick={() => navigate("/assinante/items")}
+                >
+                  <Package className="w-4 h-4 mr-1" />
+                  Meus Itens
                 </Button>
               </div>
             </Card>

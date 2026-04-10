@@ -10,6 +10,7 @@ import CitySelector from "@/components/CitySelector";
 import Index from "./pages/Index.tsx";
 import SubscriberLogin from "./pages/SubscriberLogin.tsx";
 import SubscriberDashboard from "./pages/SubscriberDashboard.tsx";
+import SubscriberItems from "./pages/SubscriberItems.tsx";
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
 import AdminLayout from "./pages/admin/AdminLayout.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
@@ -43,6 +44,7 @@ const RoutesWithCitySelector = () => {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/assinante" element={<SubscriberLogin />} />
         <Route path="/assinante/dashboard" element={<SubscriberDashboard />} />
+        <Route path="/assinante/items" element={<SubscriberItems />} />
         <Route path="/admin" element={<AdminLogin />} />
         <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
