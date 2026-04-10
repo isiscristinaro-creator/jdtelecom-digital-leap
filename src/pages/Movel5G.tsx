@@ -237,7 +237,7 @@ const Movel5G = () => {
       <Navbar />
 
       {/* HERO */}
-      <section id="inicio" className="relative pt-[128px] sm:pt-[132px] md:pt-[140px] pb-16 sm:pb-24 overflow-hidden">
+      <section id="inicio" className="relative pt-[128px] sm:pt-[132px] md:pt-[176px] lg:pt-[184px] pb-16 sm:pb-24 overflow-hidden">
         <GlowingOrbs />
         <ParticleField />
         <CyberGrid />
