@@ -2,9 +2,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useState } from "react";
 import {
-  LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText
+  LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText, Shield
 } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+const roleLabels: Record<string, string> = {
+  admin: "Administrador",
+  gerente: "Gerente",
+  atendimento: "Atendimento",
+};
 
 const navItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -20,7 +26,7 @@ const navItems = [
 const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAdminAuth();
+  const { logout, admin } = useAdminAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -65,7 +71,16 @@ const AdminSidebar = () => {
       </nav>
 
       {/* Logout */}
-      <div className="p-3 border-t border-[hsl(var(--dark-section-border))]">
+      <div className="p-3 border-t border-[hsl(var(--dark-section-border))] space-y-2">
+        {!collapsed && admin && (
+          <div className="px-3 py-2 rounded-xl bg-[hsl(var(--dark-section))]/50">
+            <p className="text-xs font-semibold text-[hsl(var(--dark-section-fg))] truncate">{admin.name}</p>
+            <p className="text-[10px] text-[hsl(var(--dark-section-muted))] truncate">{admin.email}</p>
+            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+              <Shield className="w-2.5 h-2.5" /> {roleLabels[admin.role] || admin.role}
+            </span>
+          </div>
+        )}
         <button onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[hsl(var(--dark-section-muted))] hover:text-destructive hover:bg-destructive/10 transition-all">
           <LogOut className="w-5 h-5 shrink-0" />
