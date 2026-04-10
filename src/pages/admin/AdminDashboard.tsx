@@ -7,7 +7,7 @@ import {
   totalClients, activeClients, inadimplenteClients, canceledClients,
   mrr, totalRevenue, ticketMedio, forecastRevenue,
   growthData, planDistribution, newClientsLast7, newClientsLast30, growthRate,
-  alerts, mockPlans, mockClients, allPayments
+  alerts, mockPlans, mockClients
 } from "@/data/adminMockData";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,

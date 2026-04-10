@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useState } from "react";
 import {
-  LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText
+  LayoutDashboard, Users, Package, CreditCard, BarChart3, LogOut, Menu, X, ChevronLeft, Settings, UsersRound, ScrollText, Shield
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
