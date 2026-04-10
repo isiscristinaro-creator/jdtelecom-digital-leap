@@ -12,7 +12,7 @@ interface Testemunho {
 const TestemunhosSection = () => {
   const [testemunhos, setTestemunhos] = useState<Testemunho[]>([]);
   const [current, setCurrent] = useState(0);
-  const [loaded, setLoaded] = useState(false);
+  
 
   useEffect(() => {
     (async () => {
@@ -21,10 +21,7 @@ const TestemunhosSection = () => {
         .select("id, nome, mensagem")
         .eq("ativo", true)
         .order("created_at", { ascending: false });
-      if (data?.length) {
-        setTestemunhos(data);
-        setLoaded(true);
-      }
+      if (data?.length) setTestemunhos(data);
     })();
   }, []);
 
