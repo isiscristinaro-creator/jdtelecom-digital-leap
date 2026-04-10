@@ -254,6 +254,13 @@ const Movel5G = () => {
   const [filter, setFilter] = useState<"all" | "start" | "turbo">("all");
   const navigate = useNavigate();
   const filtered = mobilePlans.filter((p) => filter === "all" || p.tier.toLowerCase() === filter);
+  const featuresRef = useFadeUp();
+  const plansRef = useFadeUp();
+  const coverageRef = useFadeUp();
+  const aboutRef = useFadeUp();
+  const whyRef = useFadeUp();
+  const faqRef = useFadeUp();
+  const ctaRef = useFadeUp();
 
   return (
     <div className="min-h-screen bg-[hsl(220,20%,6%)] text-white overflow-x-hidden">
@@ -308,7 +315,7 @@ const Movel5G = () => {
       </section>
 
       {/* FEATURES */}
-      <section className="py-12 sm:py-16 border-y border-white/5 relative">
+      <section ref={featuresRef} className="py-12 sm:py-16 border-y border-white/5 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -332,7 +339,7 @@ const Movel5G = () => {
       </section>
 
       {/* PLANS */}
-      <section id="planos" className="py-16 sm:py-24 relative">
+      <section ref={plansRef} id="planos" className="py-16 sm:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
         <CyberGrid />
         <div className="container mx-auto px-4 relative z-10">
@@ -353,10 +360,12 @@ const Movel5G = () => {
       </section>
 
       {/* COVERAGE */}
-      <CoverageMapSection />
+      <div ref={coverageRef}>
+        <CoverageMapSection />
+      </div>
 
       {/* ABOUT */}
-      <section id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
+      <section ref={aboutRef} id="sobre" className="py-16 sm:py-24 border-y border-white/5 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
@@ -368,7 +377,7 @@ const Movel5G = () => {
       </section>
 
       {/* WHY CHOOSE */}
-      <section className="py-16 sm:py-24 relative">
+      <section ref={whyRef} className="py-16 sm:py-24 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-10 sm:mb-14">
@@ -395,7 +404,7 @@ const Movel5G = () => {
       </section>
 
       {/* FAQ */}
-      <section id="contato" className="py-16 sm:py-24 border-t border-white/5">
+      <section ref={faqRef} id="contato" className="py-16 sm:py-24 border-t border-white/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-14">
             <h2 className="font-display text-2xl sm:text-4xl font-bold mb-3">Perguntas Frequentes</h2>
@@ -408,7 +417,7 @@ const Movel5G = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 relative overflow-hidden">
+      <section ref={ctaRef} className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
         <ParticleField />
