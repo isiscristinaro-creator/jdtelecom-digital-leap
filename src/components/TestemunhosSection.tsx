@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Quote, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 interface Testemunho {
   id: string;
@@ -13,7 +12,7 @@ interface Testemunho {
 const TestemunhosSection = () => {
   const [testemunhos, setTestemunhos] = useState<Testemunho[]>([]);
   const [current, setCurrent] = useState(0);
-  const { ref, isVisible } = useScrollAnimation();
+  
 
   useEffect(() => {
     (async () => {
@@ -36,10 +35,11 @@ const TestemunhosSection = () => {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-primary/[0.04] blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-primary/[0.03] blur-[100px] pointer-events-none" />
 
-      <div className="container mx-auto px-4 relative z-10" ref={ref}>
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
@@ -53,7 +53,8 @@ const TestemunhosSection = () => {
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-3xl mx-auto"
         >
