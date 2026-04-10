@@ -15,7 +15,6 @@ import { useDashboardStats, usePlans, useClients } from "@/hooks/useSupabaseData
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const COLORS = ["hsl(24,95%,50%)", "hsl(15,90%,42%)", "hsl(350,80%,55%)", "hsl(40,90%,50%)", "hsl(200,80%,50%)"];
 
