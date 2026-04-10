@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import heroBanner from "@/assets/hero-banner.png";
 import bannerGames from "@/assets/banner-games.png";
 import bannerSocial from "@/assets/banner-social.png";
 
-const banners = [heroBanner, bannerGames, bannerSocial];
+const staticBanners = [heroBanner, bannerGames, bannerSocial];
 const SWIPE_THRESHOLD = 50;
 
 const HeroSection = () => {
