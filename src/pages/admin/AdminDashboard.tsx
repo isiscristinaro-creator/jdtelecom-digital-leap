@@ -360,7 +360,7 @@ const AdminDashboard = () => {
         const handleSaveKpi = (key: string) => {
           const val = parseFloat(editValue);
           if (isNaN(val) || val <= 0) { toast.error("Valor inválido"); return; }
-          updateGoal(key, val);
+          updateGoal(key, val, admin?.name || "Admin");
           setEditingKpi(null);
         };
 
