@@ -21,6 +21,10 @@ import AdminReports from "./pages/admin/AdminReports.tsx";
 import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import AdminTeam from "./pages/admin/AdminTeam.tsx";
 import AdminLogs from "./pages/admin/AdminLogs.tsx";
+import AdminProdutos from "./pages/admin/AdminProdutos.tsx";
+import AdminPedidos from "./pages/admin/AdminPedidos.tsx";
+import AdminBanners from "./pages/admin/AdminBanners.tsx";
+import AdminTestemunhos from "./pages/admin/AdminTestemunhos.tsx";
 import Cadastro from "./pages/Cadastro.tsx";
 import Movel5G from "./pages/Movel5G.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -55,6 +59,10 @@ const RoutesWithCitySelector = () => {
           <Route path="/admin/configuracoes" element={<AdminSettings />} />
           <Route path="/admin/equipe" element={<AdminTeam />} />
           <Route path="/admin/logs" element={<AdminLogs />} />
+          <Route path="/admin/produtos" element={<AdminProdutos />} />
+          <Route path="/admin/pedidos" element={<AdminPedidos />} />
+          <Route path="/admin/banners" element={<AdminBanners />} />
+          <Route path="/admin/testemunhos" element={<AdminTestemunhos />} />
         </Route>
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

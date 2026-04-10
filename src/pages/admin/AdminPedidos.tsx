@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Loader2, Eye } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePedidos } from "@/hooks/useSupabaseData";
 
