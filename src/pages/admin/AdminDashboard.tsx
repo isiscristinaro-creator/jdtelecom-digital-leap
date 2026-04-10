@@ -36,6 +36,9 @@ const AdminDashboard = () => {
   const [editValue, setEditValue] = useState("");
   const kpiNotifiedRef = useRef<Set<string>>(new Set());
   const [trendPeriod, setTrendPeriod] = useState<7 | 30 | 90>(30);
+  const [whatIfGrowth, setWhatIfGrowth] = useState<number | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const dashboardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
