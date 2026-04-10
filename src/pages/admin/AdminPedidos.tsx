@@ -1,6 +1,8 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, FileSpreadsheet, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePedidos } from "@/hooks/useSupabaseData";
+import { exportToExcel, exportToCSV } from "@/utils/exportUtils";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   pendente: "bg-amber-500/10 text-amber-400",
@@ -13,11 +15,41 @@ const AdminPedidos = () => {
 
   if (loading) return <div className="admin-page flex items-center justify-center min-h-[400px]"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
+  const handleExportExcel = () => {
+    const data = pedidos.map(p => ({
+      Email: p.cliente_email, "Valor (R$)": p.valor, Status: p.status,
+      Data: new Date(p.created_at).toLocaleDateString("pt-BR"),
+    }));
+    if (!data.length) { toast.error("Nenhum dado"); return; }
+    exportToExcel(data, `pedidos-jdtelecom-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: "Relatório de Pedidos" });
+    toast.success(`${data.length} pedidos exportados`);
+  };
+
+  const handleExportCSV = () => {
+    const data = pedidos.map(p => ({
+      Email: p.cliente_email, "Valor (R$)": p.valor.toFixed(2), Status: p.status,
+      Data: new Date(p.created_at).toLocaleDateString("pt-BR"),
+    }));
+    if (!data.length) { toast.error("Nenhum dado"); return; }
+    exportToCSV(data, `pedidos-jdtelecom`);
+    toast.success(`${data.length} pedidos exportados`);
+  };
+
   return (
     <div className="admin-page space-y-6 w-full overflow-hidden p-4 md:p-6">
-      <div>
-        <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Pedidos</h1>
-        <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{pedidos.length} pedidos registrados</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Pedidos</h1>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{pedidos.length} pedidos registrados</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={handleExportCSV} variant="outline" className="border-[hsl(var(--dark-section-border))] bg-[hsl(var(--dark-section-card))] text-white rounded-xl font-bold text-sm w-full sm:w-auto">
+            <Download className="w-4 h-4 mr-2" /> CSV
+          </Button>
+          <Button onClick={handleExportExcel} disabled={!pedidos.length} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm disabled:opacity-60 w-full sm:w-auto">
+            <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar Excel
+          </Button>
+        </div>
       </div>
 
       <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl overflow-hidden">

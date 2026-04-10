@@ -4,14 +4,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
-import { useDashboardStats, usePlans, useClients } from "@/hooks/useSupabaseData";
+import { useDashboardStats, usePlans, useClients, usePayments } from "@/hooks/useSupabaseData";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -26,6 +27,7 @@ const AdminDashboard = () => {
   const { stats, loading: statsLoading } = useDashboardStats();
   const { plans } = usePlans();
   const { clients } = useClients();
+  const { payments } = usePayments();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -41,6 +43,41 @@ const AdminDashboard = () => {
 
   // Build chart data from plans
   const planDistribution = plans.map(p => ({ name: p.speed, value: p.active_clients }));
+
+  // Build monthly client growth chart data
+  const clientGrowthData = (() => {
+    const months: Record<string, number> = {};
+    clients.forEach(c => {
+      const d = new Date(c.join_date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      months[key] = (months[key] || 0) + 1;
+    });
+    const sorted = Object.entries(months).sort((a, b) => a[0].localeCompare(b[0]));
+    let acc = 0;
+    return sorted.map(([m, count]) => {
+      acc += count;
+      const [y, mo] = m.split("-");
+      return { mes: `${mo}/${y.slice(2)}`, novos: count, total: acc };
+    });
+  })();
+
+  // Build monthly revenue chart data
+  const revenueData = (() => {
+    const months: Record<string, { pago: number; pendente: number }> = {};
+    payments.forEach(p => {
+      const d = new Date(p.due_date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      if (!months[key]) months[key] = { pago: 0, pendente: 0 };
+      if (p.status === "Pago") months[key].pago += p.amount;
+      else months[key].pendente += p.amount;
+    });
+    return Object.entries(months)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([m, v]) => {
+        const [y, mo] = m.split("-");
+        return { mes: `${mo}/${y.slice(2)}`, pago: v.pago, pendente: v.pendente };
+      });
+  })();
 
   // Alerts based on real stats
   const alerts = [
@@ -210,6 +247,52 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Interactive Charts */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {clientGrowthData.length > 0 && (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" /> Evolução de Clientes
+            </h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={clientGrowthData}>
+                <defs>
+                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(24,95%,50%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(24,95%,50%)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                <XAxis dataKey="mes" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                <Area type="monotone" dataKey="total" stroke="hsl(24,95%,50%)" fill="url(#colorTotal)" strokeWidth={2} name="Total Acumulado" />
+                <Area type="monotone" dataKey="novos" stroke="hsl(160,80%,50%)" fill="hsl(160,80%,50%)" fillOpacity={0.15} strokeWidth={2} name="Novos" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {revenueData.length > 0 && (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-primary" /> Receita Mensal
+            </h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                <XAxis dataKey="mes" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
+                <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} formatter={(v: number) => [`R$ ${v.toFixed(2)}`, ""]} />
+                <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
+                <Bar dataKey="pago" fill="hsl(160,70%,45%)" radius={[4, 4, 0, 0]} name="Pago" />
+                <Bar dataKey="pendente" fill="hsl(40,90%,50%)" radius={[4, 4, 0, 0]} name="Pendente" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {planDistribution.length > 0 && (
