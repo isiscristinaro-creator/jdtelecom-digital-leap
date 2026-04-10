@@ -742,6 +742,60 @@ const AdminDashboard = () => {
               })}
             </div>
 
+            {/* Scenarios Comparison Side-by-Side */}
+            <div className="mb-5">
+              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
+                📊 Comparação de Cenários — Receita em 6 meses
+              </p>
+              {(() => {
+                const pessimistRate = Math.max(0, revenueGrowth * 0.5);
+                const realistRate = revenueGrowth > 0 ? revenueGrowth : 0.02;
+                const optimistRate = Math.max(revenueGrowth * 1.5, 0.1);
+
+                const scenarios = [
+                  { name: "Pessimista", rate: pessimistRate, color: "text-red-400", bg: "bg-red-500/10 border-red-500/20", icon: "📉" },
+                  { name: "Realista", rate: realistRate, color: "text-primary", bg: "bg-primary/10 border-primary/20", icon: "📊" },
+                  { name: "Otimista", rate: optimistRate, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", icon: "🚀" },
+                ];
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {scenarios.map(s => {
+                      const projected6m = Math.round(stats.mrr * Math.pow(1 + s.rate, 6));
+                      const projClients6m = Math.round(stats.totalClients * Math.pow(1 + (s.name === "Pessimista" ? monthlyGrowth * 0.5 : s.name === "Otimista" ? Math.max(monthlyGrowth * 1.5, 0.1) : monthlyGrowth > 0 ? monthlyGrowth : 0.05), 6));
+                      const monthsToMeta = projectMonths(stats.mrr, metaReceita, s.rate);
+                      return (
+                        <div key={s.name} className={`p-4 rounded-xl border ${s.bg} space-y-3`}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{s.icon}</span>
+                            <p className={`text-xs font-bold ${s.color} uppercase tracking-wider`}>{s.name}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">Taxa mensal</p>
+                            <p className={`text-sm font-bold ${s.color}`}>{(s.rate * 100).toFixed(1)}%/mês</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">Receita em 6 meses</p>
+                            <p className="text-lg font-bold text-[hsl(var(--dark-section-fg))]">{fmt(projected6m)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">Clientes em 6 meses</p>
+                            <p className="text-sm font-bold text-[hsl(var(--dark-section-fg))]">{projClients6m}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">Meta receita</p>
+                            <p className={`text-xs font-bold ${monthsToMeta === null ? "text-red-400" : monthsToMeta === 0 ? "text-emerald-400" : s.color}`}>
+                              {monthsToMeta === null ? "❌ Não atinge" : monthsToMeta === 0 ? "✓ Atingida" : `~${monthsToMeta} meses`}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
             {/* Projection Chart */}
             <div>
               <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
