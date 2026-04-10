@@ -178,6 +178,7 @@ const AdminDashboard = () => {
 
   return (
     <div ref={dashboardRef} className="admin-page space-y-6 w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">
             {greeting}, {admin?.name?.split(" ")[0] || "Admin"} 👋
@@ -194,6 +195,10 @@ const AdminDashboard = () => {
           <Button onClick={() => setFinanceiroOpen(true)} size="sm"
             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs flex-1 sm:flex-none">
             <Download className="w-3.5 h-3.5 mr-1.5" /> Financeiro
+          </Button>
+          <Button onClick={handleExportPdf} size="sm" disabled={exportingPdf}
+            className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs flex-1 sm:flex-none">
+            {exportingPdf ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <FileText className="w-3.5 h-3.5 mr-1.5" />} PDF
           </Button>
         </div>
       </div>
