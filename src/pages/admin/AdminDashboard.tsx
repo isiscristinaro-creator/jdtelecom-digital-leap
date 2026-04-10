@@ -5,10 +5,11 @@ import {
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend,
+  LineChart, Line
 } from "recharts";
 import { Button } from "@/components/ui/button";
-import { exportToCSV } from "@/utils/exportUtils";
+import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
@@ -415,6 +416,44 @@ const AdminDashboard = () => {
         );
       })()}
 
+      {/* KPI Trend Chart */}
+      {kpiHistory.length > 1 && (() => {
+        // Build trend data from history (reverse to chronological order)
+        const trendMap: Record<string, Record<string, number>> = {};
+        [...kpiHistory].reverse().forEach(entry => {
+          const d = new Date(entry.changed_at);
+          const dateKey = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+          if (!trendMap[dateKey]) trendMap[dateKey] = {};
+          trendMap[dateKey][entry.label] = entry.new_value;
+        });
+        const trendLabels = [...new Set(kpiHistory.map(e => e.label))];
+        const trendData = Object.entries(trendMap).map(([date, vals]) => ({
+          data: date,
+          ...vals,
+        }));
+        const trendColors = ["hsl(160,70%,45%)", "hsl(24,95%,50%)", "hsl(210,80%,55%)"];
+
+        return (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" /> Tendência de Metas
+            </h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                <XAxis dataKey="data" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
+                {trendLabels.map((label, i) => (
+                  <Line key={label} type="monotone" dataKey={label} stroke={trendColors[i % trendColors.length]} strokeWidth={2} dot={{ r: 4 }} name={label} />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      })()}
+
       {/* KPI Change History */}
       {kpiHistory.length > 0 && (
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
@@ -422,25 +461,49 @@ const AdminDashboard = () => {
             <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
               <History className="w-4 h-4 text-primary" /> Histórico de Alterações de Metas
             </h3>
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary"
-              onClick={() => {
-                const csvData = kpiHistory.map(entry => ({
-                  "Meta": entry.label,
-                  "Valor Anterior": entry.old_value,
-                  "Novo Valor": entry.new_value,
-                  "Alterado Por": entry.changed_by,
-                  "Data/Hora": new Date(entry.changed_at).toLocaleString("pt-BR"),
-                }));
-                if (exportToCSV(csvData, `historico-metas-${new Date().toISOString().slice(0, 10)}`)) {
-                  toast.success(`${csvData.length} registros exportados`);
-                }
-              }}
-            >
-              <Download className="w-3 h-3 mr-1" /> Exportar CSV
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary"
+                onClick={() => {
+                  const csvData = kpiHistory.map(entry => ({
+                    "Meta": entry.label,
+                    "Valor Anterior": entry.old_value,
+                    "Novo Valor": entry.new_value,
+                    "Alterado Por": entry.changed_by,
+                    "Data/Hora": new Date(entry.changed_at).toLocaleString("pt-BR"),
+                  }));
+                  if (exportToCSV(csvData, `historico-metas-${new Date().toISOString().slice(0, 10)}`)) {
+                    toast.success(`${csvData.length} registros exportados (CSV)`);
+                  }
+                }}
+              >
+                <Download className="w-3 h-3 mr-1" /> CSV
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-emerald-400 hover:border-emerald-400"
+                onClick={() => {
+                  const xlsData = kpiHistory.map(entry => ({
+                    "Meta": entry.label,
+                    "Valor Anterior": entry.old_value,
+                    "Novo Valor": entry.new_value,
+                    "Alterado Por": entry.changed_by,
+                    "Data/Hora": new Date(entry.changed_at).toLocaleString("pt-BR"),
+                  }));
+                  if (exportToExcel(xlsData, `historico-metas-${new Date().toISOString().slice(0, 10)}`, {
+                    reportTitle: "JD Telecom",
+                    reportSubtitle: "Histórico de Alterações de Metas",
+                  })) {
+                    toast.success(`${xlsData.length} registros exportados (Excel)`);
+                  }
+                }}
+              >
+                <FileSpreadsheet className="w-3 h-3 mr-1" /> Excel
+              </Button>
+            </div>
           </div>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {kpiHistory.slice(0, 20).map((entry, i) => {
