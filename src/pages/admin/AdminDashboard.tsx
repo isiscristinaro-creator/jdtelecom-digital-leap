@@ -1,6 +1,6 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -10,10 +10,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useDashboardStats, usePlans, useClients, usePayments, useAllServiceRecords } from "@/hooks/useSupabaseData";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
+import { useKpiGoals } from "@/hooks/useKpiGoals";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -29,6 +30,10 @@ const AdminDashboard = () => {
   const { clients } = useClients();
   const { payments } = usePayments();
   const { records: serviceRecords } = useAllServiceRecords();
+  const { getGoal, updateGoal } = useKpiGoals();
+  const [editingKpi, setEditingKpi] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const kpiNotifiedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
