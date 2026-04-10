@@ -1,6 +1,6 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -12,7 +12,7 @@ import { exportToCSV } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
-import { useDashboardStats, usePlans, useClients, usePayments } from "@/hooks/useSupabaseData";
+import { useDashboardStats, usePlans, useClients, usePayments, useAllServiceRecords } from "@/hooks/useSupabaseData";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -28,6 +28,7 @@ const AdminDashboard = () => {
   const { plans } = usePlans();
   const { clients } = useClients();
   const { payments } = usePayments();
+  const { records: serviceRecords } = useAllServiceRecords();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);

@@ -289,6 +289,26 @@ export function useServiceRecords(clientId: string | null) {
   return { records, loading, refetch: fetch, create };
 }
 
+export function useAllServiceRecords() {
+  const [records, setRecords] = useState<DbServiceRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("service_records")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) toast.error("Erro: " + error.message);
+    else setRecords(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+  return { records, loading, refetch: fetch };
+}
+
 // ==================== DASHBOARD STATS ====================
 
 export function useDashboardStats() {
