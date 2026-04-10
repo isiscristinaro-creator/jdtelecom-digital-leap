@@ -1,10 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Headphones } from "lucide-react";
+import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockClients, mockPlans, type Client } from "@/data/adminMockData";
+import { useClients, usePlans, useServiceRecords, type DbClient } from "@/hooks/useSupabaseData";
 import { exportToExcel } from "@/utils/exportUtils";
-import { generateServiceHistory, type ServiceRecord } from "@/data/adminServiceHistoryData";
 import { toast } from "sonner";
 
 const statusColors = {
@@ -20,100 +19,69 @@ const serviceTypeColors = {
 };
 
 const AdminClients = () => {
+  const { clients, loading } = useClients();
+  const { plans } = usePlans();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("Todos");
   const [planFilter, setPlanFilter] = useState("Todos");
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [activeTab, setActiveTab] = useState<"dados" | "pagamentos" | "atendimentos">("dados");
-  const [serviceHistory, setServiceHistory] = useState<ServiceRecord[]>([]);
+  const [selectedClient, setSelectedClient] = useState<DbClient | null>(null);
+  const [activeTab, setActiveTab] = useState<"dados" | "atendimentos">("dados");
   const [showNewService, setShowNewService] = useState(false);
-  const [newServiceType, setNewServiceType] = useState<ServiceRecord["type"]>("Suporte Técnico");
+  const [newServiceType, setNewServiceType] = useState<string>("Suporte Técnico");
   const [newServiceDesc, setNewServiceDesc] = useState("");
   const [page, setPage] = useState(0);
   const perPage = 20;
 
+  const { records: serviceHistory, create: createService } = useServiceRecords(selectedClient?.id || null);
+
   const filtered = useMemo(() => {
-    return mockClients.filter((c) => {
+    return clients.filter((c) => {
       const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "Todos" || c.status === statusFilter;
-      const matchPlan = planFilter === "Todos" || c.plan === planFilter;
+      const matchPlan = planFilter === "Todos" || c.plan_name === planFilter;
       return matchSearch && matchStatus && matchPlan;
     });
-  }, [search, statusFilter, planFilter]);
+  }, [clients, search, statusFilter, planFilter]);
 
   const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
 
-  const openClient = (c: Client) => {
+  const openClient = (c: DbClient) => {
     setSelectedClient(c);
     setActiveTab("dados");
-    setServiceHistory(generateServiceHistory(c.id));
     setShowNewService(false);
   };
 
   const handleExportClients = () => {
-    const exportData = filtered.map((client) => ({
-      Nome: client.name,
-      Email: client.email,
-      Plano: client.plan,
-      Status: client.status,
-      "Valor (R$)": client.price,
-      Data: client.joinDate,
-      Telefone: client.phone,
-      Endereço: client.address,
-      Velocidade: client.speed,
+    const exportData = filtered.map((c) => ({
+      Nome: c.name, Email: c.email, Plano: c.plan_name || "", Status: c.status,
+      "Valor (R$)": c.plan_price || 0, Data: c.join_date, Telefone: c.phone, Endereço: c.address, Velocidade: c.plan_speed || "",
     }));
-
-    if (!exportData.length) {
-      toast.error("Nenhum dado disponível para exportação");
-      return;
-    }
-
+    if (!exportData.length) { toast.error("Nenhum dado disponível"); return; }
     exportToExcel(exportData, `clientes-jdtelecom-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: "Relatório de Clientes" });
-    toast.success(`${exportData.length} clientes exportados com sucesso`);
+    toast.success(`${exportData.length} clientes exportados`);
   };
 
-  const handleExportPayments = () => {
-    if (!selectedClient) return;
-    const exportData = selectedClient.payments.map((payment) => ({
-      Nome: selectedClient.name,
-      Email: selectedClient.email,
-      Plano: selectedClient.plan,
-      Status: payment.status,
-      "Valor (R$)": payment.amount,
-      Data: payment.date,
-      Descrição: payment.description,
-    }));
-
-    if (!exportData.length) {
-      toast.error("Nenhum dado disponível para exportação");
-      return;
-    }
-
-    exportToExcel(exportData, `pagamentos-${selectedClient.name.replace(/ /g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}`, { reportTitle: "JD Telecom", reportSubtitle: `Pagamentos - ${selectedClient.name}` });
-    toast.success(`${exportData.length} pagamentos exportados com sucesso`);
-  };
-
-  const handleWhatsApp = (client: Client) => {
+  const handleWhatsApp = (client: DbClient) => {
     const phone = "08005945678";
-    const msg = encodeURIComponent(`Atendimento ao cliente: ${client.name} - ${client.plan}`);
+    const msg = encodeURIComponent(`Atendimento ao cliente: ${client.name} - ${client.plan_name}`);
     window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
   };
 
-  const handleAddService = () => {
+  const handleAddService = async () => {
     if (!selectedClient || !newServiceDesc.trim()) return;
-    const newRecord: ServiceRecord = {
-      id: `srv-new-${Date.now()}`,
-      clientId: selectedClient.id,
-      date: new Date().toLocaleDateString("pt-BR"),
-      agent: "Admin Master",
-      type: newServiceType,
-      description: newServiceDesc,
-    };
-    setServiceHistory(prev => [newRecord, ...prev]);
+    await createService({ client_id: selectedClient.id, agent: "Admin", type: newServiceType, description: newServiceDesc });
     setNewServiceDesc("");
     setShowNewService(false);
   };
+
+  if (loading) {
+    return (
+      <div className="admin-page flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page space-y-6 w-full overflow-hidden">
@@ -127,7 +95,6 @@ const AdminClients = () => {
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))]" />
@@ -145,11 +112,10 @@ const AdminClients = () => {
         <select value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(0); }}
           className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] px-4 h-10 rounded-xl text-xs font-semibold appearance-none cursor-pointer w-full sm:w-auto">
           <option value="Todos">Todos os planos</option>
-          {mockPlans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+          {plans.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
         </select>
       </div>
 
-      {/* Table */}
       <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl overflow-hidden">
         <div className="overflow-x-auto [-webkit-overflow-scrolling:touch]">
           <table className="w-full min-w-[680px] text-sm">
@@ -170,7 +136,7 @@ const AdminClients = () => {
                     <p className="text-xs text-[hsl(var(--dark-section-muted))] md:hidden">{c.email}</p>
                   </td>
                   <td className="py-3 px-4 text-[hsl(var(--dark-section-muted))] hidden md:table-cell">{c.email}</td>
-                  <td className="py-3 px-4 text-[hsl(var(--dark-section-fg))] hidden lg:table-cell">{c.plan}</td>
+                  <td className="py-3 px-4 text-[hsl(var(--dark-section-fg))] hidden lg:table-cell">{c.plan_name}</td>
                   <td className="py-3 px-4">
                     <span className={`inline-flex px-2.5 py-1 rounded-full border text-xs font-semibold ${statusColors[c.status]}`}>{c.status}</span>
                   </td>
@@ -200,7 +166,6 @@ const AdminClients = () => {
         </div>
       </div>
 
-      {/* Client Detail Modal */}
       {selectedClient && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setSelectedClient(null)}>
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-4 sm:p-6"
@@ -209,7 +174,7 @@ const AdminClients = () => {
               <h3 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))] break-words">{selectedClient.name}</h3>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button size="sm" onClick={() => handleWhatsApp(selectedClient)} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs w-full sm:w-auto">
-                  <MessageCircle className="w-3 h-3 mr-1" /> Atender via WhatsApp
+                  <MessageCircle className="w-3 h-3 mr-1" /> WhatsApp
                 </Button>
                 <button onClick={() => setSelectedClient(null)} className="text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]">
                   <X className="w-5 h-5" />
@@ -217,9 +182,8 @@ const AdminClients = () => {
               </div>
             </div>
 
-            {/* Tabs */}
             <div className="flex gap-2 mb-4 border-b border-[hsl(var(--dark-section-border))] pb-3 overflow-x-auto">
-              {([["dados", "Dados"], ["pagamentos", "Pagamentos"], ["atendimentos", "Atendimentos"]] as const).map(([id, label]) => (
+              {([["dados", "Dados"], ["atendimentos", "Atendimentos"]] as const).map(([id, label]) => (
                 <button key={id} onClick={() => setActiveTab(id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap ${activeTab === id ? "bg-primary text-primary-foreground border-primary" : "text-[hsl(var(--dark-section-muted))] border-transparent"}`}>
                   {label}
@@ -235,10 +199,10 @@ const AdminClients = () => {
                     { label: "Email", value: selectedClient.email },
                     { label: "Telefone", value: selectedClient.phone },
                     { label: "Endereço", value: selectedClient.address },
-                    { label: "Plano", value: selectedClient.plan },
-                    { label: "Velocidade", value: selectedClient.speed },
-                    { label: "Valor", value: `R$ ${selectedClient.price.toFixed(2)}` },
-                    { label: "Cliente desde", value: selectedClient.joinDate },
+                    { label: "Plano", value: selectedClient.plan_name || "" },
+                    { label: "Velocidade", value: selectedClient.plan_speed || "" },
+                    { label: "Valor", value: `R$ ${(selectedClient.plan_price || 0).toFixed(2)}` },
+                    { label: "Cliente desde", value: selectedClient.join_date },
                   ].map((f) => (
                     <div key={f.label}>
                       <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">{f.label}</p>
@@ -249,35 +213,6 @@ const AdminClients = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-[hsl(var(--dark-section-muted))]">Status:</span>
                   <span className={`inline-flex px-2.5 py-1 rounded-full border text-xs font-semibold ${statusColors[selectedClient.status]}`}>{selectedClient.status}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2 border-t border-[hsl(var(--dark-section-border))]">
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-xs w-full sm:w-auto"><Edit2 className="w-3 h-3 mr-1" /> Editar</Button>
-                  <Button size="sm" variant="outline" className="border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl text-xs w-full sm:w-auto"><UserCheck className="w-3 h-3 mr-1" /> Alterar Status</Button>
-                  <Button size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl text-xs w-full sm:w-auto"><UserXIcon className="w-3 h-3 mr-1" /> Cancelar</Button>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "pagamentos" && (
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                  <p className="text-xs uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Histórico de Pagamentos</p>
-                  <button onClick={handleExportPayments} disabled={!selectedClient.payments.length} className="text-[10px] text-emerald-400 hover:text-emerald-300 disabled:opacity-60 font-semibold flex items-center gap-1">
-                    <FileSpreadsheet className="w-3 h-3" /> Exportar Excel
-                  </button>
-                </div>
-                <div className="space-y-1.5">
-                  {selectedClient.payments.map((p) => (
-                    <div key={p.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs bg-[hsl(var(--dark-section))]/50 rounded-lg px-3 py-2">
-                      <span className="text-[hsl(var(--dark-section-fg))] break-words">{p.description}</span>
-                      <div className="flex items-center gap-3 self-start sm:self-auto">
-                        <span className="text-[hsl(var(--dark-section-muted))]">R$ {p.amount.toFixed(2)}</span>
-                        <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold ${
-                          p.status === "Pago" ? statusColors.Ativo : p.status === "Pendente" ? statusColors.Inadimplente : statusColors.Cancelado
-                        }`}>{p.status}</span>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             )}
@@ -294,7 +229,7 @@ const AdminClients = () => {
                 {showNewService && (
                   <div className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-4 mb-4 space-y-3 border border-[hsl(var(--dark-section-border))]">
                     <div className="flex gap-2 flex-wrap">
-                      {(["Suporte Técnico", "Financeiro", "Comercial"] as const).map(t => (
+                      {["Suporte Técnico", "Financeiro", "Comercial"].map(t => (
                         <button key={t} onClick={() => setNewServiceType(t)}
                           className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${newServiceType === t ? "bg-primary text-primary-foreground border-primary" : "text-[hsl(var(--dark-section-muted))] border-[hsl(var(--dark-section-border))]"}`}>
                           {t}
@@ -302,30 +237,28 @@ const AdminClients = () => {
                       ))}
                     </div>
                     <textarea value={newServiceDesc} onChange={e => setNewServiceDesc(e.target.value)}
-                      placeholder="Descreva o atendimento..."
-                      className="w-full bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl p-3 text-xs min-h-[80px] resize-none" />
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button size="sm" onClick={handleAddService} className="bg-primary text-primary-foreground rounded-xl text-xs w-full sm:w-auto">Salvar</Button>
-                      <Button size="sm" variant="ghost" onClick={() => setShowNewService(false)} className="text-[hsl(var(--dark-section-muted))] rounded-xl text-xs w-full sm:w-auto">Cancelar</Button>
-                    </div>
+                      placeholder="Descreva o atendimento..." rows={3}
+                      className="w-full bg-[hsl(var(--dark-section))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] rounded-xl p-3 text-sm placeholder:text-[hsl(var(--dark-section-muted))] resize-none" />
+                    <Button size="sm" onClick={handleAddService} disabled={!newServiceDesc.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl text-xs">
+                      Registrar Atendimento
+                    </Button>
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  {serviceHistory.map(s => (
-                    <div key={s.id} className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 border border-[hsl(var(--dark-section-border))]/50">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 mb-1.5">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold ${serviceTypeColors[s.type]}`}>{s.type}</span>
-                          <span className="text-[10px] text-[hsl(var(--dark-section-muted))]">{s.date}</span>
-                        </div>
-                        <span className="text-[10px] text-[hsl(var(--dark-section-muted))] flex items-center gap-1">
-                          <Headphones className="w-3 h-3" /> {s.agent}
-                        </span>
+                  {serviceHistory.map(r => (
+                    <div key={r.id} className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 border border-[hsl(var(--dark-section-border))]">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full border text-[10px] font-semibold ${serviceTypeColors[r.type as keyof typeof serviceTypeColors] || "bg-slate-500/10 text-slate-400 border-slate-500/20"}`}>{r.type}</span>
+                        <span className="text-[10px] text-[hsl(var(--dark-section-muted))]">{new Date(r.created_at).toLocaleDateString("pt-BR")}</span>
+                        <span className="text-[10px] text-[hsl(var(--dark-section-muted))]">• {r.agent}</span>
                       </div>
-                      <p className="text-xs text-[hsl(var(--dark-section-fg))]">{s.description}</p>
+                      <p className="text-xs text-[hsl(var(--dark-section-fg))]">{r.description}</p>
                     </div>
                   ))}
+                  {serviceHistory.length === 0 && (
+                    <p className="text-xs text-[hsl(var(--dark-section-muted))] text-center py-4">Nenhum atendimento registrado</p>
+                  )}
                 </div>
               </div>
             )}

@@ -1,31 +1,52 @@
 import { useState } from "react";
-import { Users, Plus, Edit2, ToggleLeft, ToggleRight, Shield, X } from "lucide-react";
+import { Users, Plus, Edit2, ToggleLeft, ToggleRight, Shield, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockTeam, roles, allPermissions, rolePermissions, type TeamMember, type Role, type Permission } from "@/data/adminTeamData";
+import { useTeamMembers } from "@/hooks/useSupabaseData";
+
+type Role = "Administrador" | "Atendimento" | "Financeiro" | "Comercial" | "Operação";
+type Permission = "dashboard" | "clientes" | "pagamentos" | "relatorios" | "planos" | "equipe" | "logs";
+
+const roles: Role[] = ["Administrador", "Atendimento", "Financeiro", "Comercial", "Operação"];
+
+const allPermissions: { id: Permission; label: string }[] = [
+  { id: "dashboard", label: "Dashboard" },
+  { id: "clientes", label: "Clientes" },
+  { id: "pagamentos", label: "Pagamentos" },
+  { id: "relatorios", label: "Relatórios" },
+  { id: "planos", label: "Planos" },
+  { id: "equipe", label: "Equipe" },
+  { id: "logs", label: "Logs" },
+];
+
+const rolePermissions: Record<Role, Permission[]> = {
+  Administrador: ["dashboard", "clientes", "pagamentos", "relatorios", "planos", "equipe", "logs"],
+  Atendimento: ["dashboard", "clientes"],
+  Financeiro: ["dashboard", "pagamentos", "relatorios"],
+  Comercial: ["dashboard", "clientes", "planos"],
+  "Operação": ["dashboard", "clientes"],
+};
 
 const AdminTeam = () => {
-  const [team, setTeam] = useState<TeamMember[]>(mockTeam);
+  const { team, loading, create, update, toggleActive } = useTeamMembers();
   const [showModal, setShowModal] = useState(false);
-  const [editing, setEditing] = useState<TeamMember | null>(null);
-
-  // Form state
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formRole, setFormRole] = useState<Role>("Atendimento");
   const [formPermissions, setFormPermissions] = useState<Permission[]>([]);
 
   const openCreate = () => {
-    setEditing(null);
+    setEditingId(null);
     setFormName(""); setFormEmail(""); setFormRole("Atendimento");
     setFormPermissions([...rolePermissions.Atendimento]);
     setShowModal(true);
   };
 
-  const openEdit = (m: TeamMember) => {
-    setEditing(m);
-    setFormName(m.name); setFormEmail(m.email); setFormRole(m.role);
-    setFormPermissions([...m.permissions]);
+  const openEdit = (m: any) => {
+    setEditingId(m.id);
+    setFormName(m.name); setFormEmail(m.email); setFormRole(m.role as Role);
+    setFormPermissions([...(m.permissions || [])]);
     setShowModal(true);
   };
 
@@ -38,23 +59,23 @@ const AdminTeam = () => {
     setFormPermissions(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formName || !formEmail) return;
-    if (editing) {
-      setTeam(prev => prev.map(m => m.id === editing.id ? { ...m, name: formName, email: formEmail, role: formRole, permissions: formPermissions } : m));
+    if (editingId) {
+      await update(editingId, { name: formName, email: formEmail, role: formRole, permissions: formPermissions });
     } else {
-      const newMember: TeamMember = {
-        id: `team-${Date.now()}`, name: formName, email: formEmail, role: formRole,
-        permissions: formPermissions, active: true, lastLogin: "—", createdAt: new Date().toLocaleDateString("pt-BR"),
-      };
-      setTeam(prev => [...prev, newMember]);
+      await create({ name: formName, email: formEmail, role: formRole, permissions: formPermissions, active: true });
     }
     setShowModal(false);
   };
 
-  const toggleActive = (id: string) => {
-    setTeam(prev => prev.map(m => m.id === id ? { ...m, active: !m.active } : m));
-  };
+  if (loading) {
+    return (
+      <div className="admin-page flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page space-y-6 w-full overflow-hidden">
@@ -94,9 +115,9 @@ const AdminTeam = () => {
                       <Shield className="w-3 h-3" /> {m.role}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-[hsl(var(--dark-section-muted))] text-xs hidden lg:table-cell">{m.lastLogin}</td>
+                  <td className="py-3 px-4 text-[hsl(var(--dark-section-muted))] text-xs hidden lg:table-cell">{m.last_login || "—"}</td>
                   <td className="py-3 px-4 text-center">
-                    <button onClick={() => toggleActive(m.id)} className="inline-flex items-center gap-1">
+                    <button onClick={() => toggleActive(m.id, !m.active)} className="inline-flex items-center gap-1">
                       {m.active ? <ToggleRight className="w-6 h-6 text-emerald-400" /> : <ToggleLeft className="w-6 h-6 text-[hsl(var(--dark-section-muted))]" />}
                       <span className={`text-xs font-semibold ${m.active ? "text-emerald-400" : "text-[hsl(var(--dark-section-muted))]"}`}>{m.active ? "Ativo" : "Inativo"}</span>
                     </button>
@@ -113,15 +134,13 @@ const AdminTeam = () => {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))]">{editing ? "Editar Usuário" : "Novo Usuário"}</h3>
+              <h3 className="font-display text-lg font-bold text-[hsl(var(--dark-section-fg))]">{editingId ? "Editar Usuário" : "Novo Usuário"}</h3>
               <button onClick={() => setShowModal(false)} className="text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]"><X className="w-5 h-5" /></button>
             </div>
-
             <div className="space-y-4">
               <div>
                 <label className="text-xs text-[hsl(var(--dark-section-muted))] font-semibold uppercase tracking-wider">Nome</label>
@@ -155,7 +174,7 @@ const AdminTeam = () => {
                 </div>
               </div>
               <Button onClick={handleSave} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
-                {editing ? "Salvar Alterações" : "Criar Usuário"}
+                {editingId ? "Salvar Alterações" : "Criar Usuário"}
               </Button>
             </div>
           </div>

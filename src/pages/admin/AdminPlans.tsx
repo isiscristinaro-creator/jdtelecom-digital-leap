@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Plus, Edit2, Trash2, X, Check } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Plus, Edit2, Trash2, X, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { mockPlans, type Plan } from "@/data/adminMockData";
+import { usePlans, type DbPlan } from "@/hooks/useSupabaseData";
 
 const AdminPlans = () => {
-  const [plans, setPlans] = useState<Plan[]>(mockPlans);
-  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const { plans, loading, create, update, remove } = usePlans();
+  const [editingPlan, setEditingPlan] = useState<DbPlan | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [form, setForm] = useState({ name: "", speed: "", price: "", benefits: "" });
 
@@ -17,36 +17,37 @@ const AdminPlans = () => {
     setEditingPlan(null);
   };
 
-  const openEdit = (plan: Plan) => {
+  const openEdit = (plan: DbPlan) => {
     setForm({ name: plan.name, speed: plan.speed, price: plan.price.toString(), benefits: plan.benefits.join(", ") });
     setEditingPlan(plan);
     setIsCreating(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.speed || !form.price) return;
-    const planData: Plan = {
-      id: editingPlan?.id || `plan-${Date.now()}`,
-      name: form.name,
-      speed: form.speed,
-      price: parseFloat(form.price),
-      benefits: form.benefits.split(",").map((b) => b.trim()).filter(Boolean),
-      activeClients: editingPlan?.activeClients || 0,
-    };
+    const benefits = form.benefits.split(",").map(b => b.trim()).filter(Boolean);
     if (editingPlan) {
-      setPlans(plans.map((p) => p.id === editingPlan.id ? planData : p));
+      await update(editingPlan.id, { name: form.name, speed: form.speed, price: parseFloat(form.price), benefits });
     } else {
-      setPlans([...plans, planData]);
+      await create({ name: form.name, speed: form.speed, price: parseFloat(form.price), benefits });
     }
     setEditingPlan(null);
     setIsCreating(false);
   };
 
-  const handleDelete = (id: string) => {
-    setPlans(plans.filter((p) => p.id !== id));
+  const handleDelete = async (id: string) => {
+    await remove(id);
   };
 
   const showForm = isCreating || editingPlan;
+
+  if (loading) {
+    return (
+      <div className="admin-page flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page space-y-6 w-full overflow-hidden">
@@ -60,7 +61,6 @@ const AdminPlans = () => {
         </Button>
       </div>
 
-      {/* Plan form modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => { setEditingPlan(null); setIsCreating(false); }}>
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
@@ -99,7 +99,6 @@ const AdminPlans = () => {
         </div>
       )}
 
-      {/* Plans grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <div key={plan.id} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
@@ -117,7 +116,7 @@ const AdminPlans = () => {
                 </p>
               ))}
             </div>
-            <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-3">{plan.activeClients} clientes ativos</p>
+            <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-3">{plan.active_clients} clientes ativos</p>
             <div className="flex gap-2">
               <Button size="sm" variant="ghost" onClick={() => openEdit(plan)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
                 <Edit2 className="w-3 h-3 mr-1" /> Editar

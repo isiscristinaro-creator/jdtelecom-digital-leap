@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Download, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
-import { allPayments, mockClients, mockPlans } from "@/data/adminMockData";
+import { usePayments, usePlans } from "@/hooks/useSupabaseData";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 
 interface Props {
@@ -15,93 +15,39 @@ interface Props {
 }
 
 const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
+  const { payments } = usePayments();
+  const { plans } = usePlans();
   const [status, setStatus] = useState("todos");
-  const [cliente, setCliente] = useState("todos");
   const [plano, setPlano] = useState("todos");
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
   const [formato, setFormato] = useState("excel");
 
-  const clientById = useMemo(() => {
-    return new Map(mockClients.map((client) => [client.id, client]));
-  }, []);
-
-  const clientOptions = useMemo(() => {
-    const seen = new Set<string>();
-    return allPayments
-      .map((payment) => ({ id: payment.clientId, name: payment.clientName }))
-      .filter((clientOption) => {
-        if (seen.has(clientOption.id)) return false;
-        seen.add(clientOption.id);
-        return true;
-      })
-      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
-  }, []);
-
-  const parseDate = (dateStr: string) => {
-    const [d, m, y] = dateStr.split("/").map(Number);
-    return new Date(y, m - 1, d);
-  };
-
-  const parseInputDate = (dateStr: string) => {
-    const [y, m, d] = dateStr.split("-").map(Number);
-    return new Date(y, m - 1, d);
-  };
-
   const filteredData = useMemo(() => {
-    let filtered = [...allPayments];
-
-    if (status !== "todos") {
-      filtered = filtered.filter(p => p.status === status);
-    }
-
-    if (cliente !== "todos") {
-      filtered = filtered.filter((payment) => payment.clientId === cliente);
-    }
-
-    if (plano !== "todos") {
-      filtered = filtered.filter((payment) => clientById.get(payment.clientId)?.plan === plano);
-    }
-
+    let filtered = [...payments];
+    if (status !== "todos") filtered = filtered.filter(p => p.status === status);
+    if (plano !== "todos") filtered = filtered.filter(p => p.client_plan === plano);
     if (dataInicial) {
-      const start = parseInputDate(dataInicial);
-      filtered = filtered.filter(p => parseDate(p.date) >= start);
+      const start = new Date(dataInicial);
+      filtered = filtered.filter(p => new Date(p.due_date) >= start);
     }
-
     if (dataFinal) {
-      const end = parseInputDate(dataFinal);
-      end.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(p => parseDate(p.date) <= end);
+      const end = new Date(dataFinal); end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(p => new Date(p.due_date) <= end);
     }
-
     return filtered;
-  }, [status, cliente, plano, dataInicial, dataFinal, clientById]);
+  }, [payments, status, plano, dataInicial, dataFinal]);
 
   const handleExport = () => {
     const data = filteredData.map(p => ({
-      Nome: p.clientName,
-      Email: clientById.get(p.clientId)?.email ?? "-",
-      Plano: clientById.get(p.clientId)?.plan ?? "-",
-      Status: p.status,
-      "Valor (R$)": p.amount,
-      Data: p.date,
-      "Descrição": p.description,
+      Nome: p.client_name || "", Email: p.client_email || "", Plano: p.client_plan || "",
+      Status: p.status, "Valor (R$)": p.amount, Data: p.due_date, Descrição: p.description,
     }));
-
-    if (!data.length) {
-      toast.error("Nenhum dado disponível para exportação");
-      return;
-    }
-
+    if (!data.length) { toast.error("Nenhum dado"); return; }
     const filename = `relatorio-financeiro-${new Date().toISOString().slice(0, 10)}`;
-
-    if (formato === "excel") {
-      exportToExcel(data, filename, { reportTitle: "JD Telecom", reportSubtitle: "Relatório Financeiro" });
-    } else {
-      exportToCSV(data, filename);
-    }
-
-    toast.success(`${data.length} registros exportados com sucesso`);
+    if (formato === "excel") exportToExcel(data, filename, { reportTitle: "JD Telecom", reportSubtitle: "Relatório Financeiro" });
+    else exportToCSV(data, filename);
+    toast.success(`${data.length} registros exportados`);
     onOpenChange(false);
   };
 
@@ -110,18 +56,14 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
       <DialogContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold flex items-center gap-2">
-            <Download className="w-5 h-5 text-primary" />
-            Exportar Financeiro
+            <Download className="w-5 h-5 text-primary" /> Exportar Financeiro
           </DialogTitle>
         </DialogHeader>
-
         <div className="space-y-4 mt-2">
           <div className="space-y-1.5">
             <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Status</Label>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]"><SelectValue /></SelectTrigger>
               <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))]">
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="Pago">Pago</SelectItem>
@@ -130,39 +72,16 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
               </SelectContent>
             </Select>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Cliente</Label>
-              <Select value={cliente} onValueChange={setCliente}>
-                <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] max-h-60">
-                  <SelectItem value="todos">Todos</SelectItem>
-                  {clientOptions.map((clientOption) => (
-                    <SelectItem key={clientOption.id} value={clientOption.id}>{clientOption.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Plano</Label>
-              <Select value={plano} onValueChange={setPlano}>
-                <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))]">
-                  <SelectItem value="todos">Todos</SelectItem>
-                  {mockPlans.map((planOption) => (
-                    <SelectItem key={planOption.id} value={planOption.name}>{planOption.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Plano</Label>
+            <Select value={plano} onValueChange={setPlano}>
+              <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))]">
+                <SelectItem value="todos">Todos</SelectItem>
+                {plans.map(p => <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Data Inicial</Label>
@@ -175,29 +94,23 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
                 className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]" />
             </div>
           </div>
-
           <div className="space-y-1.5">
             <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Formato</Label>
             <Select value={formato} onValueChange={setFormato}>
-              <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="bg-[hsl(var(--dark-section))]/50 border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]"><SelectValue /></SelectTrigger>
               <SelectContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))]">
                 <SelectItem value="excel">Excel (.xls)</SelectItem>
                 <SelectItem value="csv">CSV (.csv)</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
           <div className="bg-[hsl(var(--dark-section))]/50 rounded-xl p-3 text-center">
             <p className="text-sm text-[hsl(var(--dark-section-muted))]">
               <span className="font-bold text-primary text-lg">{filteredData.length.toLocaleString()}</span> registros encontrados
             </p>
           </div>
-
           <Button onClick={handleExport} disabled={!filteredData.length} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl disabled:opacity-60">
-            <FileSpreadsheet className="w-4 h-4 mr-2" />
-            Exportar {filteredData.length.toLocaleString()} registros
+            <FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar {filteredData.length.toLocaleString()} registros
           </Button>
         </div>
       </DialogContent>
