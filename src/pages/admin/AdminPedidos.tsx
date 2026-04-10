@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Loader2, FileSpreadsheet, Download, Search } from "lucide-react";
+import { Loader2, FileSpreadsheet, Download, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePedidos } from "@/hooks/useSupabaseData";
