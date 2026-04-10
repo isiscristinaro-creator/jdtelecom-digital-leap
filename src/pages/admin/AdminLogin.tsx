@@ -29,10 +29,10 @@ const AdminLogin = () => {
     setError("");
     if (!email.trim() || !password.trim()) { setError("Preencha todos os campos."); return; }
     setLoading(true);
-    const success = await login(email.trim(), password);
+    const result = await login(email.trim(), password);
     setLoading(false);
-    if (success) navigate("/admin/dashboard", { replace: true });
-    else setError("Credenciais inválidas.");
+    if (result.success) navigate("/admin/dashboard", { replace: true });
+    else setError(result.error || "Credenciais inválidas.");
   };
 
   return (
