@@ -4,8 +4,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { exportToCSV } from "@/utils/exportUtils";
@@ -16,7 +15,7 @@ import { useDashboardStats, usePlans, useClients } from "@/hooks/useSupabaseData
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const fmtK = (v: number) => `R$ ${(v / 1000).toFixed(0)}k`;
+const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const COLORS = ["hsl(24,95%,50%)", "hsl(15,90%,42%)", "hsl(350,80%,55%)", "hsl(40,90%,50%)", "hsl(200,80%,50%)"];
 
