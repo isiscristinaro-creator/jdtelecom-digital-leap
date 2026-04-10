@@ -44,6 +44,7 @@ const RoutesWithCitySelector = () => {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/assinante" element={<SubscriberLogin />} />
         <Route path="/assinante/dashboard" element={<SubscriberDashboard />} />
+        <Route path="/assinante/items" element={<SubscriberItems />} />
         <Route path="/admin" element={<AdminLogin />} />
         <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
