@@ -438,12 +438,16 @@ const AdminDashboard = () => {
         }));
         const trendColors = ["hsl(160,70%,45%)", "hsl(24,95%,50%)", "hsl(210,80%,55%)"];
 
-        // Meta vs Real comparison data
+        // Meta vs Real comparison data with alert flags
         const metaVsReal = [
           { name: "Receita", meta: getGoal("meta_receita"), real: stats.mrr },
           { name: "Clientes", meta: getGoal("meta_clientes"), real: stats.totalClients },
           { name: "Novos 30d", meta: getGoal("meta_novos_30d"), real: stats.newLast30 },
-        ];
+        ].map(item => ({
+          ...item,
+          pct: item.meta > 0 ? Math.round((item.real / item.meta) * 100) : 0,
+          alert: item.meta > 0 && (item.real / item.meta) < 0.5,
+        }));
 
         const periodButtons = [
           { label: "7d", value: 7 as const },
@@ -503,12 +507,33 @@ const AdminDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
                   <XAxis dataKey="name" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
                   <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                  <Tooltip
+                    contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }}
+                    formatter={(value: number, name: string) => [value.toLocaleString("pt-BR"), name]}
+                  />
                   <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
                   <Bar dataKey="meta" fill="hsl(220,60%,50%)" radius={[4, 4, 0, 0]} name="Meta" />
-                  <Bar dataKey="real" fill="hsl(160,70%,45%)" radius={[4, 4, 0, 0]} name="Real" />
+                  <Bar dataKey="real" radius={[4, 4, 0, 0]} name="Real">
+                    {metaVsReal.map((entry, idx) => (
+                      <Cell key={idx} fill={entry.alert ? "hsl(0,70%,50%)" : "hsl(160,70%,45%)"} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              {/* Alert badges below chart */}
+              <div className="flex gap-3 mt-3">
+                {metaVsReal.map(item => (
+                  <div key={item.name} className={`flex-1 text-center px-2 py-1.5 rounded-lg text-[10px] font-semibold ${
+                    item.alert
+                      ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                      : item.pct >= 100
+                        ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                        : "bg-[hsl(var(--dark-section))]/50 text-[hsl(var(--dark-section-muted))] border border-transparent"
+                  }`}>
+                    {item.name}: {item.pct}% {item.alert && "⚠️"} {item.pct >= 100 && "✓"}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );

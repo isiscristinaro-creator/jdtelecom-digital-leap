@@ -31,6 +31,7 @@ export function useKpiGoals() {
   const [history, setHistory] = useState<KpiHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [dbAvailable, setDbAvailable] = useState(false);
+  const [historyDbAvailable, setHistoryDbAvailable] = useState(false);
 
   const fetchGoals = useCallback(async () => {
     setLoading(true);
@@ -64,7 +65,29 @@ export function useKpiGoals() {
     setLoading(false);
   }, []);
 
-  const fetchHistory = useCallback(() => {
+  const fetchHistory = useCallback(async () => {
+    // Try DB first
+    try {
+      const { data, error } = await supabase
+        .from("kpi_goals_history")
+        .select("key, label, old_value, new_value, changed_by, changed_at")
+        .order("changed_at", { ascending: false })
+        .limit(50);
+
+      if (!error && data && data.length > 0) {
+        setHistory(data);
+        setHistoryDbAvailable(true);
+        return;
+      }
+      if (!error) {
+        // Table exists but empty
+        setHistoryDbAvailable(true);
+      }
+    } catch {
+      // Table doesn't exist
+    }
+
+    // Fallback to localStorage
     try {
       const saved = localStorage.getItem(HISTORY_KEY);
       if (saved) {
@@ -78,13 +101,33 @@ export function useKpiGoals() {
 
   useEffect(() => { fetchGoals(); fetchHistory(); }, [fetchGoals, fetchHistory]);
 
-  const addHistoryEntry = useCallback((entry: KpiHistoryEntry) => {
+  const addHistoryEntry = useCallback(async (entry: KpiHistoryEntry) => {
+    // Try DB insert
+    if (historyDbAvailable) {
+      const { error } = await supabase
+        .from("kpi_goals_history")
+        .insert({
+          key: entry.key,
+          label: entry.label,
+          old_value: entry.old_value,
+          new_value: entry.new_value,
+          changed_by: entry.changed_by,
+          changed_at: entry.changed_at,
+        });
+
+      if (!error) {
+        setHistory(prev => [entry, ...prev].slice(0, 50));
+        return;
+      }
+    }
+
+    // Fallback to localStorage
     setHistory(prev => {
-      const updated = [entry, ...prev].slice(0, 50); // keep last 50
+      const updated = [entry, ...prev].slice(0, 50);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
       return updated;
     });
-  }, []);
+  }, [historyDbAvailable]);
 
   const updateGoal = useCallback(async (key: string, target_value: number, changedBy?: string) => {
     const currentGoal = goals.find(g => g.key === key);
@@ -107,7 +150,7 @@ export function useKpiGoals() {
     }
 
     // Save history entry
-    addHistoryEntry({
+    await addHistoryEntry({
       key,
       label: currentGoal?.label ?? key,
       old_value: oldValue,
