@@ -418,9 +418,30 @@ const AdminDashboard = () => {
       {/* KPI Change History */}
       {kpiHistory.length > 0 && (
         <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-          <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
-            <History className="w-4 h-4 text-primary" /> Histórico de Alterações de Metas
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
+              <History className="w-4 h-4 text-primary" /> Histórico de Alterações de Metas
+            </h3>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary"
+              onClick={() => {
+                const csvData = kpiHistory.map(entry => ({
+                  "Meta": entry.label,
+                  "Valor Anterior": entry.old_value,
+                  "Novo Valor": entry.new_value,
+                  "Alterado Por": entry.changed_by,
+                  "Data/Hora": new Date(entry.changed_at).toLocaleString("pt-BR"),
+                }));
+                if (exportToCSV(csvData, `historico-metas-${new Date().toISOString().slice(0, 10)}`)) {
+                  toast.success(`${csvData.length} registros exportados`);
+                }
+              }}
+            >
+              <Download className="w-3 h-3 mr-1" /> Exportar CSV
+            </Button>
+          </div>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {kpiHistory.slice(0, 20).map((entry, i) => {
               const date = new Date(entry.changed_at);
