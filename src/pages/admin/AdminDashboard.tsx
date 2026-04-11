@@ -40,10 +40,36 @@ const AdminDashboard = () => {
   const [exportingPdf, setExportingPdf] = useState(false);
   const dashboardRef = useRef<HTMLDivElement>(null);
 
+  // Auto-notify when KPIs are below 50%
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (statsLoading) return;
+    const metaReceita = getGoal("meta_receita");
+    const metaClientes = getGoal("meta_clientes");
+    const metaNovos = getGoal("meta_novos_30d");
+
+    const kpis = [
+      { key: "receita", label: "Receita Mensal", current: stats.mrr, target: metaReceita },
+      { key: "clientes", label: "Clientes Total", current: stats.totalClients, target: metaClientes },
+      { key: "novos", label: "Novos Clientes 30d", current: stats.newLast30, target: metaNovos },
+    ];
+
+    kpis.forEach(kpi => {
+      if (kpi.target <= 0) return;
+      const pct = (kpi.current / kpi.target) * 100;
+      if (pct < 50 && !kpiNotifiedRef.current.has(kpi.key)) {
+        kpiNotifiedRef.current.add(kpi.key);
+        toast.error(`⚠️ Alerta: ${kpi.label} está em ${Math.round(pct)}% da meta (abaixo de 50%)`, {
+          duration: 8000,
+          description: `Atual: ${kpi.key === "receita" ? fmt(kpi.current) : kpi.current} | Meta: ${kpi.key === "receita" ? fmt(kpi.target) : kpi.target}`,
+        });
+      }
+    });
+  }, [statsLoading, stats, getGoal]);
 
   const greeting = (() => {
     const h = currentTime.getHours();
@@ -1027,6 +1053,62 @@ const AdminDashboard = () => {
               </Button>
             </div>
           </div>
+
+          {/* Visual Timeline Chart */}
+          {(() => {
+            const keyMap: Record<string, { label: string; entries: { date: string; value: number }[] }> = {};
+            [...kpiHistory].reverse().forEach(entry => {
+              if (!keyMap[entry.key]) keyMap[entry.key] = { label: entry.label, entries: [] };
+              const dateStr = new Date(entry.changed_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+              // Add old value as first point
+              if (keyMap[entry.key].entries.length === 0) {
+                keyMap[entry.key].entries.push({ date: dateStr + " (ant)", value: entry.old_value });
+              }
+              keyMap[entry.key].entries.push({ date: dateStr, value: entry.new_value });
+            });
+
+            const timelineKeys = Object.keys(keyMap);
+            if (timelineKeys.length === 0) return null;
+
+            const allDates: string[] = [];
+            timelineKeys.forEach(k => {
+              keyMap[k].entries.forEach(e => {
+                if (!allDates.includes(e.date)) allDates.push(e.date);
+              });
+            });
+
+            const timelineData = allDates.map(date => {
+              const point: Record<string, any> = { date };
+              timelineKeys.forEach(k => {
+                const match = keyMap[k].entries.find(e => e.date === date);
+                if (match) point[keyMap[k].label] = match.value;
+              });
+              return point;
+            });
+
+            const lineColors = ["hsl(24,95%,50%)", "hsl(160,70%,45%)", "hsl(210,80%,55%)"];
+
+            return (
+              <div className="mb-5">
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
+                  📈 Evolução das Metas ao Longo do Tempo
+                </p>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={timelineData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                    <XAxis dataKey="date" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} />
+                    <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} />
+                    <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                    <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 11 }} />
+                    {timelineKeys.map((k, i) => (
+                      <Line key={k} type="monotone" dataKey={keyMap[k].label} stroke={lineColors[i % lineColors.length]} strokeWidth={2} dot={{ r: 4, fill: lineColors[i % lineColors.length] }} connectNulls name={keyMap[k].label} />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          })()}
+
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {kpiHistory.slice(0, 20).map((entry, i) => {
               const date = new Date(entry.changed_at);
