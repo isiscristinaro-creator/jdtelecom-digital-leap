@@ -40,10 +40,36 @@ const AdminDashboard = () => {
   const [exportingPdf, setExportingPdf] = useState(false);
   const dashboardRef = useRef<HTMLDivElement>(null);
 
+  // Auto-notify when KPIs are below 50%
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (statsLoading) return;
+    const metaReceita = getGoal("meta_receita");
+    const metaClientes = getGoal("meta_clientes");
+    const metaNovos = getGoal("meta_novos_30d");
+
+    const kpis = [
+      { key: "receita", label: "Receita Mensal", current: stats.mrr, target: metaReceita },
+      { key: "clientes", label: "Clientes Total", current: stats.totalClients, target: metaClientes },
+      { key: "novos", label: "Novos Clientes 30d", current: stats.newLast30, target: metaNovos },
+    ];
+
+    kpis.forEach(kpi => {
+      if (kpi.target <= 0) return;
+      const pct = (kpi.current / kpi.target) * 100;
+      if (pct < 50 && !kpiNotifiedRef.current.has(kpi.key)) {
+        kpiNotifiedRef.current.add(kpi.key);
+        toast.error(`⚠️ Alerta: ${kpi.label} está em ${Math.round(pct)}% da meta (abaixo de 50%)`, {
+          duration: 8000,
+          description: `Atual: ${kpi.key === "receita" ? fmt(kpi.current) : kpi.current} | Meta: ${kpi.key === "receita" ? fmt(kpi.target) : kpi.target}`,
+        });
+      }
+    });
+  }, [statsLoading, stats, getGoal]);
 
   const greeting = (() => {
     const h = currentTime.getHours();
