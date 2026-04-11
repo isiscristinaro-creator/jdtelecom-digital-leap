@@ -1,6 +1,6 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText, Trophy
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText, Trophy, CalendarIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -9,6 +9,8 @@ import {
   LineChart, Line, ReferenceLine
 } from "recharts";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
@@ -16,6 +18,8 @@ import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useDashboardStats, usePlans, useClients, usePayments, useAllServiceRecords } from "@/hooks/useSupabaseData";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
 import { useKpiGoals } from "@/hooks/useKpiGoals";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -39,6 +43,10 @@ const AdminDashboard = () => {
   const [whatIfGrowth, setWhatIfGrowth] = useState<number | null>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
   const dashboardRef = useRef<HTMLDivElement>(null);
+  const [compStartDate, setCompStartDate] = useState<Date>(() => {
+    const d = new Date(); d.setMonth(d.getMonth() - 5); d.setDate(1); return d;
+  });
+  const [compEndDate, setCompEndDate] = useState<Date>(new Date());
 
   // Auto-notify when KPIs are below 50%
   useEffect(() => {
@@ -1138,47 +1146,145 @@ const AdminDashboard = () => {
 
       {/* Monthly Performance Comparison & Ranking */}
       {(() => {
-        const now = new Date();
-        const getMonthData = (monthsAgo: number) => {
-          const start = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 1);
-          const end = new Date(now.getFullYear(), now.getMonth() - monthsAgo + 1, 0);
-          const endStr = end.toISOString().slice(0, 10);
-          const startStr = start.toISOString().slice(0, 10);
-          const monthClients = clients.filter(c => c.join_date >= startStr && c.join_date <= endStr);
-          const monthPayments = payments.filter(p => p.due_date >= startStr && p.due_date <= endStr);
-          const revenue = monthPayments.filter(p => p.status === "Pago").reduce((s, p) => s + p.amount, 0);
-          const pending = monthPayments.filter(p => p.status !== "Pago").reduce((s, p) => s + p.amount, 0);
-          const monthLabel = start.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
-          return { label: monthLabel, newClients: monthClients.length, revenue, pending, total: revenue + pending };
+        // Build monthly data from compStartDate to compEndDate
+        const buildMonthlyData = () => {
+          const result: { label: string; newClients: number; revenue: number; pending: number; total: number; startDate: Date }[] = [];
+          const cursor = new Date(compStartDate.getFullYear(), compStartDate.getMonth(), 1);
+          const endMonth = new Date(compEndDate.getFullYear(), compEndDate.getMonth(), 1);
+
+          while (cursor <= endMonth) {
+            const start = new Date(cursor);
+            const end = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+            const startStr = start.toISOString().slice(0, 10);
+            const endStr = end.toISOString().slice(0, 10);
+            const monthClients = clients.filter(c => c.join_date >= startStr && c.join_date <= endStr);
+            const monthPayments = payments.filter(p => p.due_date >= startStr && p.due_date <= endStr);
+            const revenue = monthPayments.filter(p => p.status === "Pago").reduce((s, p) => s + p.amount, 0);
+            const pending = monthPayments.filter(p => p.status !== "Pago").reduce((s, p) => s + p.amount, 0);
+            const monthLabel = start.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+            result.push({ label: monthLabel, newClients: monthClients.length, revenue, pending, total: revenue + pending, startDate: start });
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
+          return result;
         };
 
-        const months = Array.from({ length: 6 }, (_, i) => getMonthData(5 - i));
+        const months = buildMonthlyData();
         const currentMonth = months[months.length - 1];
-        const prevMonth = months[months.length - 2];
-        const revenueChange = prevMonth.revenue > 0 ? Math.round(((currentMonth.revenue - prevMonth.revenue) / prevMonth.revenue) * 100) : 0;
-        const clientsChange = prevMonth.newClients > 0 ? Math.round(((currentMonth.newClients - prevMonth.newClients) / prevMonth.newClients) * 100) : 0;
+        const prevMonth = months.length >= 2 ? months[months.length - 2] : null;
+        const revenueChange = prevMonth && prevMonth.revenue > 0 ? Math.round(((currentMonth.revenue - prevMonth.revenue) / prevMonth.revenue) * 100) : 0;
+        const clientsChange = prevMonth && prevMonth.newClients > 0 ? Math.round(((currentMonth.newClients - prevMonth.newClients) / prevMonth.newClients) * 100) : 0;
 
         // Ranking by revenue
         const ranked = [...months].sort((a, b) => b.revenue - a.revenue).map((m, i) => ({ ...m, rank: i + 1 }));
 
+        const presetPeriods = [
+          { label: "3 meses", months: 3 },
+          { label: "6 meses", months: 6 },
+          { label: "12 meses", months: 12 },
+        ];
+
         return (
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-primary" /> Comparação Mensal & Ranking
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-primary" /> Comparação Mensal & Ranking
+              </h3>
+              <div className="flex flex-wrap items-center gap-2">
+                {presetPeriods.map(p => {
+                  const presetStart = new Date();
+                  presetStart.setMonth(presetStart.getMonth() - p.months + 1);
+                  presetStart.setDate(1);
+                  const isActive = compStartDate.getFullYear() === presetStart.getFullYear() && compStartDate.getMonth() === presetStart.getMonth();
+                  return (
+                    <button
+                      key={p.months}
+                      onClick={() => {
+                        const s = new Date(); s.setMonth(s.getMonth() - p.months + 1); s.setDate(1);
+                        setCompStartDate(s);
+                        setCompEndDate(new Date());
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-colors ${
+                        isActive ? "bg-primary text-primary-foreground" : "bg-[hsl(var(--dark-section))]/50 text-[hsl(var(--dark-section-muted))] hover:text-[hsl(var(--dark-section-fg))]"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Date Pickers */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-5">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[hsl(var(--dark-section-muted))] font-semibold uppercase">De:</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[160px] justify-start text-left text-xs font-normal h-8 rounded-lg",
+                        "bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {format(compStartDate, "dd/MM/yyyy")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={compStartDate}
+                      onSelect={(d) => d && setCompStartDate(d)}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[hsl(var(--dark-section-muted))] font-semibold uppercase">Até:</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[160px] justify-start text-left text-xs font-normal h-8 rounded-lg",
+                        "bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {format(compEndDate, "dd/MM/yyyy")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={compEndDate}
+                      onSelect={(d) => d && setCompEndDate(d)}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <p className="text-[10px] text-[hsl(var(--dark-section-muted))] self-center">
+                {months.length} {months.length === 1 ? "mês" : "meses"} selecionados
+              </p>
+            </div>
 
             {/* Month-over-Month Summary */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               <div className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 text-center">
-                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Receita Mês Atual</p>
-                <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))] mt-1">{fmt(currentMonth.revenue)}</p>
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Receita Último Mês</p>
+                <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))] mt-1">{fmt(currentMonth?.revenue || 0)}</p>
                 <p className={`text-xs font-bold mt-1 ${revenueChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {revenueChange >= 0 ? "↑" : "↓"} {Math.abs(revenueChange)}% vs mês anterior
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 text-center">
-                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Novos Clientes Mês Atual</p>
-                <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))] mt-1">{currentMonth.newClients}</p>
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Novos Clientes Último Mês</p>
+                <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))] mt-1">{currentMonth?.newClients || 0}</p>
                 <p className={`text-xs font-bold mt-1 ${clientsChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {clientsChange >= 0 ? "↑" : "↓"} {Math.abs(clientsChange)}% vs mês anterior
                 </p>
@@ -1193,7 +1299,7 @@ const AdminDashboard = () => {
             {/* Comparison Chart */}
             <div className="mb-5">
               <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
-                📊 Receita & Novos Clientes — Últimos 6 meses
+                📊 Receita & Novos Clientes — Período Selecionado
               </p>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={months} barGap={2}>
