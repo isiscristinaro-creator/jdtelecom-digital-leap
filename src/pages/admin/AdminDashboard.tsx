@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { useDashboardStats, usePlans, useClients, usePayments, useAllServiceRecords } from "@/hooks/useSupabaseData";
 import ExportFinanceiroModal from "@/components/admin/ExportFinanceiroModal";
