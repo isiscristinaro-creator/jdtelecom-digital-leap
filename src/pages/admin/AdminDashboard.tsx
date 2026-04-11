@@ -39,6 +39,10 @@ const AdminDashboard = () => {
   const [whatIfGrowth, setWhatIfGrowth] = useState<number | null>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
   const dashboardRef = useRef<HTMLDivElement>(null);
+  const [compStartDate, setCompStartDate] = useState<Date>(() => {
+    const d = new Date(); d.setMonth(d.getMonth() - 5); d.setDate(1); return d;
+  });
+  const [compEndDate, setCompEndDate] = useState<Date>(new Date());
 
   // Auto-notify when KPIs are below 50%
   useEffect(() => {
