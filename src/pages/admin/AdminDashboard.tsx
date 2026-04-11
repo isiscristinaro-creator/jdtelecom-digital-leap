@@ -1,6 +1,6 @@
 import {
   Users, UserCheck, UserX, AlertTriangle, DollarSign, TrendingUp, BarChart3, Package,
-  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText
+  UserPlus, ArrowUpRight, AlertCircle, Info, Download, FileSpreadsheet, Loader2, Headphones, Target, Pencil, Check, X, History, Clock, Zap, FileText, Trophy
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -1135,6 +1135,110 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Monthly Performance Comparison & Ranking */}
+      {(() => {
+        const now = new Date();
+        const getMonthData = (monthsAgo: number) => {
+          const start = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 1);
+          const end = new Date(now.getFullYear(), now.getMonth() - monthsAgo + 1, 0);
+          const endStr = end.toISOString().slice(0, 10);
+          const startStr = start.toISOString().slice(0, 10);
+          const monthClients = clients.filter(c => c.join_date >= startStr && c.join_date <= endStr);
+          const monthPayments = payments.filter(p => p.due_date >= startStr && p.due_date <= endStr);
+          const revenue = monthPayments.filter(p => p.status === "Pago").reduce((s, p) => s + p.amount, 0);
+          const pending = monthPayments.filter(p => p.status !== "Pago").reduce((s, p) => s + p.amount, 0);
+          const monthLabel = start.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+          return { label: monthLabel, newClients: monthClients.length, revenue, pending, total: revenue + pending };
+        };
+
+        const months = Array.from({ length: 6 }, (_, i) => getMonthData(5 - i));
+        const currentMonth = months[months.length - 1];
+        const prevMonth = months[months.length - 2];
+        const revenueChange = prevMonth.revenue > 0 ? Math.round(((currentMonth.revenue - prevMonth.revenue) / prevMonth.revenue) * 100) : 0;
+        const clientsChange = prevMonth.newClients > 0 ? Math.round(((currentMonth.newClients - prevMonth.newClients) / prevMonth.newClients) * 100) : 0;
+
+        // Ranking by revenue
+        const ranked = [...months].sort((a, b) => b.revenue - a.revenue).map((m, i) => ({ ...m, rank: i + 1 }));
+
+        return (
+          <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+            <h3 className="font-display font-semibold text-[hsl(var(--dark-section-fg))] mb-4 flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-primary" /> Comparação Mensal & Ranking
+            </h3>
+
+            {/* Month-over-Month Summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+              <div className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 text-center">
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Receita Mês Atual</p>
+                <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))] mt-1">{fmt(currentMonth.revenue)}</p>
+                <p className={`text-xs font-bold mt-1 ${revenueChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {revenueChange >= 0 ? "↑" : "↓"} {Math.abs(revenueChange)}% vs mês anterior
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 text-center">
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Novos Clientes Mês Atual</p>
+                <p className="font-display text-xl font-bold text-[hsl(var(--dark-section-fg))] mt-1">{currentMonth.newClients}</p>
+                <p className={`text-xs font-bold mt-1 ${clientsChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {clientsChange >= 0 ? "↑" : "↓"} {Math.abs(clientsChange)}% vs mês anterior
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-[hsl(var(--dark-section))]/50 text-center">
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">Melhor Mês (Receita)</p>
+                <p className="font-display text-xl font-bold text-primary mt-1">{ranked[0]?.label}</p>
+                <p className="text-xs text-[hsl(var(--dark-section-muted))] mt-1">{fmt(ranked[0]?.revenue || 0)}</p>
+              </div>
+            </div>
+
+            {/* Comparison Chart */}
+            <div className="mb-5">
+              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
+                📊 Receita & Novos Clientes — Últimos 6 meses
+              </p>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={months} barGap={2}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                  <XAxis dataKey="label" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
+                  <YAxis yAxisId="left" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} />
+                  <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} />
+                  <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 12 }} />
+                  <Bar yAxisId="left" dataKey="revenue" fill="hsl(160,70%,45%)" radius={[4, 4, 0, 0]} name="Receita (R$)" />
+                  <Bar yAxisId="left" dataKey="pending" fill="hsl(40,90%,50%)" radius={[4, 4, 0, 0]} name="Pendente (R$)" />
+                  <Bar yAxisId="right" dataKey="newClients" fill="hsl(210,80%,55%)" radius={[4, 4, 0, 0]} name="Novos Clientes" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Performance Ranking Table */}
+            <div>
+              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
+                🏆 Ranking de Performance por Período
+              </p>
+              <div className="space-y-2">
+                {ranked.map(m => {
+                  const medalColors = ["text-amber-400", "text-gray-300", "text-orange-500"];
+                  const medals = ["🥇", "🥈", "🥉"];
+                  return (
+                    <div key={m.label} className={`flex items-center gap-3 p-3 rounded-xl ${m.rank === 1 ? "bg-amber-500/10 border border-amber-500/20" : "bg-[hsl(var(--dark-section))]/50"}`}>
+                      <span className="text-lg w-8 text-center">{m.rank <= 3 ? medals[m.rank - 1] : `#${m.rank}`}</span>
+                      <div className="flex-1">
+                        <p className={`text-sm font-bold ${m.rank <= 3 ? medalColors[m.rank - 1] || "text-[hsl(var(--dark-section-fg))]" : "text-[hsl(var(--dark-section-fg))]"}`}>
+                          {m.label.charAt(0).toUpperCase() + m.label.slice(1)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-[hsl(var(--dark-section-fg))]">{fmt(m.revenue)}</p>
+                        <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">{m.newClients} novos clientes</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Atendimentos Metrics + Chart */}
       {serviceRecords.length > 0 && (() => {
