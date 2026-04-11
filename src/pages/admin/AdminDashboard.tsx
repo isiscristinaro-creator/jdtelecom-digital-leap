@@ -796,6 +796,153 @@ const AdminDashboard = () => {
               })()}
             </div>
 
+            {/* Comparative 3-Scenario Chart */}
+            {(() => {
+              const pessimistRate = Math.max(0, revenueGrowth * 0.5);
+              const realistRate = revenueGrowth > 0 ? revenueGrowth : 0.02;
+              const optimistRate = Math.max(revenueGrowth * 1.5, 0.1);
+
+              const scenarioChartData = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date();
+                d.setMonth(d.getMonth() + i);
+                const label = d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+                return {
+                  mes: label,
+                  pessimista: Math.round(stats.mrr * Math.pow(1 + pessimistRate, i)),
+                  realista: Math.round(stats.mrr * Math.pow(1 + realistRate, i)),
+                  otimista: Math.round(stats.mrr * Math.pow(1 + optimistRate, i)),
+                  meta: metaReceita,
+                };
+              });
+
+              return (
+                <div className="mb-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">
+                      📈 Gráfico Comparativo — 3 Cenários (6 meses)
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-red-400 hover:border-red-400"
+                      onClick={async () => {
+                        try {
+                          const { jsPDF } = await import("jspdf");
+                          const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                          const pw = 210; const margin = 15; const cw = pw - margin * 2;
+                          let y = 20;
+
+                          // Header
+                          pdf.setFillColor(15, 17, 23);
+                          pdf.rect(0, 0, pw, 297, "F");
+                          pdf.setTextColor(255, 140, 50);
+                          pdf.setFontSize(18);
+                          pdf.text("JD Telecom — Relatório de Cenários What-If", margin, y);
+                          y += 8;
+                          pdf.setFontSize(9);
+                          pdf.setTextColor(150, 150, 160);
+                          pdf.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, margin, y);
+                          y += 12;
+
+                          // Current metrics
+                          pdf.setFontSize(12);
+                          pdf.setTextColor(255, 255, 255);
+                          pdf.text("Métricas Atuais", margin, y); y += 7;
+                          pdf.setFontSize(9);
+                          pdf.setTextColor(200, 200, 210);
+                          pdf.text(`Receita Mensal (MRR): ${fmt(stats.mrr)}`, margin, y); y += 5;
+                          pdf.text(`Total de Clientes: ${stats.totalClients}`, margin, y); y += 5;
+                          pdf.text(`Meta de Receita: ${fmt(metaReceita)}`, margin, y); y += 5;
+                          pdf.text(`Meta de Clientes: ${metaClientes}`, margin, y); y += 5;
+                          pdf.text(`Crescimento Receita: ${(revenueGrowth * 100).toFixed(1)}%/mês`, margin, y); y += 5;
+                          pdf.text(`Crescimento Clientes: ${(monthlyGrowth * 100).toFixed(1)}%/mês`, margin, y); y += 12;
+
+                          // Scenarios table
+                          const scenarios = [
+                            { name: "Pessimista", rate: pessimistRate, emoji: "📉" },
+                            { name: "Realista", rate: realistRate, emoji: "📊" },
+                            { name: "Otimista", rate: optimistRate, emoji: "🚀" },
+                          ];
+                          pdf.setFontSize(12);
+                          pdf.setTextColor(255, 255, 255);
+                          pdf.text("Cenários de Projeção", margin, y); y += 8;
+
+                          scenarios.forEach(s => {
+                            const proj6m = Math.round(stats.mrr * Math.pow(1 + s.rate, 6));
+                            const projClients = Math.round(stats.totalClients * Math.pow(1 + s.rate, 6));
+                            const months = projectMonths(stats.mrr, metaReceita, s.rate);
+
+                            pdf.setFontSize(10);
+                            pdf.setTextColor(255, 140, 50);
+                            pdf.text(`${s.name} (${(s.rate * 100).toFixed(1)}%/mês)`, margin, y); y += 6;
+                            pdf.setFontSize(9);
+                            pdf.setTextColor(200, 200, 210);
+                            pdf.text(`  Receita em 6 meses: ${fmt(proj6m)}`, margin, y); y += 5;
+                            pdf.text(`  Clientes em 6 meses: ${projClients}`, margin, y); y += 5;
+                            pdf.text(`  Meta de receita: ${months === null ? "Não atinge" : months === 0 ? "Já atingida" : `~${months} meses`}`, margin, y); y += 8;
+                          });
+
+                          // Monthly projection table
+                          y += 4;
+                          pdf.setFontSize(12);
+                          pdf.setTextColor(255, 255, 255);
+                          pdf.text("Projeção Mensal Detalhada", margin, y); y += 8;
+
+                          pdf.setFontSize(8);
+                          pdf.setTextColor(150, 150, 160);
+                          pdf.text("Mês", margin, y);
+                          pdf.text("Pessimista", margin + 40, y);
+                          pdf.text("Realista", margin + 80, y);
+                          pdf.text("Otimista", margin + 120, y);
+                          y += 5;
+                          pdf.setDrawColor(50, 50, 60);
+                          pdf.line(margin, y, margin + cw, y); y += 4;
+
+                          scenarioChartData.forEach(row => {
+                            pdf.setTextColor(200, 200, 210);
+                            pdf.text(row.mes, margin, y);
+                            pdf.text(fmt(row.pessimista), margin + 40, y);
+                            pdf.text(fmt(row.realista), margin + 80, y);
+                            pdf.text(fmt(row.otimista), margin + 120, y);
+                            y += 5;
+                          });
+
+                          // What-if note
+                          if (whatIfGrowth !== null) {
+                            y += 8;
+                            pdf.setFontSize(10);
+                            pdf.setTextColor(255, 200, 50);
+                            pdf.text(`Nota: Cenário What-If ativo com taxa simulada de ${whatIfGrowth}%/mês`, margin, y);
+                          }
+
+                          pdf.save(`cenarios-whatif-jdtelecom-${new Date().toISOString().slice(0, 10)}.pdf`);
+                          toast.success("Relatório de cenários exportado em PDF!");
+                        } catch (err) {
+                          console.error(err);
+                          toast.error("Erro ao exportar PDF de cenários");
+                        }
+                      }}
+                    >
+                      <FileText className="w-3 h-3 mr-1" /> PDF Cenários
+                    </Button>
+                  </div>
+                  <ResponsiveContainer width="100%" height={260}>
+                    <LineChart data={scenarioChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
+                      <XAxis dataKey="mes" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} />
+                      <YAxis tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                      <Tooltip contentStyle={{ background: "hsl(220,18%,14%)", border: "1px solid hsl(220,14%,22%)", borderRadius: 12, color: "#fff" }} formatter={(v: number) => [fmt(v), ""]} />
+                      <Legend wrapperStyle={{ color: "hsl(220,10%,70%)", fontSize: 11 }} />
+                      <Line type="monotone" dataKey="pessimista" stroke="hsl(0,70%,55%)" strokeWidth={2} dot={{ r: 3 }} name="📉 Pessimista" />
+                      <Line type="monotone" dataKey="realista" stroke="hsl(24,95%,50%)" strokeWidth={2.5} dot={{ r: 4 }} name="📊 Realista" />
+                      <Line type="monotone" dataKey="otimista" stroke="hsl(160,70%,45%)" strokeWidth={2} dot={{ r: 3 }} name="🚀 Otimista" />
+                      <ReferenceLine y={metaReceita} stroke="hsl(260,70%,60%)" strokeWidth={2} strokeDasharray="8 4" label={{ value: "Meta", fill: "hsl(260,70%,60%)", fontSize: 10, position: "right" }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })()}
+
             {/* Projection Chart */}
             <div>
               <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
