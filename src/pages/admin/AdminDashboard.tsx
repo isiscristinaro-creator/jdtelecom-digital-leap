@@ -1296,13 +1296,19 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Comparison Chart */}
+            {/* Comparison Chart with Line Overlay */}
             <div className="mb-5">
               <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
-                📊 Receita & Novos Clientes — Período Selecionado
+                📊 Receita & Novos Clientes — Período Selecionado (com tendência)
               </p>
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={months} barGap={2}>
+                  <defs>
+                    <linearGradient id="trendGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="hsl(280,80%,60%)" />
+                      <stop offset="100%" stopColor="hsl(340,80%,60%)" />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,14%,22%)" />
                   <XAxis dataKey="label" tick={{ fill: "hsl(220,10%,55%)", fontSize: 11 }} />
                   <YAxis yAxisId="left" tick={{ fill: "hsl(220,10%,55%)", fontSize: 10 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
@@ -1312,15 +1318,57 @@ const AdminDashboard = () => {
                   <Bar yAxisId="left" dataKey="revenue" fill="hsl(160,70%,45%)" radius={[4, 4, 0, 0]} name="Receita (R$)" />
                   <Bar yAxisId="left" dataKey="pending" fill="hsl(40,90%,50%)" radius={[4, 4, 0, 0]} name="Pendente (R$)" />
                   <Bar yAxisId="right" dataKey="newClients" fill="hsl(210,80%,55%)" radius={[4, 4, 0, 0]} name="Novos Clientes" />
+                  <Line yAxisId="left" type="monotone" dataKey="total" stroke="url(#trendGrad)" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(280,80%,60%)", stroke: "hsl(280,80%,60%)" }} name="Total (Tendência)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Performance Ranking Table */}
+            {/* Performance Ranking Table + Export */}
             <div>
-              <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider mb-3">
-                🏆 Ranking de Performance por Período
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] uppercase text-[hsl(var(--dark-section-muted))] font-semibold tracking-wider">
+                  🏆 Ranking de Performance por Período
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const data = ranked.map(m => ({
+                        Posição: `#${m.rank}`,
+                        Mês: m.label.charAt(0).toUpperCase() + m.label.slice(1),
+                        "Receita (R$)": m.revenue.toFixed(2),
+                        "Pendente (R$)": m.pending.toFixed(2),
+                        "Novos Clientes": m.newClients,
+                      }));
+                      exportToCSV(data, `ranking-mensal-${format(compStartDate, "yyyyMM")}-${format(compEndDate, "yyyyMM")}`);
+                      toast.success("Ranking exportado em CSV!");
+                    }}
+                    className="h-7 px-2.5 text-[10px] bg-[hsl(var(--dark-section))] border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary/20 rounded-lg"
+                  >
+                    <FileSpreadsheet className="w-3 h-3 mr-1" /> CSV
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const data = ranked.map(m => ({
+                        Posição: `#${m.rank}`,
+                        Mês: m.label.charAt(0).toUpperCase() + m.label.slice(1),
+                        "Receita (R$)": m.revenue.toFixed(2),
+                        "Pendente (R$)": m.pending.toFixed(2),
+                        "Novos Clientes": m.newClients,
+                      }));
+                      exportToExcel(data, `ranking-mensal-${format(compStartDate, "yyyyMM")}-${format(compEndDate, "yyyyMM")}`, {
+                        reportTitle: "JD Telecom — Ranking Mensal",
+                        reportSubtitle: `Período: ${format(compStartDate, "dd/MM/yyyy")} a ${format(compEndDate, "dd/MM/yyyy")}`,
+                      });
+                      toast.success("Ranking exportado em Excel!");
+                    }}
+                    className="h-7 px-2.5 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg"
+                  >
+                    <Download className="w-3 h-3 mr-1" /> Excel
+                  </Button>
+                </div>
+              </div>
               <div className="space-y-2">
                 {ranked.map(m => {
                   const medalColors = ["text-amber-400", "text-gray-300", "text-orange-500"];
