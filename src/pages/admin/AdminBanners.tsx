@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star, Link as LinkIcon, GripVertical } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star, Link as LinkIcon, GripVertical, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -85,12 +85,13 @@ const AdminBanners = () => {
     imagem_url: "",
     ativo: true,
     destaque: false,
+    hero: false,
     link: "",
   });
   const [linkError, setLinkError] = useState<string>("");
 
   const openCreate = () => {
-    setForm({ titulo: "", imagem_url: "", ativo: true, destaque: false, link: "" });
+    setForm({ titulo: "", imagem_url: "", ativo: true, destaque: false, hero: false, link: "" });
     setLinkError("");
     setIsCreating(true);
     setEditing(null);
@@ -102,6 +103,7 @@ const AdminBanners = () => {
       imagem_url: b.imagem_url || "",
       ativo: b.ativo,
       destaque: meta.destaque,
+      hero: meta.hero,
       link: meta.link,
     });
     setLinkError("");
@@ -147,13 +149,17 @@ const AdminBanners = () => {
     const finalTitulo = buildBannerTitulo({
       titulo: form.titulo,
       destaque: form.destaque,
+      hero: form.hero,
       link: form.link,
     });
     const payload = { titulo: finalTitulo, imagem_url: form.imagem_url, ativo: form.ativo };
 
-    // Se este banner está sendo marcado como destaque, remove o destaque dos outros
-    if (form.destaque) {
-      const outros = banners.filter((b) => b.id !== editing?.id && parseBannerTitulo(b.titulo).destaque);
+    // Se este banner está sendo marcado como destaque (e NÃO é hero),
+    // remove o destaque dos outros banners de ofertas
+    if (form.destaque && !form.hero) {
+      const outros = banners.filter(
+        (b) => b.id !== editing?.id && parseBannerTitulo(b.titulo).destaque && !parseBannerTitulo(b.titulo).hero
+      );
       for (const b of outros) {
         const meta = parseBannerTitulo(b.titulo);
         await update(b.id, {
@@ -296,7 +302,24 @@ const AdminBanners = () => {
               <label className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors">
                 <input
                   type="checkbox"
+                  checked={form.hero}
+                  onChange={(e) => setForm({ ...form, hero: e.target.checked })}
+                  className="rounded"
+                />
+                <ImageIcon className={`w-4 h-4 ${form.hero ? "text-primary" : "text-[hsl(var(--dark-section-muted))]"}`} />
+                <div className="flex-1">
+                  <span className="text-sm font-bold text-[hsl(var(--dark-section-fg))]">Banner do Hero</span>
+                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">
+                    Aparece no carrossel principal do topo da home (em vez de Ofertas Especiais)
+                  </p>
+                </div>
+              </label>
+
+              <label className={`flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 transition-colors ${form.hero ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-primary/10"}`}>
+                <input
+                  type="checkbox"
                   checked={form.destaque}
+                  disabled={form.hero}
                   onChange={(e) => setForm({ ...form, destaque: e.target.checked })}
                   className="rounded"
                 />
@@ -345,7 +368,12 @@ const AdminBanners = () => {
                     {b.imagem_url && (
                       <div className="relative">
                         <img src={b.imagem_url} alt={meta.titulo} className="w-full h-40 object-cover" />
-                        {meta.destaque && (
+                        {meta.hero && (
+                          <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
+                            <ImageIcon className="w-3 h-3" /> Hero
+                          </div>
+                        )}
+                        {meta.destaque && !meta.hero && (
                           <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
                             <Star className="w-3 h-3 fill-current" /> Destaque
                           </div>

@@ -1,23 +1,26 @@
 /**
  * Utilitários para serializar/desserializar metadados extras de banners
- * (destaque e link de destino) dentro do campo `titulo` da tabela banners,
+ * (destaque, hero e link de destino) dentro do campo `titulo` da tabela banners,
  * já que não podemos alterar o schema do banco.
  *
  * Formato do título armazenado:
- *   "★ Título visível|||https://link-destino.com"
+ *   "[HERO] ★ Título visível|||https://link-destino.com"
  *
- * - Prefixo "★ " marca o banner como destaque principal (apenas 1 por vez)
+ * - Prefixo "[HERO] " marca o banner como pertencente ao carrossel hero da home
+ * - Prefixo "★ " marca como destaque principal (apenas 1 por vez na seção de ofertas)
  * - Separador "|||" delimita o link opcional
  */
 
 import { z } from "zod";
 
 export const DESTAQUE_PREFIX = "★ ";
+export const HERO_PREFIX = "[HERO] ";
 export const LINK_SEPARATOR = "|||";
 
 export interface BannerMeta {
   titulo: string;
   destaque: boolean;
+  hero: boolean;
   link: string;
 }
 
@@ -36,15 +39,19 @@ const linkSchema = z
   );
 
 export function parseBannerTitulo(raw: string): BannerMeta {
-  const destaque = raw.startsWith(DESTAQUE_PREFIX);
-  const semPrefixo = destaque ? raw.slice(DESTAQUE_PREFIX.length) : raw;
+  let working = raw;
+  const hero = working.startsWith(HERO_PREFIX);
+  if (hero) working = working.slice(HERO_PREFIX.length);
+  const destaque = working.startsWith(DESTAQUE_PREFIX);
+  const semPrefixo = destaque ? working.slice(DESTAQUE_PREFIX.length) : working;
   const sepIdx = semPrefixo.indexOf(LINK_SEPARATOR);
   if (sepIdx === -1) {
-    return { titulo: semPrefixo, destaque, link: "" };
+    return { titulo: semPrefixo, destaque, hero, link: "" };
   }
   return {
     titulo: semPrefixo.slice(0, sepIdx),
     destaque,
+    hero,
     link: semPrefixo.slice(sepIdx + LINK_SEPARATOR.length),
   };
 }
@@ -53,7 +60,12 @@ export function buildBannerTitulo(meta: BannerMeta): string {
   const titulo = meta.titulo.trim();
   const link = meta.link.trim();
   const base = link ? `${titulo}${LINK_SEPARATOR}${link}` : titulo;
-  return meta.destaque ? `${DESTAQUE_PREFIX}${base}` : base;
+  const withDestaque = meta.destaque ? `${DESTAQUE_PREFIX}${base}` : base;
+  return meta.hero ? `${HERO_PREFIX}${withDestaque}` : withDestaque;
+}
+
+export function isHeroTitulo(raw: string): boolean {
+  return raw.startsWith(HERO_PREFIX);
 }
 
 export function validateBannerLink(link: string): { ok: boolean; error: string } {
