@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin, ChevronDown, ChevronUp, Globe } from "lucide-react";
+import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin, ChevronDown, ChevronUp, Globe, Signal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCity } from "@/contexts/CityContext";
 import logo from "@/assets/logo.png";
@@ -138,9 +138,10 @@ const Navbar = () => {
   ];
 
   const subNavLinks = [
-    { label: "Internet", href: "#planos", icon: Wifi },
+    { label: "Internet", href: "/fibra", icon: Wifi, isRoute: true },
+    { label: "FWA 5G", href: "/fwa-5g", icon: Signal, isRoute: true },
     { label: "Móvel 5G", href: "/movel", icon: Smartphone, isRoute: true },
-    { label: "Combos", href: "#planos", icon: Tv },
+    { label: "Combos", href: "/combos", icon: Tv, isRoute: true },
     { label: "Autoatendimento", href: "#autoatendimento", icon: Headphones },
   ];
 
