@@ -202,7 +202,7 @@ const AdminBanners = () => {
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Banners</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">
-            {banners.length} banners cadastrados • Apenas 1 pode ser destaque
+            {banners.length} banners cadastrados • Arraste pelo ícone <GripVertical className="inline w-3 h-3 align-text-top" /> para reordenar
           </p>
         </div>
         <Button
