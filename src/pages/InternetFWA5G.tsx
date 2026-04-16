@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Signal, Wifi, Zap, ChevronDown, Check, ArrowRight,
   Star, Sparkles, Globe, Monitor, Smartphone, MessageCircle,
-  Home, Router, MapPin
+  Home, Router, MapPin, Clock, Shield, Activity, Gauge,
+  Cable, WifiOff, PlugZap
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -12,128 +13,369 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 /* ══════════════════════════════════════════════════════════════
-   FWA 5G — Unique Elements:
-   1. SignalWaves — concentric 5G wave propagation animation
-   2. SignalTower3D — animated cell tower with radiating signals
-   3. CoverageRadar — rotating radar sweep showing coverage
-   4. WirelessBenchmark — animated latency/speed comparison
-   5. InstallationTimeline — step-by-step install process
+   FWA 5G — Highly Personalized Unique Elements:
+   1. SignalPropagation — animated 5G wave propagation from tower
+   2. SignalTowerViz — animated tower with orbiting devices
+   3. LiveLatencyMonitor — real-time latency visualization
+   4. CoverageRadar — rotating radar with city dots
+   5. InstallationTimeline — step-by-step install visual
+   6. WirelessBenchmark — FWA vs Radio comparison bars
+   7. BeforeAfter — cable mess vs clean wireless
+   8. TechSpecsPanel — animated tech specifications
+   9. DeviceConnectionMap — animated device mesh network
    ══════════════════════════════════════════════════════════════ */
 
-/* ── 5G Signal Waves (UNIQUE to FWA) ── */
-const SignalWaves = () => (
+/* ── 5G Signal Propagation (hero background) ── */
+const SignalPropagation = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {[1, 2, 3, 4, 5].map((i) => (
+    {/* Expanding rings from center-right */}
+    {[1, 2, 3, 4, 5, 6].map((i) => (
       <motion.div
         key={i}
-        className="absolute rounded-full border border-primary/10"
+        className="absolute rounded-full"
         style={{
-          width: `${i * 200}px`, height: `${i * 200}px`,
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
+          width: `${i * 180}px`, height: `${i * 180}px`,
+          top: "40%", right: "-5%",
+          transform: "translate(50%, -50%)",
+          border: `1px solid hsl(24 95% 50% / ${0.15 - i * 0.02})`,
         }}
-        animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.05, 0.15, 0.05] }}
-        transition={{ duration: 4, repeat: Infinity, delay: i * 0.6, ease: "easeInOut" }}
+        animate={{
+          scale: [0.6, 1.4],
+          opacity: [0.3, 0],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          delay: i * 0.5,
+          ease: "easeOut",
+        }}
+      />
+    ))}
+    {/* Floating data packets */}
+    {Array.from({ length: 8 }).map((_, i) => (
+      <motion.div
+        key={`packet-${i}`}
+        className="absolute w-1 h-1 bg-primary rounded-full"
+        style={{ left: `${50 + Math.random() * 50}%`, top: `${20 + Math.random() * 60}%` }}
+        animate={{
+          x: [0, -200 - Math.random() * 300],
+          opacity: [0, 1, 0],
+          scale: [0.5, 1.5, 0.5],
+        }}
+        transition={{
+          duration: 2 + Math.random() * 2,
+          repeat: Infinity,
+          delay: Math.random() * 3,
+          ease: "easeOut",
+        }}
       />
     ))}
   </div>
 );
 
-/* ── Signal Tower Visualization (UNIQUE to FWA) ── */
+/* ── Signal Tower Hero Visualization ── */
 const SignalTowerViz = () => (
-  <div className="relative w-64 sm:w-80 h-64 sm:h-80 flex items-center justify-center">
-    {/* Tower base */}
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-1 h-32 bg-gradient-to-t from-white/20 to-transparent" />
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-6 h-1 bg-white/20 rounded-full" />
-
-    {/* Signal rings from tower */}
-    {[0, 1, 2, 3].map((i) => (
+  <div className="relative w-72 sm:w-96 h-72 sm:h-96 flex items-center justify-center">
+    {/* Concentric pulse rings */}
+    {[0, 1, 2, 3, 4].map((i) => (
       <motion.div
-        key={i}
-        className="absolute border border-primary/20 rounded-full"
-        style={{ width: `${60 + i * 50}px`, height: `${60 + i * 50}px` }}
+        key={`ring-${i}`}
+        className="absolute rounded-full border"
+        style={{
+          width: `${50 + i * 40}px`, height: `${50 + i * 40}px`,
+          borderColor: `hsl(24 95% 50% / ${0.25 - i * 0.04})`,
+        }}
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.3, 0.05, 0.3],
-          borderColor: ["hsl(24 95% 50% / 0.3)", "hsl(24 95% 50% / 0.05)", "hsl(24 95% 50% / 0.3)"],
         }}
-        transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.5 }}
+        transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.4 }}
       />
     ))}
 
-    {/* Tower antenna */}
+    {/* Central tower icon with glow */}
     <motion.div
-      className="relative z-10 w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/20 flex items-center justify-center"
-      animate={{ boxShadow: ["0 0 20px hsl(24 95% 50% / 0)", "0 0 40px hsl(24 95% 50% / 0.3)", "0 0 20px hsl(24 95% 50% / 0)"] }}
-      transition={{ duration: 2, repeat: Infinity }}
+      className="relative z-10 w-24 h-24 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 border border-primary/30 flex items-center justify-center"
+      animate={{
+        boxShadow: [
+          "0 0 20px hsl(24 95% 50% / 0), 0 0 60px hsl(24 95% 50% / 0)",
+          "0 0 30px hsl(24 95% 50% / 0.3), 0 0 80px hsl(24 95% 50% / 0.1)",
+          "0 0 20px hsl(24 95% 50% / 0), 0 0 60px hsl(24 95% 50% / 0)",
+        ],
+      }}
+      transition={{ duration: 2.5, repeat: Infinity }}
     >
-      <Signal className="w-10 h-10 text-primary" />
+      <Signal className="w-12 h-12 text-primary" />
     </motion.div>
 
-    {/* Device indicators */}
+    {/* Orbiting devices */}
     {[
-      { angle: -30, icon: Smartphone, label: "Celular" },
-      { angle: 30, icon: Monitor, label: "Smart TV" },
-      { angle: 90, icon: Home, label: "Casa" },
+      { icon: Smartphone, label: "Celular", angle: -40, dist: 130, color: "hsl(220 80% 60%)" },
+      { icon: Monitor, label: "Smart TV", angle: 30, dist: 140, color: "hsl(150 70% 50%)" },
+      { icon: Home, label: "Casa", angle: 100, dist: 125, color: "hsl(24 95% 50%)" },
+      { icon: Router, label: "Notebook", angle: 170, dist: 135, color: "hsl(280 60% 60%)" },
+      { icon: Globe, label: "IoT", angle: 240, dist: 120, color: "hsl(40 90% 50%)" },
     ].map((d, i) => {
-      const rad = (d.angle - 90) * (Math.PI / 180);
-      const x = Math.cos(rad) * 120;
-      const y = Math.sin(rad) * 120;
+      const rad = ((d.angle - 90) * Math.PI) / 180;
+      const x = Math.cos(rad) * d.dist;
+      const y = Math.sin(rad) * d.dist;
       return (
         <motion.div
           key={d.label}
-          className="absolute flex flex-col items-center gap-1"
-          style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`, transform: "translate(-50%, -50%)" }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity, delay: i * 0.8 }}
+          className="absolute flex flex-col items-center gap-1 z-10"
+          style={{
+            left: `calc(50% + ${x}px)`,
+            top: `calc(50% + ${y}px)`,
+            transform: "translate(-50%, -50%)",
+          }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8 + i * 0.15, type: "spring" }}
         >
-          <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-            <d.icon className="w-4 h-4 text-primary/70" />
-          </div>
-          <span className="text-[8px] text-white/30">{d.label}</span>
+          {/* Animated connection line (SVG) */}
+          <motion.div
+            className="w-10 h-10 rounded-xl border flex items-center justify-center backdrop-blur-sm"
+            style={{ backgroundColor: `${d.color}15`, borderColor: `${d.color}30` }}
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 3, repeat: Infinity, delay: i * 0.6 }}
+            whileHover={{ scale: 1.2, borderColor: d.color }}
+          >
+            <d.icon className="w-4 h-4" style={{ color: d.color }} />
+          </motion.div>
+          <span className="text-[8px] text-white/40 font-bold">{d.label}</span>
         </motion.div>
       );
     })}
 
-    {/* Connection lines */}
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 320">
+    {/* Animated connection rays from center to devices */}
+    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 384 384">
       {[
-        { x: 100, y: 90 },
-        { x: 220, y: 90 },
-        { x: 260, y: 160 },
-      ].map((p, i) => (
-        <motion.line
-          key={i} x1="160" y1="160" x2={p.x} y2={p.y}
-          stroke="hsl(24 95% 50%)" strokeWidth="0.5" strokeDasharray="4 4"
-          animate={{ opacity: [0.1, 0.4, 0.1] }}
-          transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
-        />
-      ))}
+        { angle: -40, dist: 130 },
+        { angle: 30, dist: 140 },
+        { angle: 100, dist: 125 },
+        { angle: 170, dist: 135 },
+        { angle: 240, dist: 120 },
+      ].map((d, i) => {
+        const rad = ((d.angle - 90) * Math.PI) / 180;
+        const ex = 192 + Math.cos(rad) * d.dist;
+        const ey = 192 + Math.sin(rad) * d.dist;
+        return (
+          <motion.line
+            key={i} x1="192" y1="192" x2={ex} y2={ey}
+            stroke="hsl(24 95% 50%)" strokeWidth="0.8" strokeDasharray="4 6"
+            animate={{ opacity: [0.1, 0.4, 0.1], strokeDashoffset: [0, -20] }}
+            transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+          />
+        );
+      })}
     </svg>
   </div>
 );
 
-/* ── Coverage Radar (UNIQUE to FWA) ── */
+/* ── Live Latency Monitor (UNIQUE) ── */
+const LiveLatencyMonitor = () => {
+  const [values, setValues] = useState<number[]>(Array(20).fill(8));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setValues((prev) => {
+        const next = [...prev.slice(1), 5 + Math.random() * 8];
+        return next;
+      });
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const max = 20;
+  const points = values.map((v, i) => `${(i / (values.length - 1)) * 100},${100 - (v / max) * 100}`).join(" ");
+
+  return (
+    <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 overflow-hidden">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-primary" />
+          <span className="text-xs font-bold text-white/80">Latência em Tempo Real</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <motion.div
+            className="w-2 h-2 rounded-full bg-green-400"
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 1, repeat: Infinity }}
+          />
+          <span className="text-[10px] text-green-400 font-bold">{values[values.length - 1].toFixed(0)}ms</span>
+        </div>
+      </div>
+      <svg viewBox="0 0 100 100" className="w-full h-20" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="latencyFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="hsl(24 95% 50%)" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="hsl(24 95% 50%)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {/* Grid lines */}
+        {[25, 50, 75].map((y) => (
+          <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="white" strokeOpacity="0.05" strokeWidth="0.3" />
+        ))}
+        <polygon
+          points={`0,100 ${points} 100,100`}
+          fill="url(#latencyFill)"
+        />
+        <polyline
+          points={points}
+          fill="none" stroke="hsl(24 95% 50%)" strokeWidth="1.5" strokeLinejoin="round"
+        />
+        {/* Current dot */}
+        <circle cx="100" cy={100 - (values[values.length - 1] / max) * 100} r="2" fill="hsl(24 95% 50%)">
+          <animate attributeName="r" values="2;3;2" dur="1s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+      <div className="flex justify-between mt-2 text-[9px] text-white/30">
+        <span>10s atrás</span>
+        <span>agora</span>
+      </div>
+    </div>
+  );
+};
+
+/* ── Before/After - Cables vs Wireless (UNIQUE) ── */
+const BeforeAfter = () => {
+  const [showAfter, setShowAfter] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => setShowAfter((p) => !p), 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="max-w-md mx-auto">
+      <div className="flex gap-2 mb-4 justify-center">
+        <button
+          onClick={() => setShowAfter(false)}
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            !showAfter ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-white/5 text-white/30"
+          }`}
+        >
+          <WifiOff className="w-3 h-3 inline mr-1" /> Internet Comum
+        </button>
+        <button
+          onClick={() => setShowAfter(true)}
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            showAfter ? "bg-primary/20 text-primary border border-primary/30" : "bg-white/5 text-white/30"
+          }`}
+        >
+          <Signal className="w-3 h-3 inline mr-1" /> FWA 5G
+        </button>
+      </div>
+      <AnimatePresence mode="wait">
+        {!showAfter ? (
+          <motion.div
+            key="before"
+            className="bg-red-500/5 border border-red-500/10 rounded-2xl p-6"
+            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+          >
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              {[
+                { label: "Velocidade", value: "50 Mbps", bad: true },
+                { label: "Latência", value: "45ms", bad: true },
+                { label: "Instalação", value: "3-7 dias", bad: true },
+                { label: "Estabilidade", value: "Instável", bad: true },
+              ].map((m) => (
+                <div key={m.label} className="text-center">
+                  <p className="text-[10px] text-white/30 mb-0.5">{m.label}</p>
+                  <p className="text-sm font-bold text-red-400">{m.value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 bg-red-500/10 rounded-xl px-3 py-2">
+              <Cable className="w-5 h-5 text-red-400 shrink-0" />
+              <div>
+                <p className="text-xs font-bold text-red-400">Cabos por toda casa</p>
+                <p className="text-[10px] text-white/30">Instalação complexa, furos na parede</p>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="after"
+            className="bg-primary/5 border border-primary/10 rounded-2xl p-6"
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+          >
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              {[
+                { label: "Velocidade", value: "500 Mbps" },
+                { label: "Latência", value: "8ms" },
+                { label: "Instalação", value: "3 minutos" },
+                { label: "Estabilidade", value: "99.9%" },
+              ].map((m) => (
+                <div key={m.label} className="text-center">
+                  <p className="text-[10px] text-white/30 mb-0.5">{m.label}</p>
+                  <p className="text-sm font-bold text-primary">{m.value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 bg-primary/10 rounded-xl px-3 py-2">
+              <PlugZap className="w-5 h-5 text-primary shrink-0" />
+              <div>
+                <p className="text-xs font-bold text-primary">Só precisa de uma tomada</p>
+                <p className="text-[10px] text-white/30">Plug & Play, sem cabos, sem furos</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+/* ── Tech Specs Panel (UNIQUE) ── */
+const TechSpecsPanel = () => {
+  const specs = [
+    { label: "Tecnologia", value: "5G NR (New Radio)", icon: Signal },
+    { label: "Frequência", value: "3.5 GHz / mmWave", icon: Activity },
+    { label: "Wi-Fi", value: "Wi-Fi 6 (802.11ax)", icon: Wifi },
+    { label: "Latência", value: "< 10ms", icon: Gauge },
+    { label: "Segurança", value: "WPA3 Enterprise", icon: Shield },
+    { label: "Cobertura", value: "Até 150m²", icon: Home },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl mx-auto">
+      {specs.map((spec, i) => (
+        <motion.div
+          key={spec.label}
+          className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center group hover:border-primary/20 transition-all"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.08 }}
+          whileHover={{ y: -2 }}
+        >
+          <spec.icon className="w-4 h-4 text-primary/50 mx-auto mb-2 group-hover:text-primary transition-colors" />
+          <p className="text-[10px] text-white/30 mb-0.5">{spec.label}</p>
+          <p className="text-xs font-bold text-white/70">{spec.value}</p>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+/* ── Coverage Radar (UNIQUE) ── */
 const CoverageRadar = () => (
-  <div className="relative w-48 h-48 mx-auto">
+  <div className="relative w-56 h-56 mx-auto">
     <svg viewBox="0 0 200 200" className="w-full h-full">
-      {/* Circles */}
       {[30, 60, 90].map((r) => (
         <circle key={r} cx="100" cy="100" r={r} fill="none" stroke="hsl(24 95% 50% / 0.1)" strokeWidth="0.5" />
       ))}
-      {/* Cross lines */}
       <line x1="100" y1="10" x2="100" y2="190" stroke="hsl(24 95% 50% / 0.05)" strokeWidth="0.5" />
       <line x1="10" y1="100" x2="190" y2="100" stroke="hsl(24 95% 50% / 0.05)" strokeWidth="0.5" />
-      {/* Sweep */}
       <motion.g animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "100px 100px" }}>
         <line x1="100" y1="100" x2="100" y2="10" stroke="hsl(24 95% 50% / 0.6)" strokeWidth="1" />
         <path d="M 100 100 L 100 10 A 90 90 0 0 1 163 37 Z" fill="hsl(24 95% 50% / 0.08)" />
       </motion.g>
-      {/* Dots (coverage points) */}
       {[
         { x: 120, y: 60 }, { x: 70, y: 80 }, { x: 140, y: 120 },
         { x: 80, y: 130 }, { x: 110, y: 90 }, { x: 60, y: 60 },
-        { x: 150, y: 80 }, { x: 90, y: 150 },
+        { x: 150, y: 80 }, { x: 90, y: 150 }, { x: 130, y: 70 },
       ].map((p, i) => (
         <motion.circle
           key={i} cx={p.x} cy={p.y} r="2.5"
@@ -149,7 +391,7 @@ const CoverageRadar = () => (
   </div>
 );
 
-/* ── Installation Timeline (UNIQUE to FWA) ── */
+/* ── Installation Timeline (UNIQUE) ── */
 const InstallationTimeline = () => {
   const steps = [
     { icon: "📦", title: "Receba o Roteador", desc: "Entregamos o equipamento 5G na sua porta", time: "Dia 1" },
@@ -160,7 +402,6 @@ const InstallationTimeline = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="relative">
-        {/* Vertical line */}
         <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-primary/20 to-transparent" />
         <div className="space-y-6">
           {steps.map((s, i) => (
@@ -190,7 +431,7 @@ const InstallationTimeline = () => {
   );
 };
 
-/* ── Wireless Benchmark (UNIQUE to FWA) ── */
+/* ── Wireless Benchmark (UNIQUE) ── */
 const WirelessBenchmark = () => {
   const metrics = [
     { label: "Download", fwa: "500 Mbps", other: "50 Mbps", fwaPercent: 100, otherPercent: 10 },
@@ -211,26 +452,26 @@ const WirelessBenchmark = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-bold text-primary w-16">FWA 5G</span>
-              <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+              <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-primary to-orange-400"
                   initial={{ width: 0 }}
                   whileInView={{ width: `${m.label === "Latência" ? 100 - m.fwaPercent : m.fwaPercent}%` }}
                   viewport={{ once: true }}
-                  transition={{ duration: 1, delay: i * 0.1 }}
+                  transition={{ duration: 1.2, delay: i * 0.1, ease: "easeOut" }}
                 />
               </div>
               <span className="text-[10px] font-bold text-white/70 w-16 text-right">{m.fwa}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-bold text-white/30 w-16">Rádio</span>
-              <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+              <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full bg-white/10"
                   initial={{ width: 0 }}
                   whileInView={{ width: `${m.label === "Latência" ? 100 - m.otherPercent : m.otherPercent}%` }}
                   viewport={{ once: true }}
-                  transition={{ duration: 1, delay: i * 0.1 }}
+                  transition={{ duration: 1.2, delay: i * 0.1, ease: "easeOut" }}
                 />
               </div>
               <span className="text-[10px] font-bold text-white/30 w-16 text-right">{m.other}</span>
@@ -331,6 +572,8 @@ const faqs = [
   { q: "Precisa de instalação com cabos?", a: "Não! A maior vantagem do FWA 5G é que não precisa de cabos. Basta ligar o roteador na tomada e ele já se conecta à rede 5G automaticamente." },
   { q: "Posso levar o roteador para outro cômodo?", a: "Sim! Como não há cabos, você pode posicionar o roteador onde preferir para melhor sinal. Basta ter uma tomada." },
   { q: "A velocidade é a mesma da fibra óptica?", a: "O FWA 5G oferece velocidades excelentes com baixa latência. A experiência é muito similar à fibra óptica para uso residencial." },
+  { q: "O sinal é afetado por chuva?", a: "A tecnologia 5G NR opera em frequências otimizadas. Em condições extremas pode haver leve variação, mas o sistema se adapta automaticamente para manter a estabilidade." },
+  { q: "Quantos dispositivos posso conectar?", a: "O roteador Wi-Fi 6 suporta até 64 dispositivos simultâneos com tecnologia MU-MIMO, sem perda de performance." },
 ];
 
 const InternetFWA5G = () => {
@@ -340,10 +583,10 @@ const InternetFWA5G = () => {
     <div className="min-h-screen bg-[hsl(220,20%,6%)] text-white overflow-x-hidden">
       <Navbar />
 
-      {/* HERO with Signal Waves */}
+      {/* ══ HERO ══ */}
       <section className="relative pt-[128px] sm:pt-[132px] md:pt-[176px] lg:pt-[184px] pb-16 sm:pb-24 overflow-hidden">
         <GlowingOrbs />
-        <SignalWaves />
+        <SignalPropagation />
         <ParticleField />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
@@ -385,19 +628,19 @@ const InternetFWA5G = () => {
                 </Button>
               </div>
               <div className="flex flex-wrap gap-6 text-xs sm:text-sm text-white/50">
-                {[{ icon: Check, label: "Sem Cabos" }, { icon: Check, label: "Wi-Fi 6" }, { icon: Check, label: "Instalação Rápida" }].map((item) => (
+                {[{ icon: Check, label: "Sem Cabos" }, { icon: Check, label: "Wi-Fi 6" }, { icon: Check, label: "< 10ms Latência" }].map((item) => (
                   <span key={item.label} className="flex items-center gap-1.5"><item.icon className="w-4 h-4 text-primary" /> {item.label}</span>
                 ))}
               </div>
             </motion.div>
 
-            {/* Hero Visual: Signal Tower */}
+            {/* Hero: Signal Tower with Devices */}
             <motion.div className="flex justify-center lg:justify-end" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3 }}>
               <div className="relative">
-                <div className="absolute inset-0 bg-primary/15 blur-[100px] rounded-full" />
+                <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full" />
                 <SignalTowerViz />
                 <motion.div
-                  className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-gradient-to-br from-primary to-orange-600 text-primary-foreground text-lg sm:text-xl font-black px-4 py-2 rounded-2xl shadow-glow-lg"
+                  className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-gradient-to-br from-primary to-orange-600 text-primary-foreground text-lg sm:text-xl font-black px-4 py-2 rounded-2xl shadow-glow-lg z-20"
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >5G</motion.div>
@@ -407,16 +650,16 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* ══ FEATURES ══ */}
       <section className="py-12 sm:py-16 border-y border-white/5 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: Signal, title: "Ultra Velocidade", desc: "Grandes velocidades com ampla cobertura 5G.", color: "from-primary/20 to-yellow-500/10" },
-              { icon: Zap, title: "Sem Cabos", desc: "Instalação sem quebradeira, sem furos na parede.", color: "from-blue-500/20 to-primary/10" },
-              { icon: Monitor, title: "Multi-conexões", desc: "Rede segura e estável para todos dispositivos.", color: "from-green-500/20 to-primary/10" },
-              { icon: Wifi, title: "Wi-Fi 6", desc: "Tecnologia de última geração para máximo desempenho.", color: "from-purple-500/20 to-primary/10" },
+              { icon: Signal, title: "Ultra Velocidade", desc: "Até 500 Mbps via sinal 5G direto na sua casa.", color: "from-primary/20 to-yellow-500/10" },
+              { icon: Zap, title: "Zero Cabos", desc: "Instalação sem quebradeira, sem furos, sem espera.", color: "from-blue-500/20 to-primary/10" },
+              { icon: Shield, title: "WPA3 Seguro", desc: "Criptografia de última geração para sua rede.", color: "from-green-500/20 to-primary/10" },
+              { icon: Wifi, title: "Wi-Fi 6", desc: "64 dispositivos simultâneos com MU-MIMO.", color: "from-purple-500/20 to-primary/10" },
             ].map((f) => (
               <motion.div key={f.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
@@ -436,13 +679,51 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
-      {/* INSTALLATION TIMELINE (UNIQUE) */}
+      {/* ══ BEFORE / AFTER (UNIQUE) ══ */}
       <section className="py-16 sm:py-24 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-10 sm:mb-14">
             <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
-              <Zap className="w-4 h-4" /> Instalação Instantânea
+              <Zap className="w-4 h-4" /> Comparação
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">
+              Antes e <span className="text-primary">depois</span> do 5G
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">
+              Veja a diferença real entre internet comum e FWA 5G
+            </p>
+          </div>
+          <BeforeAfter />
+        </div>
+      </section>
+
+      {/* ══ TECH SPECS (UNIQUE) ══ */}
+      <section className="py-16 sm:py-24 border-y border-white/5 relative">
+        <CyberGrid />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-10 sm:mb-14">
+            <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+              <Gauge className="w-4 h-4" /> Especificações Técnicas
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl font-bold mb-4">
+              Tecnologia de <span className="text-primary">ponta</span>
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">
+              Equipamento 5G NR com Wi-Fi 6 e segurança WPA3
+            </p>
+          </div>
+          <TechSpecsPanel />
+        </div>
+      </section>
+
+      {/* ══ INSTALLATION TIMELINE (UNIQUE) ══ */}
+      <section className="py-16 sm:py-24 relative">
+        <GlowingOrbs />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-10 sm:mb-14">
+            <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+              <Clock className="w-4 h-4" /> Instalação Instantânea
             </span>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">
               Pronto em <span className="text-primary">3 minutos</span>
@@ -455,36 +736,51 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
-      {/* COVERAGE RADAR (UNIQUE) */}
+      {/* ══ LATENCY MONITOR + COVERAGE (UNIQUE) ══ */}
       <section className="py-16 sm:py-24 border-y border-white/5 relative">
-        <CyberGrid />
+        <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-10 items-start">
+            {/* Latency Monitor */}
+            <div>
+              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+                <Activity className="w-4 h-4" /> Monitoramento
+              </span>
+              <h3 className="font-display text-xl sm:text-2xl font-bold mb-4">
+                Latência <span className="text-primary">ultra-baixa</span>
+              </h3>
+              <p className="text-white/50 text-sm leading-relaxed mb-6">
+                Monitore a performance em tempo real. Ideal para games, video calls e streaming 4K.
+              </p>
+              <LiveLatencyMonitor />
+            </div>
+
+            {/* Coverage Radar */}
             <div>
               <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
                 <MapPin className="w-4 h-4" /> Cobertura 5G
               </span>
-              <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
-                Sinal 5G <span className="text-primary">expandindo</span> na região Norte
-              </h2>
+              <h3 className="font-display text-xl sm:text-2xl font-bold mb-4">
+                Sinal <span className="text-primary">expandindo</span>
+              </h3>
               <p className="text-white/50 text-sm leading-relaxed mb-6">
-                Nossa rede 5G está em constante expansão. Verifique a disponibilidade na sua cidade e garanta internet sem fio de última geração.
+                Nossa rede 5G cresce a cada dia na região Norte.
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <CoverageRadar />
+              <div className="grid grid-cols-2 gap-2 mt-6">
                 {["Manaus - AM", "Santarém - PA", "Nhamundá - AM", "Redenção - PA"].map((city) => (
                   <div key={city} className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2">
-                    <div className="w-2 h-2 rounded-full bg-green-400" />
+                    <motion.div className="w-2 h-2 rounded-full bg-green-400" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }} />
                     <span className="text-xs text-white/60">{city}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <CoverageRadar />
           </div>
         </div>
       </section>
 
-      {/* BENCHMARK (UNIQUE) */}
+      {/* ══ BENCHMARK (UNIQUE) ══ */}
       <section className="py-16 sm:py-24 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
@@ -496,14 +792,14 @@ const InternetFWA5G = () => {
               FWA 5G <span className="text-primary">vs</span> Internet por Rádio
             </h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">
-              Veja a diferença real entre FWA 5G e internet comum por rádio
+              Números reais que mostram a superioridade do 5G
             </p>
           </div>
           <WirelessBenchmark />
         </div>
       </section>
 
-      {/* ELEVATE */}
+      {/* ══ USE CASES ══ */}
       <section className="py-16 sm:py-24 border-y border-white/5 relative">
         <DataStreams />
         <div className="container mx-auto px-4 relative z-10">
@@ -513,10 +809,10 @@ const InternetFWA5G = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
             {[
-              { icon: Home, title: "Home Office", desc: "Conexão constante e segura para trabalho remoto", color: "from-blue-500/20 to-primary/10" },
-              { icon: Monitor, title: "Streaming", desc: "Filmes e séries em alta resolução sem buffering", color: "from-purple-500/20 to-primary/10" },
-              { icon: Smartphone, title: "Dispositivos", desc: "Conecte TVs, smartphones, notebooks e mais", color: "from-green-500/20 to-primary/10" },
-              { icon: Router, title: "Portabilidade", desc: "Leve o roteador onde quiser, sem cabos", color: "from-primary/20 to-yellow-500/10" },
+              { icon: Home, title: "Home Office", desc: "Videoconferências HD sem travamento", color: "from-blue-500/20 to-primary/10" },
+              { icon: Monitor, title: "Streaming 4K", desc: "Netflix, Disney+ e YouTube sem buffering", color: "from-purple-500/20 to-primary/10" },
+              { icon: Smartphone, title: "Gaming Online", desc: "Latência < 10ms para jogos competitivos", color: "from-green-500/20 to-primary/10" },
+              { icon: Router, title: "Smart Home", desc: "Câmeras, Alexa, IoT sem instabilidade", color: "from-primary/20 to-yellow-500/10" },
             ].map((uc) => (
               <motion.div key={uc.title}
                 className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
@@ -536,7 +832,7 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
-      {/* PLANS */}
+      {/* ══ PLANS ══ */}
       <section id="planos" className="py-16 sm:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent" />
         <CyberGrid />
@@ -602,7 +898,7 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ══ FAQ ══ */}
       <section className="py-16 sm:py-24 border-t border-white/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-14">
@@ -615,7 +911,7 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ══ CTA ══ */}
       <section className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
