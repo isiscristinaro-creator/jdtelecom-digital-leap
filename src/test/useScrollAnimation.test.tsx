@@ -143,7 +143,7 @@ describe("useScrollAnimation", () => {
     expect(result.current.isVisible).toBe(false);
 
     act(() => {
-      vi.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(800);
     });
 
     expect(result.current.isVisible).toBe(true);
