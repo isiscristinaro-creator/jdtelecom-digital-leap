@@ -75,7 +75,7 @@ const HeroSection = () => {
                 <img
                   src={src}
                   alt={`JD Telecom Banner ${i + 1}`}
-                  className="w-full h-auto block"
+                  className="w-full h-auto block 2xl:h-[min(60vh,720px)] 2xl:object-cover 2xl:object-center"
                   loading={i === 0 ? "eager" : "lazy"}
                   draggable={false}
                 />
