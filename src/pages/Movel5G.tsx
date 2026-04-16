@@ -8,7 +8,7 @@ import {
   ChevronLeft, ChevronRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import heroImg from "@/assets/movel-5g-hero-tech.png";
+import heroImg from "@/assets/movel-5g-hero-tech.webp";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
