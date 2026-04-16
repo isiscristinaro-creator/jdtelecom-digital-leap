@@ -162,7 +162,7 @@ const BannersSection = () => {
               <div className="relative h-full min-h-[320px] md:min-h-[480px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 shadow-elevated">
                 <img
                   src={featured.imagem_url}
-                  alt={cleanTitulo(featured.titulo)}
+                  alt={featuredMeta.titulo}
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                 />
@@ -176,15 +176,15 @@ const BannersSection = () => {
                     Destaque
                   </div>
                   <h3 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-[hsl(var(--dark-section-fg))] mb-4 leading-tight">
-                    {cleanTitulo(featured.titulo)}
+                    {featuredMeta.titulo}
                   </h3>
                   <Button
                     asChild
                     className="w-fit bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-2xl px-6 py-6 shadow-glow group/btn"
                   >
                     <a
-                      href="#planos"
-                      aria-label={`Ver oferta: ${cleanTitulo(featured.titulo)}`}
+                      href={safeBannerHref(featuredMeta.link)}
+                      aria-label={`Ver oferta: ${featuredMeta.titulo}`}
                       className="inline-flex items-center gap-2"
                     >
                       Aproveitar agora
@@ -196,36 +196,42 @@ const BannersSection = () => {
             </motion.div>
 
             {/* Cards menores */}
-            {rest.slice(0, 4).map((banner, i) => (
-              <motion.div
-                key={banner.id}
-                initial={{ opacity: 0, y: 40 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
-                whileHover={{ y: -6 }}
-                className="group relative"
-              >
-                <div className="relative h-full min-h-[200px] md:min-h-[230px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
-                  <img
-                    src={banner.imagem_url}
-                    alt={cleanTitulo(banner.titulo)}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/30 to-transparent" />
+            {rest.slice(0, 4).map((banner, i) => {
+              const meta = parseBannerTitulo(banner.titulo);
+              const href = safeBannerHref(meta.link);
+              return (
+                <motion.a
+                  key={banner.id}
+                  href={href}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
+                  whileHover={{ y: -6 }}
+                  className="group relative block"
+                  aria-label={`Ver oferta: ${meta.titulo}`}
+                >
+                  <div className="relative h-full min-h-[200px] md:min-h-[230px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
+                    <img
+                      src={banner.imagem_url}
+                      alt={meta.titulo}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/30 to-transparent" />
 
-                  <div className="relative h-full flex flex-col justify-end p-5 md:p-6">
-                    <h3 className="font-display text-base md:text-lg font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
-                      {cleanTitulo(banner.titulo)}
-                    </h3>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Ver detalhes
-                      <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                    </span>
+                    <div className="relative h-full flex flex-col justify-end p-5 md:p-6">
+                      <h3 className="font-display text-base md:text-lg font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
+                        {meta.titulo}
+                      </h3>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        Ver detalhes
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.a>
+              );
+            })}
           </div>
         )}
       </div>
