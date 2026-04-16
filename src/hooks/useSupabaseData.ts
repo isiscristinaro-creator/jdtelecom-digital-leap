@@ -473,7 +473,35 @@ export function useBanners() {
     toast.success("Banner removido!"); await fetchData(); return true;
   };
 
-  return { banners, loading, refetch: fetchData, create, update, remove };
+  /**
+   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente
+   * (1s de diferença), já que a tabela não tem coluna `ordem` dedicada.
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   */
+  const reorder = async (orderedIds: string[]) => {
+    if (orderedIds.length === 0) return true;
+    // Atualiza estado local imediatamente (otimista)
+    setBanners((prev) => {
+      const map = new Map(prev.map((b) => [b.id, b]));
+      return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbBanner[];
+    });
+    const baseMs = Date.now();
+    // Primeiro item recebe timestamp mais novo, espaçados em 1s
+    const updates = orderedIds.map((id, idx) => {
+      const created_at = new Date(baseMs - idx * 1000).toISOString();
+      return supabase.from("banners").update({ created_at }).eq("id", id);
+    });
+    const results = await Promise.all(updates);
+    const firstError = results.find((r) => r.error)?.error;
+    if (firstError) {
+      toast.error("Erro ao reordenar: " + firstError.message);
+      await fetchData();
+      return false;
+    }
+    return true;
+  };
+
+  return { banners, loading, refetch: fetchData, create, update, remove, reorder };
 }
 
 // ==================== TESTEMUNHOS ====================
