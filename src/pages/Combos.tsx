@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import equipmentComboBundle from "@/assets/equipment-combo-bundle.png";
+import ProductTestimonials from "@/components/ProductTestimonials";
 
 /* ══════════════════════════════════════════════════════════════
    COMBOS — Unique Elements:
@@ -731,6 +732,8 @@ const Combos = () => {
           </div>
         </div>
       </section>
+
+      <ProductTestimonials produto="combos" title="Quem economiza com Combos" subtitle="Depoimentos Combos" />
 
       <Footer />
       <WhatsAppButton />
