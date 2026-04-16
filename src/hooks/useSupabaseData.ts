@@ -12,6 +12,7 @@ export interface DbPlan {
   benefits: string[];
   active_clients: number;
   created_at: string;
+  ordem?: number | null;
 }
 
 export interface DbClient {
@@ -97,6 +98,7 @@ export interface DbBanner {
   imagem_url: string;
   ativo: boolean;
   created_at: string;
+  ordem?: number | null;
 }
 
 export interface DbTestemunho {
@@ -106,6 +108,7 @@ export interface DbTestemunho {
   ativo: boolean;
   produto: string;
   created_at: string;
+  ordem?: number | null;
 }
 
 // ==================== HOOKS ====================
