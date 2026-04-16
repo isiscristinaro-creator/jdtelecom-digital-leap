@@ -28,6 +28,9 @@ import AdminTestemunhos from "./pages/admin/AdminTestemunhos.tsx";
 import AdminAtendimentos from "./pages/admin/AdminAtendimentos.tsx";
 import Cadastro from "./pages/Cadastro.tsx";
 import Movel5G from "./pages/Movel5G.tsx";
+import InternetFibra from "./pages/InternetFibra.tsx";
+import InternetFWA5G from "./pages/InternetFWA5G.tsx";
+import Combos from "./pages/Combos.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -46,6 +49,9 @@ const RoutesWithCitySelector = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/movel" element={<Movel5G />} />
+        <Route path="/fibra" element={<InternetFibra />} />
+        <Route path="/fwa-5g" element={<InternetFWA5G />} />
+        <Route path="/combos" element={<Combos />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/assinante" element={<SubscriberLogin />} />
         <Route path="/assinante/dashboard" element={<SubscriberDashboard />} />
