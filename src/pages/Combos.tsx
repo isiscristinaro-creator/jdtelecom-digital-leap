@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import equipmentComboBundle from "@/assets/equipment-combo-bundle.png";
 
 /* ══════════════════════════════════════════════════════════════
    COMBOS — Unique Elements:
@@ -464,6 +465,79 @@ const Combos = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EQUIPMENT SHOWCASE */}
+      <section className="py-16 sm:py-24 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div
+              className="relative flex justify-center"
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full scale-75" />
+                <motion.img
+                  src={equipmentComboBundle}
+                  alt="Kit Combo JD Telecom - Roteador, TV Box e App"
+                  className="relative z-10 w-72 sm:w-96 h-auto drop-shadow-2xl"
+                  width={1024}
+                  height={800}
+                  loading="lazy"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-56 h-6 bg-primary/10 rounded-full blur-xl"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
+            <motion.div
+              className="space-y-6"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold">
+                <Package className="w-4 h-4" /> Tudo Incluso
+              </span>
+              <h2 className="font-display text-2xl sm:text-4xl font-bold">
+                Um combo, <span className="text-primary">todos os equipamentos</span>
+              </h2>
+              <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-md">
+                No combo JD Telecom você recebe tudo: roteador Wi-Fi 6 de alta performance, TV Box para streaming e acesso ao app exclusivo no celular.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { icon: Wifi, label: "Roteador Wi-Fi 6", desc: "Internet ultra-rápida" },
+                  { icon: Tv, label: "TV Box 4K", desc: "Streaming e canais ao vivo" },
+                  { icon: Smartphone, label: "App JD Telecom", desc: "Controle na palma da mão" },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.label}
+                    className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 text-center hover:border-primary/20 transition-all"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                      <item.icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <p className="text-xs font-bold text-white/80">{item.label}</p>
+                    <p className="text-[10px] text-white/40">{item.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
