@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Tag } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
