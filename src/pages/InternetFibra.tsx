@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import equipmentFiberRouter from "@/assets/equipment-fiber-router.png";
 
 /* ══════════════════════════════════════════════════════════════
    FIBRA ÓPTICA — Unique Elements:

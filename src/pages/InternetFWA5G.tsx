@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import equipment5gRouter from "@/assets/equipment-5g-router.png";
 
 /* ══════════════════════════════════════════════════════════════
    FWA 5G — Highly Personalized Unique Elements:
