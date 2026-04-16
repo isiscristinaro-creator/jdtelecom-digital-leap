@@ -56,23 +56,6 @@ function validarCPF(cpf: string) {
   if (rest === 10) rest = 0;
   return rest === parseInt(nums[10]);
 }
-
-function validarCNPJ(nums: string) {
-  if (nums.length !== 14 || /^(\d)\1+$/.test(nums)) return false;
-  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-  let sum = 0;
-  for (let i = 0; i < 12; i++) sum += parseInt(nums[i]) * weights1[i];
-  let rest = sum % 11;
-  const d1 = rest < 2 ? 0 : 11 - rest;
-  if (parseInt(nums[12]) !== d1) return false;
-  sum = 0;
-  for (let i = 0; i < 13; i++) sum += parseInt(nums[i]) * weights2[i];
-  rest = sum % 11;
-  const d2 = rest < 2 ? 0 : 11 - rest;
-  return parseInt(nums[13]) === d2;
-}
-
 function maskCPFCNPJ(v: string) {
   const nums = v.replace(/\D/g, "");
   if (nums.length <= 11) {
