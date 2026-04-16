@@ -104,6 +104,7 @@ export interface DbTestemunho {
   nome: string;
   mensagem: string;
   ativo: boolean;
+  produto: string;
   created_at: string;
 }
 

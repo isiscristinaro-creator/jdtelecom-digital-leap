@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import equipmentFiberRouter from "@/assets/equipment-fiber-router.png";
+import ProductTestimonials from "@/components/ProductTestimonials";
 
 /* ══════════════════════════════════════════════════════════════
    FIBRA ÓPTICA — Unique Elements:
@@ -829,6 +830,8 @@ const InternetFibra = () => {
           </div>
         </div>
       </section>
+
+      <ProductTestimonials produto="fibra" title="Clientes que amam nossa Fibra" subtitle="Depoimentos Fibra Óptica" />
 
       <Footer />
       <WhatsAppButton />

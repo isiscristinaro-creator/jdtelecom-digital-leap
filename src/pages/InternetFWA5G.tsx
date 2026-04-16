@@ -12,6 +12,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import equipment5gRouter from "@/assets/equipment-5g-router.png";
+import ProductTestimonials from "@/components/ProductTestimonials";
 
 /* ══════════════════════════════════════════════════════════════
    FWA 5G — Highly Personalized Unique Elements:
@@ -1041,6 +1042,8 @@ const InternetFWA5G = () => {
           </div>
         </div>
       </section>
+
+      <ProductTestimonials produto="fwa5g" title="Clientes conectados via 5G" subtitle="Depoimentos FWA 5G" />
 
       <Footer />
       <WhatsAppButton />
