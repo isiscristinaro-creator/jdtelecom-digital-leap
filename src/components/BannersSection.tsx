@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Tag } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -42,14 +42,19 @@ const BannersSection = () => {
     })();
   }, []);
 
-  if (!banners.length) return null;
+  // Memoiza derivações pesadas: parse de títulos só re-executa se banners mudar
+  const derived = useMemo(() => {
+    if (!banners.length) return null;
+    const useCarousel = banners.length > CAROUSEL_THRESHOLD;
+    const destaqueIdx = banners.findIndex((b) => parseBannerTitulo(b.titulo).destaque);
+    const featured = destaqueIdx >= 0 ? banners[destaqueIdx] : banners[0];
+    const featuredMeta = parseBannerTitulo(featured.titulo);
+    const rest = banners.filter((b) => b.id !== featured.id);
+    return { useCarousel, featured, featuredMeta, rest };
+  }, [banners]);
 
-  const useCarousel = banners.length > CAROUSEL_THRESHOLD;
-  // Banner com destaque vira o featured; senão usa o primeiro
-  const destaqueIdx = banners.findIndex((b) => parseBannerTitulo(b.titulo).destaque);
-  const featured = destaqueIdx >= 0 ? banners[destaqueIdx] : banners[0];
-  const featuredMeta = parseBannerTitulo(featured.titulo);
-  const rest = banners.filter((b) => b.id !== featured.id);
+  if (!derived) return null;
+  const { useCarousel, featured, featuredMeta, rest } = derived;
 
   return (
     <section

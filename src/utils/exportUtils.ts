@@ -1,5 +1,3 @@
-import XLSX from "xlsx-js-style";
-
 type ExportValue = string | number | boolean | null | undefined;
 
 export function exportToCSV(data: Record<string, ExportValue>[], filename: string) {
@@ -51,12 +49,20 @@ function detectAlignment(header: string, value: ExportValue): string {
   return "left";
 }
 
-export function exportToExcel(
+/**
+ * Exporta para Excel (.xlsx).
+ * IMPORTANTE: agora é async — `xlsx-js-style` (~334KB) é carregado dinamicamente
+ * apenas quando a função é chamada, evitando inflar o bundle inicial.
+ */
+export async function exportToExcel(
   data: Record<string, ExportValue>[],
   filename: string,
   options?: ExportExcelOptions
 ) {
   if (!data.length) return false;
+
+  // Lazy import: só baixa o xlsx-js-style quando o usuário realmente exporta
+  const { default: XLSX } = await import("xlsx-js-style");
 
   const headers = Object.keys(data[0]);
   const colCount = headers.length;
@@ -71,17 +77,13 @@ export function exportToExcel(
   const now = new Date();
   const dateStr = `Gerado em: ${now.toLocaleDateString("pt-BR")} às ${now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
 
-  // Build worksheet data
   const wsData: (string | number | boolean | null)[][] = [];
-
-  // Title rows
   wsData.push([reportTitle, ...Array(colCount - 1).fill(null)]);
   wsData.push([reportSubtitle, ...Array(colCount - 1).fill(null)]);
   wsData.push([dateStr, ...Array(colCount - 1).fill(null)]);
-  wsData.push(Array(colCount).fill(null)); // spacer
-  wsData.push(headers); // header row
+  wsData.push(Array(colCount).fill(null));
+  wsData.push(headers);
 
-  // Data rows
   data.forEach(row => {
     wsData.push(headers.map(h => {
       const v = row[h];
@@ -91,14 +93,12 @@ export function exportToExcel(
 
   const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-  // Merge title cells
   ws["!merges"] = [
     { s: { r: titleRow, c: 0 }, e: { r: titleRow, c: colCount - 1 } },
     { s: { r: subtitleRow, c: 0 }, e: { r: subtitleRow, c: colCount - 1 } },
     { s: { r: dateRow, c: 0 }, e: { r: dateRow, c: colCount - 1 } },
   ];
 
-  // Style title rows
   for (let c = 0; c < colCount; c++) {
     const titleCell = XLSX.utils.encode_cell({ r: titleRow, c });
     const subCell = XLSX.utils.encode_cell({ r: subtitleRow, c });
@@ -109,7 +109,6 @@ export function exportToExcel(
     if (ws[dateCell]) ws[dateCell].s = { font: DATE_FONT, alignment: { horizontal: "left", vertical: "center" } };
   }
 
-  // Style header row
   for (let c = 0; c < colCount; c++) {
     const ref = XLSX.utils.encode_cell({ r: headerRow, c });
     if (ws[ref]) {
@@ -122,7 +121,6 @@ export function exportToExcel(
     }
   }
 
-  // Style data rows
   for (let r = 0; r < data.length; r++) {
     const isZebra = r % 2 === 1;
     for (let c = 0; c < colCount; c++) {
@@ -138,8 +136,7 @@ export function exportToExcel(
     }
   }
 
-  // Auto column widths
-  ws["!cols"] = headers.map((header, c) => {
+  ws["!cols"] = headers.map((header) => {
     let maxW = header.length;
     data.forEach(row => {
       const len = String(row[header] ?? "").length;
@@ -148,23 +145,18 @@ export function exportToExcel(
     return { wch: Math.min(50, maxW + 4) };
   });
 
-  // Row heights
   ws["!rows"] = [];
   ws["!rows"][titleRow] = { hpt: 28 };
   ws["!rows"][subtitleRow] = { hpt: 22 };
   ws["!rows"][dateRow] = { hpt: 18 };
   ws["!rows"][headerRow] = { hpt: 24 };
 
-  // Freeze panes below header
   ws["!freeze"] = { xSplit: 0, ySplit: dataStartRow, topLeftCell: XLSX.utils.encode_cell({ r: dataStartRow, c: 0 }) };
-
-  // Auto filter on header row
   ws["!autofilter"] = { ref: `${XLSX.utils.encode_cell({ r: headerRow, c: 0 })}:${XLSX.utils.encode_cell({ r: headerRow + data.length, c: colCount - 1 })}` };
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Dados");
 
-  // Set freeze panes via sheet views
   if (!ws["!views"]) ws["!views"] = [];
   ws["!views"].push({ state: "frozen", ySplit: dataStartRow });
 
