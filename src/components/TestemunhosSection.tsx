@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Quote, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getTestimonialAvatar } from "@/data/testimonialAvatars";
 
 interface Testemunho {
   id: string;
@@ -73,9 +74,14 @@ const TestemunhosSection = () => {
               </p>
               
               <div className="flex items-center justify-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg">
-                  {testemunhos[current]?.nome.charAt(0)}
-                </div>
+                <img
+                  src={getTestimonialAvatar(testemunhos[current]?.nome || "")}
+                  alt={testemunhos[current]?.nome}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-primary/30"
+                  loading="lazy"
+                  width={48}
+                  height={48}
+                />
                 <div className="text-left">
                   <p className="font-display font-bold text-[hsl(var(--dark-section-fg))]">
                     {testemunhos[current]?.nome}
