@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, CheckCircle, Navigation, Wifi, Signal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -78,7 +78,7 @@ const secondaryRoads = [
 
 const CoverageSection = () => {
   const [activeCity, setActiveCity] = useState<string | null>(null);
-  const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
+  
   const { ref, isVisible } = useScrollAnimation();
   const [animPhase, setAnimPhase] = useState(0);
 
