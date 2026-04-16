@@ -82,6 +82,7 @@ export interface DbProduto {
   categoria: string;
   ativo: boolean;
   created_at: string;
+  ordem?: number | null;
 }
 
 export interface DbPedido {
@@ -407,7 +408,11 @@ export function useProdutos() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("produtos").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("produtos")
+      .select("*")
+      .order("ordem", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar produtos: " + error.message);
     else setProdutos(data || []);
     setLoading(false);
@@ -433,7 +438,30 @@ export function useProdutos() {
     toast.success("Produto removido!"); await fetchData(); return true;
   };
 
-  return { produtos, loading, refetch: fetchData, create, update, remove };
+  /**
+   * Persiste a nova ordem na coluna dedicada `ordem` (inteiro asc).
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo, ordem=0).
+   */
+  const reorder = async (orderedIds: string[]) => {
+    if (orderedIds.length === 0) return true;
+    setProdutos((prev) => {
+      const map = new Map(prev.map((p) => [p.id, p]));
+      return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbProduto[];
+    });
+    const updates = orderedIds.map((id, idx) =>
+      supabase.from("produtos").update({ ordem: idx } as any).eq("id", id)
+    );
+    const results = await Promise.all(updates);
+    const firstError = results.find((r) => r.error)?.error;
+    if (firstError) {
+      toast.error("Erro ao reordenar: " + firstError.message);
+      await fetchData();
+      return false;
+    }
+    return true;
+  };
+
+  return { produtos, loading, refetch: fetchData, create, update, remove, reorder };
 }
 
 // ==================== PEDIDOS ====================
