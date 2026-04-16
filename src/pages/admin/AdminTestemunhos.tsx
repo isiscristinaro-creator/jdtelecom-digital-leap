@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTestemunhos, type DbTestemunho } from "@/hooks/useSupabaseData";
 
+const FILTER_OPTIONS = [
+  { value: "todos", label: "Todos" },
+  { value: "geral", label: "Geral" },
+  { value: "fibra", label: "Fibra" },
+  { value: "fwa5g", label: "FWA 5G" },
+  { value: "combos", label: "Combos" },
+];
+
 const PRODUTO_OPTIONS = [
   { value: "geral", label: "Geral (Home)" },
   { value: "fibra", label: "Fibra Óptica" },
