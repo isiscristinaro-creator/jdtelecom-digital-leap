@@ -565,7 +565,32 @@ export function useTestemunhos() {
     toast.success("Testemunho removido!"); await fetchData(); return true;
   };
 
-  return { testemunhos, loading, refetch: fetchData, create, update, remove };
+  /**
+   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente.
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   */
+  const reorder = async (orderedIds: string[]) => {
+    if (orderedIds.length === 0) return true;
+    setTestemunhos((prev) => {
+      const map = new Map(prev.map((t) => [t.id, t]));
+      return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbTestemunho[];
+    });
+    const baseMs = Date.now();
+    const updates = orderedIds.map((id, idx) => {
+      const created_at = new Date(baseMs - idx * 1000).toISOString();
+      return supabase.from("testemunhos").update({ created_at }).eq("id", id);
+    });
+    const results = await Promise.all(updates);
+    const firstError = results.find((r) => r.error)?.error;
+    if (firstError) {
+      toast.error("Erro ao reordenar: " + firstError.message);
+      await fetchData();
+      return false;
+    }
+    return true;
+  };
+
+  return { testemunhos, loading, refetch: fetchData, create, update, remove, reorder };
 }
 
 // ==================== STORAGE UPLOAD ====================
