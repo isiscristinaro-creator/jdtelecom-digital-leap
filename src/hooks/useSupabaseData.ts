@@ -12,6 +12,7 @@ export interface DbPlan {
   benefits: string[];
   active_clients: number;
   created_at: string;
+  ordem?: number | null;
 }
 
 export interface DbClient {
@@ -97,6 +98,7 @@ export interface DbBanner {
   imagem_url: string;
   ativo: boolean;
   created_at: string;
+  ordem?: number | null;
 }
 
 export interface DbTestemunho {
@@ -106,6 +108,7 @@ export interface DbTestemunho {
   ativo: boolean;
   produto: string;
   created_at: string;
+  ordem?: number | null;
 }
 
 // ==================== HOOKS ====================
@@ -116,10 +119,11 @@ export function usePlans() {
 
   const fetch = useCallback(async () => {
     setLoading(true);
-    // Ordem manual persistida via created_at desc (reorder reescreve created_at)
+    // Ordena por coluna `ordem` (asc), com fallback para created_at desc para itens sem ordem definida
     const { data, error } = await supabase
       .from("plans")
       .select("*")
+      .order("ordem", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar planos: " + error.message);
     else setPlans(data || []);
@@ -147,9 +151,8 @@ export function usePlans() {
   };
 
   /**
-   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente
-   * (1s de diferença), já que a tabela não tem coluna `ordem` dedicada.
-   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   * Persiste a nova ordem na coluna dedicada `ordem` (inteiro asc).
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo, ordem=0).
    */
   const reorder = async (orderedIds: string[]) => {
     if (orderedIds.length === 0) return true;
@@ -157,11 +160,9 @@ export function usePlans() {
       const map = new Map(prev.map((p) => [p.id, p]));
       return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbPlan[];
     });
-    const baseMs = Date.now();
-    const updates = orderedIds.map((id, idx) => {
-      const created_at = new Date(baseMs - idx * 1000).toISOString();
-      return supabase.from("plans").update({ created_at }).eq("id", id);
-    });
+    const updates = orderedIds.map((id, idx) =>
+      supabase.from("plans").update({ ordem: idx } as any).eq("id", id)
+    );
     const results = await Promise.all(updates);
     const firstError = results.find((r) => r.error)?.error;
     if (firstError) {
@@ -474,7 +475,11 @@ export function useBanners() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("banners").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("banners")
+      .select("*")
+      .order("ordem", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar banners: " + error.message);
     else setBanners(data || []);
     setLoading(false);
@@ -501,23 +506,18 @@ export function useBanners() {
   };
 
   /**
-   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente
-   * (1s de diferença), já que a tabela não tem coluna `ordem` dedicada.
-   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   * Persiste a nova ordem na coluna dedicada `ordem` (inteiro asc).
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo, ordem=0).
    */
   const reorder = async (orderedIds: string[]) => {
     if (orderedIds.length === 0) return true;
-    // Atualiza estado local imediatamente (otimista)
     setBanners((prev) => {
       const map = new Map(prev.map((b) => [b.id, b]));
       return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbBanner[];
     });
-    const baseMs = Date.now();
-    // Primeiro item recebe timestamp mais novo, espaçados em 1s
-    const updates = orderedIds.map((id, idx) => {
-      const created_at = new Date(baseMs - idx * 1000).toISOString();
-      return supabase.from("banners").update({ created_at }).eq("id", id);
-    });
+    const updates = orderedIds.map((id, idx) =>
+      supabase.from("banners").update({ ordem: idx } as any).eq("id", id)
+    );
     const results = await Promise.all(updates);
     const firstError = results.find((r) => r.error)?.error;
     if (firstError) {
@@ -539,7 +539,11 @@ export function useTestemunhos() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("testemunhos").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("testemunhos")
+      .select("*")
+      .order("ordem", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar testemunhos: " + error.message);
     else setTestemunhos(data || []);
     setLoading(false);
@@ -566,8 +570,8 @@ export function useTestemunhos() {
   };
 
   /**
-   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente.
-   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   * Persiste a nova ordem na coluna dedicada `ordem` (inteiro asc).
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo, ordem=0).
    */
   const reorder = async (orderedIds: string[]) => {
     if (orderedIds.length === 0) return true;
@@ -575,11 +579,9 @@ export function useTestemunhos() {
       const map = new Map(prev.map((t) => [t.id, t]));
       return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbTestemunho[];
     });
-    const baseMs = Date.now();
-    const updates = orderedIds.map((id, idx) => {
-      const created_at = new Date(baseMs - idx * 1000).toISOString();
-      return supabase.from("testemunhos").update({ created_at }).eq("id", id);
-    });
+    const updates = orderedIds.map((id, idx) =>
+      supabase.from("testemunhos").update({ ordem: idx } as any).eq("id", id)
+    );
     const results = await Promise.all(updates);
     const firstError = results.find((r) => r.error)?.error;
     if (firstError) {
