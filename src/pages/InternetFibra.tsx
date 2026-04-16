@@ -1,17 +1,293 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Wifi, Shield, Zap, ChevronDown, Check, ArrowRight, Headphones,
   Star, Sparkles, Globe, Monitor, FileText, Phone,
-  MessageCircle, MapPin, CreditCard
+  MessageCircle, MapPin, CreditCard, Activity, Gauge, Network
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
-/* ── Decorative backgrounds (same quality as Movel5G) ── */
+/* ══════════════════════════════════════════════════════════════
+   FIBRA ÓPTICA — Unique Elements:
+   1. FiberOpticLines — animated light pulses traveling through fiber cables
+   2. SpeedGauge — animated speedometer with real-time needle
+   3. NetworkTopology — animated network nodes diagram
+   4. FiberVsCopper — interactive comparison section
+   5. LiveSpeedCounter — animated counter showing speed values
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Fiber Optic Light Pulses (UNIQUE to Fibra) ── */
+const FiberOpticLines = () => {
+  const paths = [
+    "M0,30 Q25,10 50,30 T100,30",
+    "M0,50 Q30,30 60,50 T100,50",
+    "M0,70 Q20,90 50,70 T100,70",
+  ];
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+      <svg viewBox="0 0 100 100" className="w-full h-full" preserveAspectRatio="none">
+        {paths.map((d, i) => (
+          <g key={i}>
+            <path d={d} fill="none" stroke="hsl(24 95% 50% / 0.15)" strokeWidth="0.3" />
+            <motion.circle r="1" fill="hsl(24 95% 50%)" filter="url(#fiberGlow)">
+              <animateMotion dur={`${3 + i * 0.8}s`} repeatCount="indefinite" path={d} />
+            </motion.circle>
+            <motion.circle r="0.6" fill="hsl(40 100% 70%)">
+              <animateMotion dur={`${3 + i * 0.8}s`} repeatCount="indefinite" path={d} begin={`${1.5 + i * 0.4}s`} />
+            </motion.circle>
+          </g>
+        ))}
+        <defs>
+          <filter id="fiberGlow">
+            <feGaussianBlur stdDeviation="0.8" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+  );
+};
+
+/* ── Speed Gauge (UNIQUE to Fibra) ── */
+const SpeedGauge = ({ speed }: { speed: number }) => {
+  const angle = useMotionValue(0);
+  const displaySpeed = useMotionValue(0);
+
+  useEffect(() => {
+    const maxAngle = (speed / 1000) * 240 - 120;
+    animate(angle, maxAngle, { duration: 2, ease: "easeOut" });
+    animate(displaySpeed, speed, { duration: 2, ease: "easeOut" });
+  }, [speed]);
+
+  const rotation = useTransform(angle, (v) => `rotate(${v}deg)`);
+
+  return (
+    <div className="relative w-48 h-48 sm:w-56 sm:h-56">
+      {/* Gauge background */}
+      <svg viewBox="0 0 200 200" className="w-full h-full">
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="hsl(24 95% 50% / 0.2)" />
+            <stop offset="100%" stopColor="hsl(24 95% 50% / 0.8)" />
+          </linearGradient>
+        </defs>
+        {/* Background arc */}
+        <path d="M 30 150 A 80 80 0 1 1 170 150" fill="none" stroke="white" strokeOpacity="0.05" strokeWidth="8" strokeLinecap="round" />
+        {/* Filled arc */}
+        <motion.path
+          d="M 30 150 A 80 80 0 1 1 170 150"
+          fill="none" stroke="url(#gaugeGrad)" strokeWidth="8" strokeLinecap="round"
+          initial={{ pathLength: 0 }} animate={{ pathLength: speed / 1000 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+        />
+        {/* Tick marks */}
+        {[0, 200, 400, 600, 800, 1000].map((v, i) => {
+          const a = ((v / 1000) * 240 - 120) * (Math.PI / 180);
+          const x1 = 100 + 72 * Math.cos(a);
+          const y1 = 100 + 72 * Math.sin(a);
+          const x2 = 100 + 80 * Math.cos(a);
+          const y2 = 100 + 80 * Math.sin(a);
+          const tx = 100 + 62 * Math.cos(a);
+          const ty = 100 + 62 * Math.sin(a);
+          return (
+            <g key={i}>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeOpacity="0.3" strokeWidth="1.5" />
+              <text x={tx} y={ty} fill="white" fillOpacity="0.4" fontSize="8" textAnchor="middle" dominantBaseline="middle">{v}</text>
+            </g>
+          );
+        })}
+      </svg>
+      {/* Needle */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 w-1 h-20 -mt-16 -ml-0.5 origin-bottom"
+        style={{ rotate: rotation }}
+      >
+        <div className="w-full h-full bg-gradient-to-t from-primary to-orange-300 rounded-full" />
+      </motion.div>
+      {/* Center dot */}
+      <div className="absolute top-1/2 left-1/2 w-4 h-4 -mt-2 -ml-2 rounded-full bg-primary shadow-glow" />
+      {/* Speed text */}
+      <div className="absolute bottom-4 left-0 right-0 text-center">
+        <SpeedCounter target={speed} />
+        <span className="text-[10px] text-white/40 block">Mbps</span>
+      </div>
+    </div>
+  );
+};
+
+const SpeedCounter = ({ target }: { target: number }) => {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let frame: number;
+    const start = performance.now();
+    const dur = 2000;
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(ease * target));
+      if (p < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+  return <span className="font-display text-2xl font-black text-white">{val === 1000 ? "1 Gbps" : `${val}`}</span>;
+};
+
+/* ── Network Topology (UNIQUE to Fibra) ── */
+const NetworkTopology = () => {
+  const nodes = [
+    { x: 50, y: 15, label: "OLT", main: true },
+    { x: 20, y: 45, label: "Splitter" },
+    { x: 80, y: 45, label: "Splitter" },
+    { x: 10, y: 75, label: "Casa" },
+    { x: 30, y: 75, label: "Casa" },
+    { x: 70, y: 75, label: "Casa" },
+    { x: 90, y: 75, label: "Casa" },
+  ];
+  const links = [
+    [0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6],
+  ];
+
+  return (
+    <div className="relative w-full max-w-md mx-auto h-48">
+      <svg viewBox="0 0 100 90" className="w-full h-full">
+        <defs>
+          <filter id="nodeGlow">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+        {links.map(([a, b], i) => (
+          <g key={i}>
+            <line
+              x1={nodes[a].x} y1={nodes[a].y} x2={nodes[b].x} y2={nodes[b].y}
+              stroke="hsl(24 95% 50% / 0.2)" strokeWidth="0.5"
+            />
+            <motion.circle r="1" fill="hsl(24 95% 50%)" filter="url(#nodeGlow)">
+              <animateMotion dur={`${1.5 + i * 0.3}s`} repeatCount="indefinite">
+                <mpath xlinkHref={`#link-${i}`} />
+              </animateMotion>
+            </motion.circle>
+            <path id={`link-${i}`} d={`M${nodes[a].x},${nodes[a].y} L${nodes[b].x},${nodes[b].y}`} fill="none" />
+          </g>
+        ))}
+        {nodes.map((n, i) => (
+          <g key={i}>
+            <motion.circle
+              cx={n.x} cy={n.y} r={n.main ? 4 : 2.5}
+              fill={n.main ? "hsl(24 95% 50%)" : "hsl(24 95% 50% / 0.5)"}
+              filter="url(#nodeGlow)"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+            />
+            <text x={n.x} y={n.y + (n.main ? -7 : 7)} fill="white" fillOpacity="0.5" fontSize="3" textAnchor="middle">{n.label}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+};
+
+/* ── Fiber vs Copper Comparison (UNIQUE to Fibra) ── */
+const FiberVsCopper = () => {
+  const [hoveredSide, setHoveredSide] = useState<"fiber" | "copper" | null>(null);
+  const comparisons = [
+    { label: "Velocidade", fiber: "Até 1 Gbps", copper: "Até 100 Mbps" },
+    { label: "Latência", fiber: "< 5ms", copper: "> 30ms" },
+    { label: "Estabilidade", fiber: "99.9%", copper: "~90%" },
+    { label: "Distância", fiber: "Sem perda", copper: "Perde sinal" },
+  ];
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="grid grid-cols-3 gap-0">
+        {/* Fiber column */}
+        <div className="text-center p-4" onMouseEnter={() => setHoveredSide("fiber")} onMouseLeave={() => setHoveredSide(null)}>
+          <motion.div
+            className="w-16 h-16 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-3"
+            animate={hoveredSide === "fiber" ? { scale: 1.1, boxShadow: "0 0 30px hsl(24 95% 50% / 0.4)" } : { scale: 1 }}
+          >
+            <Zap className="w-7 h-7 text-primary" />
+          </motion.div>
+          <h4 className="font-bold text-primary text-sm mb-1">Fibra Óptica</h4>
+          <p className="text-[10px] text-white/40">JD Telecom</p>
+        </div>
+        {/* VS */}
+        <div className="flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+            <span className="font-display text-xs font-black text-white/40">VS</span>
+          </div>
+        </div>
+        {/* Copper column */}
+        <div className="text-center p-4" onMouseEnter={() => setHoveredSide("copper")} onMouseLeave={() => setHoveredSide(null)}>
+          <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3">
+            <Wifi className="w-7 h-7 text-white/30" />
+          </div>
+          <h4 className="font-bold text-white/50 text-sm mb-1">Internet Comum</h4>
+          <p className="text-[10px] text-white/30">Cabo/Rádio</p>
+        </div>
+      </div>
+      <div className="space-y-2 mt-6">
+        {comparisons.map((c, i) => (
+          <motion.div
+            key={c.label}
+            className="grid grid-cols-3 gap-2 items-center"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+          >
+            <div className="bg-primary/10 border border-primary/20 rounded-xl px-3 py-2.5 text-center">
+              <span className="text-xs font-bold text-primary">{c.fiber}</span>
+            </div>
+            <div className="text-center">
+              <span className="text-[10px] font-semibold text-white/50">{c.label}</span>
+            </div>
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5 text-center">
+              <span className="text-xs font-bold text-white/40">{c.copper}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── Animated Speed Bars (UNIQUE to Fibra) ── */
+const SpeedBars = () => {
+  const speeds = [
+    { label: "400 Mega", value: 40, color: "from-primary/60 to-primary/30" },
+    { label: "600 Mega", value: 60, color: "from-primary/70 to-primary/40" },
+    { label: "800 Mega", value: 80, color: "from-primary/80 to-primary/50" },
+    { label: "1 Giga", value: 100, color: "from-primary to-orange-400" },
+  ];
+  return (
+    <div className="space-y-4 max-w-md">
+      {speeds.map((s, i) => (
+        <div key={s.label}>
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className="font-bold text-white/70">{s.label}</span>
+            <span className="text-primary font-bold">{s.value === 100 ? "1 Gbps" : `${s.value * 10} Mbps`}</span>
+          </div>
+          <div className="h-2.5 bg-white/5 rounded-full overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full bg-gradient-to-r ${s.color}`}
+              initial={{ width: 0 }}
+              whileInView={{ width: `${s.value}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, delay: i * 0.15, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/* ── Standard decorative backgrounds ── */
 const ParticleField = () => {
   const particles = Array.from({ length: 25 }, (_, i) => ({
     id: i, x: Math.random() * 100, y: Math.random() * 100,
@@ -69,7 +345,6 @@ const DataStreams = () => (
   </div>
 );
 
-/* ── FAQ ── */
 const FaqItem = ({ q, a }: { q: string; a: string }) => {
   const [open, setOpen] = useState(false);
   return (
@@ -78,7 +353,13 @@ const FaqItem = ({ q, a }: { q: string; a: string }) => {
         <span className="text-sm sm:text-base font-semibold text-white pr-4">{q}</span>
         <ChevronDown className={`w-5 h-5 text-primary shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{a}</p>}
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
+            <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -101,16 +382,17 @@ const faqs = [
 /* ── Main Page ── */
 const InternetFibra = () => {
   const navigate = useNavigate();
+  const [selectedSpeed, setSelectedSpeed] = useState(600);
 
   return (
     <div className="min-h-screen bg-[hsl(220,20%,6%)] text-white overflow-x-hidden">
       <Navbar />
 
-      {/* HERO */}
+      {/* HERO with Fiber Optic Lines */}
       <section className="relative pt-[128px] sm:pt-[132px] md:pt-[176px] lg:pt-[184px] pb-16 sm:pb-24 overflow-hidden">
         <GlowingOrbs />
+        <FiberOpticLines />
         <ParticleField />
-        <CyberGrid />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -157,36 +439,33 @@ const InternetFibra = () => {
               </div>
             </motion.div>
 
+            {/* Hero Visual: Speed Gauge */}
             <motion.div className="flex justify-center lg:justify-end" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3 }}>
               <div className="relative">
-                <motion.div className="absolute inset-[-20%] border border-primary/10 rounded-full" animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} />
-                <motion.div className="absolute inset-[-10%] border border-primary/5 rounded-full" animate={{ rotate: -360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} />
-                <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full" />
-                <div className="relative w-64 sm:w-80 lg:w-96 h-64 sm:h-80 lg:h-96 flex items-center justify-center">
+                <div className="absolute inset-0 bg-primary/15 blur-[100px] rounded-full" />
+                <div className="relative flex flex-col items-center gap-6">
+                  <SpeedGauge speed={selectedSpeed} />
+                  <div className="flex gap-2">
+                    {[400, 600, 800, 1000].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSpeed(s)}
+                        className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all ${
+                          selectedSpeed === s
+                            ? "bg-primary text-primary-foreground shadow-glow"
+                            : "bg-white/5 text-white/40 hover:bg-white/10"
+                        }`}
+                      >
+                        {s === 1000 ? "1G" : s}
+                      </button>
+                    ))}
+                  </div>
                   <motion.div
-                    className="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-2 border-primary/20 flex items-center justify-center"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                  >
-                    <div className="w-36 h-36 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/10">
-                      <Wifi className="w-20 h-20 sm:w-28 sm:h-28 text-primary/60" />
-                    </div>
-                  </motion.div>
-                  <motion.div
-                    className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-gradient-to-br from-primary to-orange-600 text-primary-foreground text-lg sm:text-xl font-black px-4 py-2 rounded-2xl shadow-glow-lg"
-                    animate={{ y: [0, -8, 0] }}
+                    className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-2 text-xs text-center"
+                    animate={{ y: [0, -4, 0] }}
                     transition={{ duration: 3, repeat: Infinity }}
-                  >FIBRA</motion.div>
-                  <motion.div
-                    className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-3 py-2 text-xs"
-                    animate={{ y: [0, 5, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, delay: 1.5 }}
                   >
-                    <div className="flex items-center gap-1.5">
-                      <motion.div className="w-2 h-2 rounded-full bg-green-400" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} />
-                      <span className="font-bold text-white">1Gbps</span>
-                    </div>
-                    <p className="text-white/40 text-[9px]">Velocidade máx.</p>
+                    <span className="text-primary font-bold">Clique</span> para testar velocidades
                   </motion.div>
                 </div>
               </div>
@@ -201,12 +480,15 @@ const InternetFibra = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: Wifi, title: "Ultra Velocidade", desc: "Fibra óptica com até 1 Gbps de velocidade real.", color: "from-primary/20 to-yellow-500/10" },
+              { icon: Gauge, title: "Ultra Velocidade", desc: "Fibra óptica com até 1 Gbps de velocidade simétrica.", color: "from-primary/20 to-yellow-500/10" },
               { icon: Shield, title: "Estabilidade Total", desc: "Conexão estável 24h por dia, sem quedas.", color: "from-blue-500/20 to-primary/10" },
-              { icon: Monitor, title: "Multi-dispositivos", desc: "Conecte todos os dispositivos da sua casa.", color: "from-green-500/20 to-primary/10" },
+              { icon: Network, title: "Rede Inteligente", desc: "Infraestrutura GPON de última geração.", color: "from-green-500/20 to-primary/10" },
               { icon: Headphones, title: "Suporte Premium", desc: "Atendimento humano 24h pelo WhatsApp e telefone.", color: "from-purple-500/20 to-primary/10" },
             ].map((f) => (
-              <div key={f.title} className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden">
+              <motion.div key={f.title}
+                className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 sm:p-6 hover:border-primary/30 transition-all duration-300 group overflow-hidden"
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              >
                 <div className={`absolute inset-0 bg-gradient-to-br ${f.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative z-10">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
@@ -215,8 +497,65 @@ const InternetFibra = () => {
                   <h3 className="font-display text-sm sm:text-base font-bold mb-2">{f.title}</h3>
                   <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{f.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* NETWORK TOPOLOGY (UNIQUE) */}
+      <section className="py-16 sm:py-24 relative">
+        <GlowingOrbs />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+              <Network className="w-4 h-4" /> Infraestrutura
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">
+              Rede <span className="text-primary">100% Fibra Óptica</span>
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base max-w-lg mx-auto">
+              Da central até sua casa, tudo em fibra óptica. Sem conversões, sem perda de qualidade.
+            </p>
+          </div>
+          <NetworkTopology />
+          <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-8">
+            {[
+              { label: "OLT Central", desc: "Equipamento de alta capacidade" },
+              { label: "Splitter", desc: "Distribui o sinal ótico" },
+              { label: "Sua Casa", desc: "Fibra direto no roteador" },
+            ].map((n, i) => (
+              <motion.div key={n.label} className="text-center"
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.15 }}
+              >
+                <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-2">
+                  <span className="text-primary font-bold text-xs">{i + 1}</span>
+                </div>
+                <p className="text-xs font-bold text-white/80">{n.label}</p>
+                <p className="text-[10px] text-white/40">{n.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SPEED COMPARISON (UNIQUE) */}
+      <section className="py-16 sm:py-24 border-y border-white/5 relative">
+        <CyberGrid />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold mb-4">
+                <Activity className="w-4 h-4" /> Velocidade Real
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">Sinta a diferença da <span className="text-primary">velocidade real</span></h2>
+              <p className="text-white/50 text-sm leading-relaxed mb-8">
+                Nossos planos entregam velocidade simétrica — o upload é tão rápido quanto o download. Ideal para home office, lives e jogos online.
+              </p>
+              <SpeedBars />
+            </div>
+            <FiberVsCopper />
           </div>
         </div>
       </section>
@@ -234,8 +573,11 @@ const InternetFibra = () => {
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet fibra óptica com instalação gratuita e Wi-Fi incluso</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
-            {fibraPlans.map((plan) => (
-              <div key={plan.name} className="relative h-full">
+            {fibraPlans.map((plan, idx) => (
+              <motion.div key={plan.name} className="relative h-full"
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: idx * 0.1 }}
+              >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">
                     ⭐ MAIS POPULAR
@@ -278,7 +620,7 @@ const InternetFibra = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -336,7 +678,10 @@ const InternetFibra = () => {
               { icon: Shield, title: "Conexão Estável", desc: "Sem quedas, sem lentidão. Internet que funciona quando você precisa.", color: "from-blue-500/20 to-primary/10" },
               { icon: CreditCard, title: "Preço Justo", desc: "Planos acessíveis com a melhor relação custo-benefício do mercado.", color: "from-green-500/20 to-primary/10" },
             ].map((item) => (
-              <div key={item.title} className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all overflow-hidden group">
+              <motion.div key={item.title}
+                className="relative bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center hover:border-primary/30 transition-all overflow-hidden group"
+                whileHover={{ y: -6 }}
+              >
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative z-10">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -345,7 +690,7 @@ const InternetFibra = () => {
                   <h3 className="font-display text-sm sm:text-base font-bold mb-2">{item.title}</h3>
                   <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{item.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -368,7 +713,7 @@ const InternetFibra = () => {
       <section className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-[hsl(20,92%,45%)] to-[hsl(10,80%,35%)]" />
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%)` }} />
-        <ParticleField />
+        <FiberOpticLines />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Pronto para navegar sem limites?</h2>
           <p className="text-white/80 text-sm sm:text-base mb-8 max-w-md mx-auto">Assine agora e tenha a melhor internet fibra óptica da região.</p>
