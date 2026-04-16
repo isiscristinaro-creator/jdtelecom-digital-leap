@@ -31,14 +31,19 @@ const BannersSection = () => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("banners")
         .select("id, titulo, imagem_url")
         .eq("ativo", true)
         .order("created_at", { ascending: false });
+      // BUGFIX: erros do Supabase eram silenciados (sem feedback ao dev).
+      if (error) {
+        console.error("[BannersSection] erro ao carregar banners:", error.message);
+        return;
+      }
       // Exclui banners destinados ao Hero
       const ofertas = (data || []).filter((b) => !isHeroTitulo(b.titulo));
-      if (ofertas.length) setBanners(ofertas);
+      setBanners(ofertas);
     })();
   }, []);
 

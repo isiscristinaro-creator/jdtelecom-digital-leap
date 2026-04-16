@@ -1041,7 +1041,7 @@ const AdminDashboard = () => {
                 size="sm"
                 variant="outline"
                 className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-emerald-400 hover:border-emerald-400"
-                onClick={() => {
+                onClick={async () => {
                   const xlsData = kpiHistory.map(entry => ({
                     "Meta": entry.label,
                     "Valor Anterior": entry.old_value,
