@@ -64,7 +64,7 @@ const MOCK_PREFERENCES = {
 };
 
 const SubscriberDashboard = () => {
-  const { user, profile, isAuthenticated, loading, logout, updateProfile: _up } = useAuth();
+  const { user, profile, isAuthenticated, loading, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ name: "", phone: "", address: "" });
@@ -99,8 +99,6 @@ const SubscriberDashboard = () => {
     await logout();
     navigate("/assinante", { replace: true });
   };
-
-  const { updateProfile } = useAuth();
 
   const handleSaveEdit = async () => {
     const result = await updateProfile({
