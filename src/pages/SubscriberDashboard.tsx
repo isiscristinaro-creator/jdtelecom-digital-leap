@@ -82,8 +82,14 @@ const SubscriberDashboard = () => {
   }, [isAuthenticated, loading, navigate]);
 
   useEffect(() => {
-    setEditData({ name: displayName, phone: displayPhone, address: "Rua das Flores, 123 - Manaus, AM" });
-  }, [displayName, displayPhone]);
+    if (profile) {
+      setEditData({
+        name: profile.full_name || user?.email || "Assinante",
+        phone: profile.phone || "(92) 99123-4567",
+        address: "Rua das Flores, 123 - Manaus, AM",
+      });
+    }
+  }, [profile, user?.email]);
 
   if (loading) {
     return (
