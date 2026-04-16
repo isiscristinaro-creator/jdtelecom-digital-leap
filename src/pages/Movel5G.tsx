@@ -142,15 +142,31 @@ const FaqItem = ({ q, a }: { q: string; a: string }) => {
 };
 
 const PlanCard = ({ plan, navigate }: { plan: typeof mobilePlans[0]; navigate: (p: string) => void }) => (
-  <div className="relative h-full">
-    {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">⭐ MAIS POPULAR</div>}
-    <div className={`rounded-2xl overflow-hidden h-full flex flex-col border transition-all backdrop-blur-sm ${plan.popular ? "border-primary shadow-glow-lg bg-white/[0.06]" : "border-white/[0.08] bg-white/[0.03] hover:border-white/15"}`}>
-      <div className={`px-4 py-2 flex items-center gap-2 ${plan.tier === "Turbo" ? "bg-gradient-to-r from-primary/20 to-orange-500/10" : "bg-white/[0.03]"}`}>
+  <motion.div className="relative h-full"
+    whileHover={{ y: -10, scale: 1.03, rotateY: plan.popular ? 0 : 2, transition: { duration: 0.3, ease: "easeOut" } }}
+    style={{ transformStyle: "preserve-3d" }}
+  >
+    {plan.popular && (
+      <motion.div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap"
+        animate={{ y: [0, -3, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >⭐ MAIS POPULAR</motion.div>
+    )}
+    <div className={`rounded-2xl overflow-hidden h-full flex flex-col border transition-all duration-500 backdrop-blur-sm group relative ${plan.popular ? "border-primary shadow-glow-lg bg-white/[0.06]" : "border-white/[0.08] bg-white/[0.03] hover:border-primary/40 hover:shadow-[0_0_30px_hsl(24_95%_50%/0.15)]"}`}>
+      {/* Shimmer */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden rounded-2xl">
+        <motion.div className="absolute -inset-full bg-gradient-to-r from-transparent via-white/[0.05] to-transparent skew-x-12"
+          animate={{ x: ["-100%", "200%"] }}
+          transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+      <div className={`px-4 py-2 flex items-center gap-2 relative z-10 ${plan.tier === "Turbo" ? "bg-gradient-to-r from-primary/20 to-orange-500/10" : "bg-white/[0.03]"}`}>
         <Zap className="w-3.5 h-3.5 text-primary" />
         <span className="text-[10px] font-bold text-primary tracking-wider uppercase">{plan.tier}</span>
         {plan.tier === "Turbo" && <span className="text-[10px]">🔥</span>}
       </div>
-      <div className="p-5 flex-1 flex flex-col">
+      <div className="p-5 flex-1 flex flex-col relative z-10">
         <h3 className="font-display text-xs sm:text-sm font-bold mb-4 text-white/90 leading-tight min-h-[2rem]">{plan.name}</h3>
         <div className="flex items-center gap-2.5 mb-3"><Globe className="w-4 h-4 text-primary shrink-0" /><div><span className="text-lg font-bold">{plan.data}</span><span className="text-[10px] text-white/40 ml-1.5">INTERNET 5G</span></div></div>
         <div className="flex items-center gap-2.5 mb-3"><MessageCircle className="w-4 h-4 text-green-400 shrink-0" /><div><span className="text-xs font-medium">WhatsApp Ilimitado</span><p className="text-[10px] text-white/40">Sem descontar da franquia</p></div></div>
@@ -164,11 +180,13 @@ const PlanCard = ({ plan, navigate }: { plan: typeof mobilePlans[0]; navigate: (
             <span className="text-sm font-bold">.{plan.cents}</span>
             <span className="text-xs text-white/40 ml-1">/mês</span>
           </div>
-          <Button className={`w-full rounded-xl h-11 text-sm font-bold ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow" : "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30"}`} onClick={() => navigate("/cadastro")}>Assinar Agora</Button>
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <Button className={`w-full rounded-xl h-11 text-sm font-bold transition-all duration-300 ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_20px_hsl(24_95%_50%/0.4)] shadow-glow" : "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 hover:shadow-[0_0_15px_hsl(24_95%_50%/0.2)]"}`} onClick={() => navigate("/cadastro")}>Assinar Agora</Button>
+          </motion.div>
         </div>
       </div>
     </div>
-  </div>
+  </motion.div>
 );
 
 const PlansCarousel = ({ plans, navigate }: { plans: typeof mobilePlans; navigate: (p: string) => void }) => {
@@ -181,7 +199,7 @@ const PlansCarousel = ({ plans, navigate }: { plans: typeof mobilePlans; navigat
 
   if (!isMobile) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto" style={{ perspective: "1200px" }}>
         {plans.map((plan) => <PlanCard key={plan.name} plan={plan} navigate={navigate} />)}
       </div>
     );

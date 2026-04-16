@@ -572,23 +572,38 @@ const InternetFibra = () => {
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4">Escolha Seu Plano</h2>
             <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto">Internet fibra óptica com instalação gratuita e Wi-Fi incluso</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto" style={{ perspective: "1200px" }}>
             {fibraPlans.map((plan, idx) => (
               <motion.div key={plan.name} className="relative h-full"
-                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: idx * 0.1 }}
+                initial={{ opacity: 0, y: 40, rotateX: 8 }} whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true }} transition={{ delay: idx * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -10, scale: 1.03, rotateY: plan.popular ? 0 : (idx % 2 === 0 ? 2 : -2), transition: { duration: 0.3, ease: "easeOut" } }}
+                style={{ transformStyle: "preserve-3d" }}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  <motion.div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap"
+                    animate={{ y: [0, -3, 0], scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
                     ⭐ MAIS POPULAR
-                  </div>
+                  </motion.div>
                 )}
-                <div className={`rounded-2xl overflow-hidden h-full flex flex-col border transition-all backdrop-blur-sm ${plan.popular ? "border-primary shadow-glow-lg bg-white/[0.06]" : "border-white/[0.08] bg-white/[0.03] hover:border-white/15"}`}>
-                  <div className="px-4 py-2 flex items-center gap-2 bg-gradient-to-r from-primary/15 to-transparent">
+                <div className={`rounded-2xl overflow-hidden h-full flex flex-col border transition-all duration-500 backdrop-blur-sm group relative ${plan.popular ? "border-primary shadow-glow-lg bg-white/[0.06]" : "border-white/[0.08] bg-white/[0.03] hover:border-primary/40 hover:shadow-[0_0_30px_hsl(24_95%_50%/0.15)]"}`}>
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden rounded-2xl">
+                    <motion.div className="absolute -inset-full bg-gradient-to-r from-transparent via-white/[0.05] to-transparent skew-x-12"
+                      animate={{ x: ["-100%", "200%"] }}
+                      transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                    />
+                  </div>
+                  {/* Hover glow overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+                  <div className="px-4 py-2 flex items-center gap-2 bg-gradient-to-r from-primary/15 to-transparent relative z-10">
                     <Wifi className="w-3.5 h-3.5 text-primary" />
                     <span className="text-[10px] font-bold text-primary tracking-wider uppercase">{plan.speed} MEGA</span>
                   </div>
-                  <div className="p-5 flex-1 flex flex-col">
+                  <div className="p-5 flex-1 flex flex-col relative z-10">
                     <h3 className="font-display text-xs sm:text-sm font-bold mb-4 text-white/90">{plan.name}</h3>
                     <div className="flex items-center gap-2.5 mb-3">
                       <Globe className="w-4 h-4 text-primary shrink-0" />
@@ -598,25 +613,39 @@ const InternetFibra = () => {
                       </div>
                     </div>
                     {plan.features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 mb-2">
-                        <Check className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <motion.div key={i} className="flex items-center gap-2 mb-2"
+                        initial={{ opacity: 0, x: -8 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.1 + i * 0.06, duration: 0.4 }}
+                      >
+                        <motion.div whileHover={{ scale: 1.3, rotate: 10 }} transition={{ type: "spring", stiffness: 400 }}>
+                          <Check className="w-3.5 h-3.5 text-primary shrink-0" />
+                        </motion.div>
                         <span className="text-xs text-white/60">{f}</span>
-                      </div>
+                      </motion.div>
                     ))}
                     <div className="mt-auto pt-4">
                       <p className="text-[10px] text-white/40 mb-1">Por apenas</p>
                       <div className="flex items-baseline mb-4">
                         <span className="text-sm text-primary font-bold mr-1">R$</span>
-                        <span className="font-display text-3xl sm:text-4xl font-extrabold">{plan.price}</span>
+                        <motion.span className="font-display text-3xl sm:text-4xl font-extrabold"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          whileInView={{ scale: 1, opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: idx * 0.1 + 0.3, type: "spring", stiffness: 200 }}
+                        >{plan.price}</motion.span>
                         <span className="text-sm font-bold">.{plan.cents}</span>
                         <span className="text-xs text-white/40 ml-1">/mês</span>
                       </div>
-                      <Button
-                        className={`w-full rounded-xl h-11 text-sm font-bold ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow" : "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30"}`}
-                        onClick={() => navigate("/cadastro")}
-                      >
-                        Assinar Agora
-                      </Button>
+                      <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                          className={`w-full rounded-xl h-11 text-sm font-bold transition-all duration-300 ${plan.popular ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_20px_hsl(24_95%_50%/0.4)] shadow-glow" : "bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 hover:shadow-[0_0_15px_hsl(24_95%_50%/0.2)]"}`}
+                          onClick={() => navigate("/cadastro")}
+                        >
+                          Assinar Agora
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
