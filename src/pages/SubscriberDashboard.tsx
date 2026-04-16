@@ -64,7 +64,7 @@ const MOCK_PREFERENCES = {
 };
 
 const SubscriberDashboard = () => {
-  const { user, profile, isAuthenticated, loading, logout } = useAuth();
+  const { user, profile, isAuthenticated, loading, logout, updateProfile: _up } = useAuth();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ name: "", phone: "", address: "" });
@@ -100,9 +100,19 @@ const SubscriberDashboard = () => {
     navigate("/assinante", { replace: true });
   };
 
-  const handleSaveEdit = () => {
-    toast.success("Dados atualizados com sucesso!");
-    setEditMode(false);
+  const { updateProfile } = useAuth();
+
+  const handleSaveEdit = async () => {
+    const result = await updateProfile({
+      full_name: editData.name,
+      phone: editData.phone,
+    });
+    if (result.success) {
+      toast.success("Dados atualizados com sucesso!");
+      setEditMode(false);
+    } else {
+      toast.error(result.error || "Erro ao atualizar dados.");
+    }
   };
 
   const StatusBadge = ({ status }: { status: string }) => {
