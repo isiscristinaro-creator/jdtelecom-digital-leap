@@ -151,7 +151,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50">
       {/* Top bar */}
       <div className="bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
-        <div className="container mx-auto px-4 py-2 md:py-0 md:h-10 text-sm md:text-xs">
+        <div className="container mx-auto px-4 py-2 lg:py-0 lg:h-10 text-sm lg:text-xs">
           <div className="flex items-center justify-between gap-2 md:gap-0">
             <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-1 flex-wrap sm:flex-nowrap">
               <button
@@ -195,12 +195,12 @@ const Navbar = () => {
 
       {/* Main nav */}
       <div className="bg-background border-b border-border">
-        <div className="container mx-auto px-4 flex items-center h-16 md:h-[68px]">
+        <div className="container mx-auto px-4 flex items-center h-16 lg:h-[68px]">
           <a href="/" className="shrink-0" onClick={handleLogoClick}>
-            <img src={logo} alt="JD Telecom" className="h-10 md:h-12 w-auto" />
+            <img src={logo} alt="JD Telecom" className="h-10 lg:h-12 w-auto" />
           </a>
 
-          <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1 justify-center">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8 flex-1 justify-center">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -213,7 +213,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-1 shrink-0">
+          <div className="hidden lg:flex items-center gap-1 shrink-0">
             <div className="w-px h-7 bg-border mr-3" />
             <a
               href="#planos"
@@ -237,14 +237,14 @@ const Navbar = () => {
             </div>
           </div>
 
-          <button className="md:hidden text-foreground ml-auto" onClick={() => setIsOpen(!isOpen)}>
+          <button className="lg:hidden text-foreground ml-auto" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
       {/* Sub nav */}
-      <div className="hidden md:block bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
+      <div className="hidden lg:block bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
         <div className="container mx-auto px-4 flex items-center justify-center h-10 gap-8">
           {subNavLinks.map((link) => (
             <a
