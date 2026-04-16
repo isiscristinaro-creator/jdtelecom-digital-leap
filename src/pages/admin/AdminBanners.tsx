@@ -1,19 +1,29 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useBanners, uploadImage, type DbBanner } from "@/hooks/useSupabaseData";
+import { toast } from "sonner";
+
+const DESTAQUE_PREFIX = "★ ";
+
+const isDestaque = (titulo: string) => titulo.startsWith(DESTAQUE_PREFIX);
+const cleanTitulo = (titulo: string) => titulo.replace(DESTAQUE_PREFIX, "");
 
 const AdminBanners = () => {
   const { banners, loading, create, update, remove } = useBanners();
   const [editing, setEditing] = useState<DbBanner | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({ titulo: "", imagem_url: "", ativo: true });
+  const [form, setForm] = useState({ titulo: "", imagem_url: "", ativo: true, destaque: false });
 
-  const openCreate = () => { setForm({ titulo: "", imagem_url: "", ativo: true }); setIsCreating(true); setEditing(null); };
-  const openEdit = (b: DbBanner) => { setForm({ titulo: b.titulo, imagem_url: b.imagem_url || "", ativo: b.ativo }); setEditing(b); setIsCreating(false); };
+  const openCreate = () => { setForm({ titulo: "", imagem_url: "", ativo: true, destaque: false }); setIsCreating(true); setEditing(null); };
+  const openEdit = (b: DbBanner) => {
+    setForm({ titulo: cleanTitulo(b.titulo), imagem_url: b.imagem_url || "", ativo: b.ativo, destaque: isDestaque(b.titulo) });
+    setEditing(b);
+    setIsCreating(false);
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -26,9 +36,38 @@ const AdminBanners = () => {
 
   const handleSave = async () => {
     if (!form.titulo) return;
-    if (editing) await update(editing.id, form);
-    else await create(form);
+    const finalTitulo = (form.destaque ? DESTAQUE_PREFIX : "") + form.titulo.trim();
+    const payload = { titulo: finalTitulo, imagem_url: form.imagem_url, ativo: form.ativo };
+
+    // Se este banner está sendo marcado como destaque, remove o destaque dos outros
+    if (form.destaque) {
+      const outros = banners.filter(b => b.id !== editing?.id && isDestaque(b.titulo));
+      for (const b of outros) {
+        await update(b.id, { titulo: cleanTitulo(b.titulo) });
+      }
+    }
+
+    if (editing) await update(editing.id, payload);
+    else await create(payload);
+
+    if (form.destaque) toast.success("Banner definido como destaque principal");
     setEditing(null); setIsCreating(false);
+  };
+
+  const toggleDestaque = async (b: DbBanner) => {
+    const willBeDestaque = !isDestaque(b.titulo);
+    if (willBeDestaque) {
+      // Remove destaque dos outros
+      const outros = banners.filter(x => x.id !== b.id && isDestaque(x.titulo));
+      for (const o of outros) {
+        await update(o.id, { titulo: cleanTitulo(o.titulo) });
+      }
+      await update(b.id, { titulo: DESTAQUE_PREFIX + cleanTitulo(b.titulo) });
+      toast.success("Banner definido como destaque principal");
+    } else {
+      await update(b.id, { titulo: cleanTitulo(b.titulo) });
+      toast.success("Destaque removido");
+    }
   };
 
   const showForm = isCreating || editing;
@@ -40,7 +79,7 @@ const AdminBanners = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Banners</h1>
-          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{banners.length} banners cadastrados</p>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{banners.length} banners cadastrados • Apenas 1 pode ser destaque</p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
           <Plus className="w-4 h-4 mr-1" /> Novo Banner
@@ -72,6 +111,21 @@ const AdminBanners = () => {
                 </div>
                 {form.imagem_url && <img src={form.imagem_url} alt="" className="mt-2 h-20 rounded-lg object-cover w-full" />}
               </div>
+
+              <label className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={form.destaque}
+                  onChange={e => setForm({ ...form, destaque: e.target.checked })}
+                  className="rounded"
+                />
+                <Star className={`w-4 h-4 ${form.destaque ? "text-primary fill-primary" : "text-[hsl(var(--dark-section-muted))]"}`} />
+                <div className="flex-1">
+                  <span className="text-sm font-bold text-[hsl(var(--dark-section-fg))]">Destaque principal</span>
+                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))]">Aparece em tamanho grande na seção Ofertas Especiais</p>
+                </div>
+              </label>
+
               <div className="flex items-center gap-2">
                 <input type="checkbox" checked={form.ativo} onChange={e => setForm({ ...form, ativo: e.target.checked })} className="rounded" />
                 <Label className="text-xs text-[hsl(var(--dark-section-muted))]">Ativo</Label>
@@ -85,25 +139,51 @@ const AdminBanners = () => {
       )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {banners.map(b => (
-          <div key={b.id} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl overflow-hidden">
-            {b.imagem_url && <img src={b.imagem_url} alt={b.titulo} className="w-full h-40 object-cover" />}
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))]">{b.titulo}</h3>
-                {b.ativo ? <Eye className="w-4 h-4 text-emerald-400" /> : <EyeOff className="w-4 h-4 text-red-400" />}
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={() => openEdit(b)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
-                  <Edit2 className="w-3 h-3 mr-1" /> Editar
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => remove(b.id)} className="text-destructive hover:bg-destructive/10 rounded-lg text-xs">
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+        {banners.map(b => {
+          const destaque = isDestaque(b.titulo);
+          return (
+            <div
+              key={b.id}
+              className={`bg-[hsl(var(--dark-section-card))] border rounded-2xl overflow-hidden transition-all ${
+                destaque ? "border-primary shadow-glow" : "border-[hsl(var(--dark-section-border))]"
+              }`}
+            >
+              {b.imagem_url && (
+                <div className="relative">
+                  <img src={b.imagem_url} alt={cleanTitulo(b.titulo)} className="w-full h-40 object-cover" />
+                  {destaque && (
+                    <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
+                      <Star className="w-3 h-3 fill-current" /> Destaque
+                    </div>
+                  )}
+                </div>
+              )}
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))] truncate">{cleanTitulo(b.titulo)}</h3>
+                  {b.ativo ? <Eye className="w-4 h-4 text-emerald-400 shrink-0" /> : <EyeOff className="w-4 h-4 text-red-400 shrink-0" />}
+                </div>
+                <div className="flex gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => toggleDestaque(b)}
+                    className={`rounded-lg text-xs flex-1 ${destaque ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-[hsl(var(--dark-section-muted))] hover:bg-primary/5 hover:text-primary"}`}
+                    title={destaque ? "Remover destaque" : "Marcar como destaque"}
+                  >
+                    <Star className={`w-3 h-3 ${destaque ? "fill-current" : ""}`} />
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => openEdit(b)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
+                    <Edit2 className="w-3 h-3 mr-1" /> Editar
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => remove(b.id)} className="text-destructive hover:bg-destructive/10 rounded-lg text-xs">
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
