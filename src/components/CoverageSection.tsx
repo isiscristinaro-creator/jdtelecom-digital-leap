@@ -292,48 +292,66 @@ const CoverageSection = () => {
                       const cpX = midX + (dy > 0 ? -offset : offset);
                       const cpY = midY + (dx > 0 ? offset : -offset);
 
+                      const routePath = `M ${p1.x},${p1.y} Q ${cpX},${cpY} ${p2.x},${p2.y}`;
+                      const routeLen = Math.sqrt(dx * dx + dy * dy);
+                      // Stagger animation start per route for organic feel
+                      const staggerDelay = (p1.x + p1.y) % 3;
+                      const flowDur = 2.5 + (routeLen * 0.03);
+
                       return (
                         <g key={routeKey}>
                           {/* Route shadow / glow */}
                           <path
-                            d={`M ${p1.x},${p1.y} Q ${cpX},${cpY} ${p2.x},${p2.y}`}
+                            d={routePath}
                             fill="none"
-                            stroke={isRouteActive ? "hsl(24 95% 50%)" : "hsl(24 95% 50%)"}
+                            stroke="hsl(24 95% 50%)"
                             strokeWidth={isRouteActive ? "0.8" : "0.3"}
                             opacity={isRouteActive ? 0.4 : 0.1}
                             strokeLinecap="round"
                             filter={isRouteActive ? "url(#cityGlow)" : undefined}
                           />
-                          {/* Main route line */}
+                          {/* Main route line — always animated dashes */}
                           <path
-                            d={`M ${p1.x},${p1.y} Q ${cpX},${cpY} ${p2.x},${p2.y}`}
+                            d={routePath}
                             fill="none"
                             stroke={isRouteActive ? "url(#activeFiberGrad)" : "url(#fiberGrad)"}
                             strokeWidth={isRouteActive ? "0.4" : "0.2"}
-                            opacity={isRouteActive ? 0.9 : 0.35}
+                            opacity={isRouteActive ? 0.9 : 0.4}
                             strokeLinecap="round"
-                            strokeDasharray={isRouteActive ? "none" : "1.5,0.8"}
+                            strokeDasharray={isRouteActive ? "1.2,0.4" : "1.5,0.8"}
                             className="transition-all duration-500"
                           >
-                            {isRouteActive && (
-                              <animate
-                                attributeName="stroke-dashoffset"
-                                from="6"
-                                to="0"
-                                dur="1.5s"
-                                repeatCount="indefinite"
-                              />
-                            )}
+                            <animate
+                              attributeName="stroke-dashoffset"
+                              from="6"
+                              to="0"
+                              dur={isRouteActive ? "1.2s" : "3s"}
+                              repeatCount="indefinite"
+                            />
                           </path>
-                          {/* Data flow animation dots */}
+                          {/* Continuous data flow dot — always visible */}
+                          <circle r={isRouteActive ? "0.5" : "0.3"} fill={isRouteActive ? "#22d3ee" : "hsl(24 95% 50%)"} filter="url(#cityGlow)"
+                            className="transition-all duration-300">
+                            <animateMotion
+                              path={routePath}
+                              dur={`${flowDur}s`}
+                              begin={`${staggerDelay}s`}
+                              repeatCount="indefinite"
+                            />
+                            <animate attributeName="opacity" values="0;0.8;1;0.8;0" dur={`${flowDur}s`} begin={`${staggerDelay}s`} repeatCount="indefinite" />
+                          </circle>
+                          {/* Second dot traveling reverse for active routes */}
                           {isRouteActive && (
-                            <circle r="0.4" fill="#22d3ee" filter="url(#cityGlow)">
+                            <circle r="0.35" fill="#22d3ee" filter="url(#cityGlow)">
                               <animateMotion
-                                path={`M ${p1.x},${p1.y} Q ${cpX},${cpY} ${p2.x},${p2.y}`}
-                                dur="2s"
+                                path={routePath}
+                                dur={`${flowDur * 0.7}s`}
+                                begin={`${staggerDelay + 0.8}s`}
                                 repeatCount="indefinite"
+                                keyPoints="1;0"
+                                keyTimes="0;1"
                               />
-                              <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" />
+                              <animate attributeName="opacity" values="0;0.6;1;0.6;0" dur={`${flowDur * 0.7}s`} begin={`${staggerDelay + 0.8}s`} repeatCount="indefinite" />
                             </circle>
                           )}
                         </g>
