@@ -1,12 +1,113 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin, ChevronDown, ChevronUp, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCity } from "@/contexts/CityContext";
 import logo from "@/assets/logo.png";
 
+const ClientDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div ref={ref} className="absolute right-0 top-full mt-1 w-[680px] bg-card border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in">
+      {/* Top section - two app cards */}
+      <div className="grid grid-cols-2 divide-x divide-border">
+        {/* JD Fibra */}
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Wifi className="w-4 h-4 text-primary" />
+            </div>
+            <h3 className="font-bold text-foreground">JD Fibra</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Pelo app você tem acesso às suas faturas, informações do seu plano e muito mais.
+          </p>
+          <p className="text-xs font-semibold text-foreground mb-2">Baixe o App JD Fibra</p>
+          <div className="flex gap-2 mb-4">
+            <a href="#" className="flex items-center gap-1.5 bg-foreground text-background rounded-md px-3 py-2 text-xs font-medium hover:opacity-90 transition-opacity">
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302-2.302 2.302-2.903-2.302 2.903-2.302zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg>
+              Google Play
+            </a>
+            <a href="#" className="flex items-center gap-1.5 bg-foreground text-background rounded-md px-3 py-2 text-xs font-medium hover:opacity-90 transition-opacity">
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              App Store
+            </a>
+          </div>
+          <p className="text-xs text-muted-foreground mb-2">Ou acesse nosso portal Web</p>
+          <a href="/assinante" className="flex items-center justify-center gap-2 border border-primary text-primary rounded-lg py-2.5 text-sm font-semibold hover:bg-primary/5 transition-colors">
+            <Globe className="w-4 h-4" />
+            JD Fibra
+          </a>
+        </div>
+
+        {/* JD Móvel */}
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Smartphone className="w-4 h-4 text-primary" />
+            </div>
+            <h3 className="font-bold text-foreground">JD Móvel</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Pelo app você tem acesso ao consumo da sua franquia, faturas e muito mais.
+          </p>
+          <p className="text-xs font-semibold text-foreground mb-2">Baixe o App JD Móvel</p>
+          <div className="flex gap-2 mb-4">
+            <a href="#" className="flex items-center gap-1.5 bg-foreground text-background rounded-md px-3 py-2 text-xs font-medium hover:opacity-90 transition-opacity">
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302-2.302 2.302-2.903-2.302 2.903-2.302zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg>
+              Google Play
+            </a>
+            <a href="#" className="flex items-center gap-1.5 bg-foreground text-background rounded-md px-3 py-2 text-xs font-medium hover:opacity-90 transition-opacity">
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              App Store
+            </a>
+          </div>
+          <p className="text-xs text-muted-foreground mb-2">Ou acesse nosso portal Web</p>
+          <a href="/assinante" className="flex items-center justify-center gap-2 border border-primary text-primary rounded-lg py-2.5 text-sm font-semibold hover:bg-primary/5 transition-colors">
+            <Globe className="w-4 h-4" />
+            JD Móvel
+          </a>
+        </div>
+      </div>
+
+      {/* Bottom section - quick links */}
+      <div className="border-t border-border bg-muted/30 px-6 py-4">
+        <div className="grid grid-cols-3 gap-6 text-xs">
+          <div>
+            <p className="font-bold text-foreground uppercase tracking-wide mb-2">Fibra</p>
+            <a href="/assinante" className="block text-muted-foreground hover:text-primary transition-colors py-1">JD Fibra</a>
+            <a href="#autoatendimento" className="block text-muted-foreground hover:text-primary transition-colors py-1">2ª via da fatura</a>
+          </div>
+          <div>
+            <p className="font-bold text-foreground uppercase tracking-wide mb-2">JD Móvel 4G|5G</p>
+            <a href="/assinante" className="block text-muted-foreground hover:text-primary transition-colors py-1">JD Móvel</a>
+            <a href="#autoatendimento" className="block text-muted-foreground hover:text-primary transition-colors py-1">2ª via da fatura</a>
+          </div>
+          <div>
+            <p className="font-bold text-foreground uppercase tracking-wide mb-2">Guias e Suporte</p>
+            <a href="#autoatendimento" className="block text-muted-foreground hover:text-primary transition-colors py-1">Guia do cliente</a>
+            <a href="#contato" className="block text-muted-foreground hover:text-primary transition-colors py-1">Central de atendimento</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,6 +120,7 @@ const Navbar = () => {
       if (el) el.scrollIntoView({ behavior: "smooth" });
     }
     setIsOpen(false);
+    setClientDropdownOpen(false);
   }, [location.pathname, navigate]);
 
   const handleLogoClick = useCallback((e: React.MouseEvent) => {
@@ -93,15 +195,13 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Main nav - centered & distributed like Brisanet */}
+      {/* Main nav */}
       <div className="bg-background border-b border-border">
         <div className="container mx-auto px-4 flex items-center h-16 md:h-[68px]">
-          {/* Logo */}
           <a href="/" className="shrink-0" onClick={handleLogoClick}>
             <img src={logo} alt="JD Telecom" className="h-10 md:h-12 w-auto" />
           </a>
 
-          {/* Center nav links - distributed */}
           <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1 justify-center">
             {navLinks.map((link) => (
               <a
@@ -115,7 +215,6 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Right actions with separator */}
           <div className="hidden md:flex items-center gap-1 shrink-0">
             <div className="w-px h-7 bg-border mr-3" />
             <a
@@ -126,13 +225,18 @@ const Navbar = () => {
               Assine já
               <ChevronDown className="w-3.5 h-3.5" />
             </a>
-            <a
-              href="/assinante"
-              className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors px-3 py-2 whitespace-nowrap"
-            >
-              Área do cliente
-              <ChevronDown className="w-3.5 h-3.5" />
-            </a>
+
+            {/* Área do cliente with dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setClientDropdownOpen(!clientDropdownOpen)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors px-3 py-2 whitespace-nowrap"
+              >
+                Área do cliente
+                {clientDropdownOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+              <ClientDropdown isOpen={clientDropdownOpen} onClose={() => setClientDropdownOpen(false)} />
+            </div>
           </div>
 
           <button className="md:hidden text-foreground ml-auto" onClick={() => setIsOpen(!isOpen)}>
@@ -141,7 +245,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Sub nav - categories */}
+      {/* Sub nav */}
       <div className="hidden md:block bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
         <div className="container mx-auto px-4 flex items-center justify-center h-10 gap-8">
           {subNavLinks.map((link) => (
