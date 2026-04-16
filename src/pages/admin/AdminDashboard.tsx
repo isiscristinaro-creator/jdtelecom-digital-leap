@@ -1041,7 +1041,7 @@ const AdminDashboard = () => {
                 size="sm"
                 variant="outline"
                 className="text-xs border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-emerald-400 hover:border-emerald-400"
-                onClick={() => {
+                onClick={async () => {
                   const xlsData = kpiHistory.map(entry => ({
                     "Meta": entry.label,
                     "Valor Anterior": entry.old_value,
@@ -1049,12 +1049,14 @@ const AdminDashboard = () => {
                     "Alterado Por": entry.changed_by,
                     "Data/Hora": new Date(entry.changed_at).toLocaleString("pt-BR"),
                   }));
-                  if (exportToExcel(xlsData, `historico-metas-${new Date().toISOString().slice(0, 10)}`, {
+                  // BUGFIX: exportToExcel agora é async (lazy import de xlsx-js-style).
+                  // Antes: `if (Promise)` era sempre truthy, mostrando sucesso mesmo em falha.
+                  const ok = await exportToExcel(xlsData, `historico-metas-${new Date().toISOString().slice(0, 10)}`, {
                     reportTitle: "JD Telecom",
                     reportSubtitle: "Histórico de Alterações de Metas",
-                  })) {
-                    toast.success(`${xlsData.length} registros exportados (Excel)`);
-                  }
+                  });
+                  if (ok) toast.success(`${xlsData.length} registros exportados (Excel)`);
+                  else toast.error("Nenhum dado para exportar");
                 }}
               >
                 <FileSpreadsheet className="w-3 h-3 mr-1" /> Excel

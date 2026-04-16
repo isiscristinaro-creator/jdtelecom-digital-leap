@@ -38,14 +38,16 @@ const ExportFinanceiroModal = ({ open, onOpenChange }: Props) => {
     return filtered;
   }, [payments, status, plano, dataInicial, dataFinal]);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const data = filteredData.map(p => ({
       Nome: p.client_name || "", Email: p.client_email || "", Plano: p.client_plan || "",
       Status: p.status, "Valor (R$)": p.amount, Data: p.due_date, Descrição: p.description,
     }));
     if (!data.length) { toast.error("Nenhum dado"); return; }
     const filename = `relatorio-financeiro-${new Date().toISOString().slice(0, 10)}`;
-    if (formato === "excel") exportToExcel(data, filename, { reportTitle: "JD Telecom", reportSubtitle: "Relatório Financeiro" });
+    // BUGFIX: aguarda exportToExcel (agora async) antes de fechar modal e mostrar toast,
+    // garantindo que o arquivo termina de ser gerado antes do feedback ao usuário.
+    if (formato === "excel") await exportToExcel(data, filename, { reportTitle: "JD Telecom", reportSubtitle: "Relatório Financeiro" });
     else exportToCSV(data, filename);
     toast.success(`${data.length} registros exportados`);
     onOpenChange(false);
