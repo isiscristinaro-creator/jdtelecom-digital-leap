@@ -9,7 +9,7 @@ const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: (i: number = 0) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.7, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.7, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] as const }
   }),
 };
 
@@ -82,7 +82,7 @@ const InternetFWA5G = () => {
             className="flex-1 flex justify-center"
             initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
           >
             <div className="relative">
               <motion.div
