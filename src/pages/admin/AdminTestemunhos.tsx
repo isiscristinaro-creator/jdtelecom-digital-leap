@@ -65,7 +65,31 @@ const AdminTestemunhos = () => {
         </Button>
       </div>
 
-      {showForm && (
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-2">
+        {FILTER_OPTIONS.map(o => (
+          <button
+            key={o.value}
+            onClick={() => setFiltro(o.value)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              filtro === o.value
+                ? "bg-primary text-primary-foreground"
+                : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border border-[hsl(var(--dark-section-border))] hover:text-[hsl(var(--dark-section-fg))]"
+            }`}
+          >
+            {o.label}
+            {o.value !== "todos" && (
+              <span className="ml-1.5 opacity-70">
+                {testemunhos.filter(t => (t.produto || "geral") === o.value).length}
+              </span>
+            )}
+            {o.value === "todos" && (
+              <span className="ml-1.5 opacity-70">{testemunhos.length}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => { setEditing(null); setIsCreating(false); }}>
           <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
