@@ -28,8 +28,55 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+// ----- Sortable card wrapper -----
+interface SortableBannerProps {
+  banner: DbBanner;
+  children: React.ReactNode;
+}
+
+const SortableBanner = ({ banner, children }: SortableBannerProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: banner.id,
+  });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Arrastar para reordenar"
+        className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-[hsl(var(--dark-section))]/80 backdrop-blur-sm border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary/40 cursor-grab active:cursor-grabbing transition-colors"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+      {children}
+    </div>
+  );
+};
+
 const AdminBanners = () => {
-  const { banners, loading, create, update, remove } = useBanners();
+  const { banners, loading, create, update, remove, reorder } = useBanners();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = banners.findIndex((b) => b.id === active.id);
+    const newIndex = banners.findIndex((b) => b.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const newOrder = arrayMove(banners, oldIndex, newIndex).map((b) => b.id);
+    reorder(newOrder);
+  };
+
   const [editing, setEditing] = useState<DbBanner | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
