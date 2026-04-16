@@ -269,7 +269,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-background border-b border-border px-4 pb-4 shadow-lg max-h-[calc(100dvh-116px)] overflow-y-auto">
+        <div className="lg:hidden bg-background border-b border-border px-4 pb-4 shadow-lg max-h-[calc(100dvh-116px)] overflow-y-auto">
           {navLinks.map((link) => (
             <a
               key={link.href}
