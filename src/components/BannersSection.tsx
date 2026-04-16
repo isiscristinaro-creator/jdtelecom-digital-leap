@@ -158,7 +158,7 @@ const BannersSection = () => {
               <div className="relative h-full min-h-[320px] md:min-h-[480px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 shadow-elevated">
                 <img
                   src={featured.imagem_url}
-                  alt={featured.titulo}
+                  alt={cleanTitulo(featured.titulo)}
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                 />
@@ -172,7 +172,7 @@ const BannersSection = () => {
                     Destaque
                   </div>
                   <h3 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-[hsl(var(--dark-section-fg))] mb-4 leading-tight">
-                    {featured.titulo}
+                    {cleanTitulo(featured.titulo)}
                   </h3>
                   <Button
                     asChild
@@ -180,7 +180,7 @@ const BannersSection = () => {
                   >
                     <a
                       href="#planos"
-                      aria-label={`Ver oferta: ${featured.titulo}`}
+                      aria-label={`Ver oferta: ${cleanTitulo(featured.titulo)}`}
                       className="inline-flex items-center gap-2"
                     >
                       Aproveitar agora
