@@ -1,12 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useScrollAnimation(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
+  const [node, setNode] = useState<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  const ref = useCallback((el: HTMLElement | null) => {
+    setNode(el);
+  }, []);
+
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const el = node;
+    if (!el || isVisible) return;
 
     // Respeita prefers-reduced-motion: usuários com essa preferência veem
     // o conteúdo imediatamente, sem animações condicionais à viewport.
@@ -40,14 +44,14 @@ export function useScrollAnimation(threshold = 0.15) {
     observer.observe(el);
 
     // Fallback de segurança: garante que o conteúdo aparece mesmo se o
-    // observer não disparar (ex: animações iniciais perdidas em deep-link).
+    // observer não disparar (ex: conteúdo carregado assincronamente).
     const fallback = window.setTimeout(() => setIsVisible(true), 800);
 
     return () => {
       observer.disconnect();
       window.clearTimeout(fallback);
     };
-  }, [threshold]);
+  }, [node, threshold, isVisible]);
 
   return { ref, isVisible };
 }
