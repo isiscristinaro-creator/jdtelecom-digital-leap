@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Phone, User, Gauge, FileText, PhoneCall, MessageCircle, Wifi, Tv, Smartphone, Headphones, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X, User, ChevronDown, Wifi, Tv, Smartphone, Headphones } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
 import logo from "@/assets/logo.png";
 
@@ -31,7 +30,7 @@ const Navbar = () => {
   }, [location.pathname, navigate]);
 
   const navLinks = [
-    { label: "Home", href: "#inicio" },
+    { label: "Início", href: "#inicio" },
     { label: "Empresa", href: "#beneficios" },
     { label: "Planos", href: "#planos" },
     { label: "Cobertura", href: "#cobertura" },
@@ -49,129 +48,104 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      {/* Top bar - dark, sophisticated */}
-      <div className="bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
-        <div className="container mx-auto px-4 py-2 md:py-0 md:h-10 text-sm md:text-xs">
-          <div className="flex items-center justify-between gap-2 md:gap-0">
-            <div className="flex items-center gap-3 md:gap-6 min-w-0 flex-1 flex-wrap sm:flex-nowrap">
-            {/* City selector */}
-            <button
-              onClick={() => setShowCityModal(true)}
-               className="flex min-w-0 max-w-[58vw] sm:max-w-none items-center gap-1 md:gap-1.5 text-primary hover:text-primary/80 transition-colors font-medium shrink-0"
-            >
-              <MapPin className="w-3.5 h-3.5" />
-               <span className="hidden sm:inline truncate">{selectedCity ? `${selectedCity.name} ${selectedCity.state}` : "Selecione sua cidade"}</span>
-               <span className="sm:hidden truncate">{selectedCity ? selectedCity.name : "Cidade"}</span>
-            </button>
-            <a href="tel:08005945678" className="hidden sm:flex items-center gap-1 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors shrink-0">
-              <Phone className="w-3 h-3 text-primary" />
-              <span className="font-medium">0800 594 5678</span>
-            </a>
-            <a href="https://www.speedtest.net/pt" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
-              <Gauge className="w-3 h-3 text-primary" />
-              Teste de Velocidade
-            </a>
-            <a href="#autoatendimento" onClick={(e) => handleAnchorClick(e, "#autoatendimento")} className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
-              <FileText className="w-3 h-3 text-primary" />
-              2ª Via da Fatura
-            </a>
-            <a href="#contato" onClick={(e) => handleAnchorClick(e, "#contato")} className="hidden md:flex items-center gap-1.5 text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors">
-              <PhoneCall className="w-3 h-3 text-primary" />
-              Ligamos para você
-            </a>
-            </div>
-            <a
-              href="https://wa.me/558005945678"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-auto flex items-center justify-center gap-1.5 bg-primary text-primary-foreground px-3 sm:px-4 py-2 md:py-1.5 rounded-md text-[11px] sm:text-xs font-bold hover:bg-primary/90 transition-colors shrink-0 whitespace-nowrap"
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Fale via WhatsApp</span>
-              <span className="sm:hidden">WhatsApp</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Main nav */}
-      <div className="bg-background border-b border-border">
-        <div className="container mx-auto px-4 flex items-center justify-between h-16 md:h-[68px]">
-          <a href="/" className="shrink-0" onClick={handleLogoClick}>
-            <img src={logo} alt="JD Telecom" className="h-10 md:h-12 w-auto" />
+      {/* Single main bar - Brisanet style */}
+      <div className="bg-[hsl(var(--navbar-bg))]">
+        <div className="container mx-auto px-4 flex items-center h-16 md:h-[72px]">
+          {/* Logo */}
+          <a href="/" className="shrink-0 mr-8 lg:mr-12" onClick={handleLogoClick}>
+            <img src={logo} alt="JD Telecom" className="h-9 md:h-11 w-auto" />
           </a>
 
-          <div className="hidden md:flex items-center gap-7">
+          {/* Center nav links */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1 justify-center">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleAnchorClick(e, link.href)}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="text-sm font-medium text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors whitespace-nowrap"
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
-            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-full px-5 text-xs font-bold" asChild>
-              <a href="#planos" onClick={(e) => handleAnchorClick(e, "#planos")}>Assine já</a>
-            </Button>
-            <Button size="sm" className="bg-[hsl(var(--navbar-bg))] text-[hsl(var(--navbar-fg))] hover:bg-[hsl(var(--navbar-bg))]/90 rounded-full px-5 text-xs font-bold" asChild>
-              <a href="/assinante">
-                <User className="w-3.5 h-3.5 mr-1" />
-                Área do Cliente
-              </a>
-            </Button>
+          {/* Right side - Separator + Actions */}
+          <div className="hidden md:flex items-center gap-1 shrink-0">
+            <div className="w-px h-8 bg-[hsl(var(--navbar-fg))]/20 mr-4" />
+
+            <a
+              href="#planos"
+              onClick={(e) => handleAnchorClick(e, "#planos")}
+              className="flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-2 whitespace-nowrap"
+            >
+              Assine já
+              <ChevronDown className="w-3.5 h-3.5" />
+            </a>
+
+            <a
+              href="/assinante"
+              className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-2 whitespace-nowrap"
+            >
+              Área do cliente
+              <ChevronDown className="w-3.5 h-3.5" />
+            </a>
           </div>
 
-          <button className="md:hidden text-foreground" onClick={() => setIsOpen(!isOpen)}>
+          {/* Mobile toggle */}
+          <button className="md:hidden text-[hsl(var(--navbar-fg))] ml-auto" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Sub nav - categories */}
-      <div className="hidden md:block bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
-        <div className="container mx-auto px-4 flex items-center justify-between h-10">
-          <div className="flex items-center gap-8">
-            {subNavLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => {
-                  if ('isRoute' in link && link.isRoute) {
-                    e.preventDefault();
-                    navigate(link.href);
-                  } else {
-                    handleAnchorClick(e, link.href);
-                  }
-                }}
-                className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                <link.icon className="w-3.5 h-3.5" />
-                {link.label}
-              </a>
-            ))}
-          </div>
+      {/* Sub nav - categories (desktop) */}
+      <div className="hidden md:block bg-[hsl(var(--navbar-bg))]/90 backdrop-blur-sm border-t border-[hsl(var(--dark-section-border))]">
+        <div className="container mx-auto px-4 flex items-center justify-center h-9 gap-8">
+          {/* City selector */}
+          <button
+            onClick={() => setShowCityModal(true)}
+            className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            📍
+            <span>{selectedCity ? `${selectedCity.name} ${selectedCity.state}` : "Selecione sua cidade"}</span>
+          </button>
+          <div className="w-px h-4 bg-[hsl(var(--navbar-fg))]/15" />
+          {subNavLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={(e) => {
+                if ('isRoute' in link && link.isRoute) {
+                  e.preventDefault();
+                  navigate(link.href);
+                } else {
+                  handleAnchorClick(e, link.href);
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--navbar-fg))]/80 hover:text-primary transition-colors"
+            >
+              <link.icon className="w-3.5 h-3.5" />
+              {link.label}
+            </a>
+          ))}
         </div>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-background border-b border-border px-4 pb-4 shadow-lg max-h-[calc(100dvh-116px)] overflow-y-auto">
+        <div className="md:hidden bg-[hsl(var(--navbar-bg))] border-t border-[hsl(var(--dark-section-border))] px-4 pb-4 shadow-lg max-h-[calc(100dvh-64px)] overflow-y-auto">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="block py-3 text-base font-medium text-foreground hover:text-primary transition-colors border-b border-border/50"
+              className="block py-3 text-base font-medium text-[hsl(var(--navbar-fg))] hover:text-primary transition-colors border-b border-[hsl(var(--dark-section-border))]/50"
               onClick={(e) => handleAnchorClick(e, link.href)}
             >
               {link.label}
             </a>
           ))}
-          <div className="grid grid-cols-1 gap-1 mt-3 mb-3">
+          <div className="grid grid-cols-2 gap-2 mt-3 mb-3">
             {subNavLinks.map((link) => (
               <a
                 key={link.label}
@@ -192,13 +166,21 @@ const Navbar = () => {
               </a>
             ))}
           </div>
-          <div className="flex flex-col gap-2">
-            <Button variant="outline" size="sm" className="border-primary text-primary rounded-full h-11" asChild><a href="#planos" onClick={(e) => handleAnchorClick(e, "#planos")}>Assine já</a></Button>
-            <Button size="sm" className="bg-primary text-primary-foreground rounded-full h-11" asChild>
-              <a href="/assinante">
-                <User className="w-4 h-4 mr-1" /> Área do Cliente
-              </a>
-            </Button>
+          <div className="flex flex-col gap-2 mt-2">
+            <a
+              href="#planos"
+              onClick={(e) => handleAnchorClick(e, "#planos")}
+              className="flex items-center justify-center gap-1 text-sm font-bold text-[hsl(var(--navbar-bg))] bg-primary rounded-lg h-11 hover:bg-primary/90 transition-colors"
+            >
+              Assine já
+            </a>
+            <a
+              href="/assinante"
+              className="flex items-center justify-center gap-1.5 text-sm font-bold text-primary border border-primary rounded-lg h-11 hover:bg-primary/10 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              Área do Cliente
+            </a>
           </div>
         </div>
       )}
