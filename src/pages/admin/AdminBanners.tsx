@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star, Link as LinkIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star, Link as LinkIcon, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +10,73 @@ import {
   buildBannerTitulo,
   validateBannerLink,
 } from "@/lib/bannerMeta";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// ----- Sortable card wrapper -----
+interface SortableBannerProps {
+  banner: DbBanner;
+  children: React.ReactNode;
+}
+
+const SortableBanner = ({ banner, children }: SortableBannerProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: banner.id,
+  });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Arrastar para reordenar"
+        className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-[hsl(var(--dark-section))]/80 backdrop-blur-sm border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary/40 cursor-grab active:cursor-grabbing transition-colors"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+      {children}
+    </div>
+  );
+};
 
 const AdminBanners = () => {
-  const { banners, loading, create, update, remove } = useBanners();
+  const { banners, loading, create, update, remove, reorder } = useBanners();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = banners.findIndex((b) => b.id === active.id);
+    const newIndex = banners.findIndex((b) => b.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const newOrder = arrayMove(banners, oldIndex, newIndex).map((b) => b.id);
+    reorder(newOrder);
+  };
+
   const [editing, setEditing] = useState<DbBanner | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -138,7 +202,7 @@ const AdminBanners = () => {
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Banners</h1>
           <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">
-            {banners.length} banners cadastrados • Apenas 1 pode ser destaque
+            {banners.length} banners cadastrados • Arraste pelo ícone <GripVertical className="inline w-3 h-3 align-text-top" /> para reordenar
           </p>
         </div>
         <Button
@@ -266,73 +330,78 @@ const AdminBanners = () => {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {banners.map((b) => {
-          const meta = parseBannerTitulo(b.titulo);
-          return (
-            <div
-              key={b.id}
-              className={`bg-[hsl(var(--dark-section-card))] border rounded-2xl overflow-hidden transition-all ${
-                meta.destaque ? "border-primary shadow-glow" : "border-[hsl(var(--dark-section-border))]"
-              }`}
-            >
-              {b.imagem_url && (
-                <div className="relative">
-                  <img src={b.imagem_url} alt={meta.titulo} className="w-full h-40 object-cover" />
-                  {meta.destaque && (
-                    <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
-                      <Star className="w-3 h-3 fill-current" /> Destaque
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={banners.map((b) => b.id)} strategy={rectSortingStrategy}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {banners.map((b) => {
+              const meta = parseBannerTitulo(b.titulo);
+              return (
+                <SortableBanner key={b.id} banner={b}>
+                  <div
+                    className={`bg-[hsl(var(--dark-section-card))] border rounded-2xl overflow-hidden transition-all ${
+                      meta.destaque ? "border-primary shadow-glow" : "border-[hsl(var(--dark-section-border))]"
+                    }`}
+                  >
+                    {b.imagem_url && (
+                      <div className="relative">
+                        <img src={b.imagem_url} alt={meta.titulo} className="w-full h-40 object-cover" />
+                        {meta.destaque && (
+                          <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
+                            <Star className="w-3 h-3 fill-current" /> Destaque
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))] truncate">{meta.titulo}</h3>
+                        {b.ativo ? (
+                          <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                        ) : (
+                          <EyeOff className="w-4 h-4 text-red-400 shrink-0" />
+                        )}
+                      </div>
+                      {meta.link && (
+                        <p className="text-[10px] text-[hsl(var(--dark-section-muted))] truncate mb-2 flex items-center gap-1">
+                          <LinkIcon className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{meta.link}</span>
+                        </p>
+                      )}
+                      <div className="flex gap-1.5 mt-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => toggleDestaque(b)}
+                          className={`rounded-lg text-xs flex-1 ${meta.destaque ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-[hsl(var(--dark-section-muted))] hover:bg-primary/5 hover:text-primary"}`}
+                          title={meta.destaque ? "Remover destaque" : "Marcar como destaque"}
+                        >
+                          <Star className={`w-3 h-3 ${meta.destaque ? "fill-current" : ""}`} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEdit(b)}
+                          className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1"
+                        >
+                          <Edit2 className="w-3 h-3 mr-1" /> Editar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => remove(b.id)}
+                          className="text-destructive hover:bg-destructive/10 rounded-lg text-xs"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              )}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))] truncate">{meta.titulo}</h3>
-                  {b.ativo ? (
-                    <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-red-400 shrink-0" />
-                  )}
-                </div>
-                {meta.link && (
-                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))] truncate mb-2 flex items-center gap-1">
-                    <LinkIcon className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{meta.link}</span>
-                  </p>
-                )}
-                <div className="flex gap-1.5 mt-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => toggleDestaque(b)}
-                    className={`rounded-lg text-xs flex-1 ${meta.destaque ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-[hsl(var(--dark-section-muted))] hover:bg-primary/5 hover:text-primary"}`}
-                    title={meta.destaque ? "Remover destaque" : "Marcar como destaque"}
-                  >
-                    <Star className={`w-3 h-3 ${meta.destaque ? "fill-current" : ""}`} />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => openEdit(b)}
-                    className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1"
-                  >
-                    <Edit2 className="w-3 h-3 mr-1" /> Editar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => remove(b.id)}
-                    className="text-destructive hover:bg-destructive/10 rounded-lg text-xs"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                  </div>
+                </SortableBanner>
+              );
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
