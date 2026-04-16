@@ -20,6 +20,10 @@ interface Banner {
 }
 
 const CAROUSEL_THRESHOLD = 5;
+const DESTAQUE_PREFIX = "★ ";
+
+const isDestaque = (titulo: string) => titulo.startsWith(DESTAQUE_PREFIX);
+const cleanTitulo = (titulo: string) => titulo.replace(DESTAQUE_PREFIX, "");
 
 const BannersSection = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -42,7 +46,10 @@ const BannersSection = () => {
   if (!banners.length) return null;
 
   const useCarousel = banners.length > CAROUSEL_THRESHOLD;
-  const [featured, ...rest] = banners;
+  // Banner com prefixo ★ vira destaque; senão usa o primeiro
+  const destaqueIdx = banners.findIndex(b => isDestaque(b.titulo));
+  const featured = destaqueIdx >= 0 ? banners[destaqueIdx] : banners[0];
+  const rest = banners.filter(b => b.id !== featured.id);
 
   return (
     <section
@@ -109,14 +116,14 @@ const BannersSection = () => {
                     <div className="relative h-full min-h-[280px] md:min-h-[340px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
                       <img
                         src={banner.imagem_url}
-                        alt={banner.titulo}
+                        alt={cleanTitulo(banner.titulo)}
                         loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/40 to-transparent" />
                       <div className="relative h-full flex flex-col justify-end p-6">
                         <h3 className="font-display text-lg md:text-xl font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
-                          {banner.titulo}
+                          {cleanTitulo(banner.titulo)}
                         </h3>
                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           Ver detalhes
@@ -151,7 +158,7 @@ const BannersSection = () => {
               <div className="relative h-full min-h-[320px] md:min-h-[480px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 shadow-elevated">
                 <img
                   src={featured.imagem_url}
-                  alt={featured.titulo}
+                  alt={cleanTitulo(featured.titulo)}
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                 />
@@ -165,7 +172,7 @@ const BannersSection = () => {
                     Destaque
                   </div>
                   <h3 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-[hsl(var(--dark-section-fg))] mb-4 leading-tight">
-                    {featured.titulo}
+                    {cleanTitulo(featured.titulo)}
                   </h3>
                   <Button
                     asChild
@@ -173,7 +180,7 @@ const BannersSection = () => {
                   >
                     <a
                       href="#planos"
-                      aria-label={`Ver oferta: ${featured.titulo}`}
+                      aria-label={`Ver oferta: ${cleanTitulo(featured.titulo)}`}
                       className="inline-flex items-center gap-2"
                     >
                       Aproveitar agora
@@ -197,7 +204,7 @@ const BannersSection = () => {
                 <div className="relative h-full min-h-[200px] md:min-h-[230px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
                   <img
                     src={banner.imagem_url}
-                    alt={banner.titulo}
+                    alt={cleanTitulo(banner.titulo)}
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                   />
@@ -205,7 +212,7 @@ const BannersSection = () => {
 
                   <div className="relative h-full flex flex-col justify-end p-5 md:p-6">
                     <h3 className="font-display text-base md:text-lg font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
-                      {banner.titulo}
+                      {cleanTitulo(banner.titulo)}
                     </h3>
                     <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       Ver detalhes
