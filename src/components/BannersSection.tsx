@@ -12,6 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { parseBannerTitulo, safeBannerHref } from "@/lib/bannerMeta";
 
 interface Banner {
   id: string;
@@ -20,10 +21,6 @@ interface Banner {
 }
 
 const CAROUSEL_THRESHOLD = 5;
-const DESTAQUE_PREFIX = "★ ";
-
-const isDestaque = (titulo: string) => titulo.startsWith(DESTAQUE_PREFIX);
-const cleanTitulo = (titulo: string) => titulo.replace(DESTAQUE_PREFIX, "");
 
 const BannersSection = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -46,10 +43,11 @@ const BannersSection = () => {
   if (!banners.length) return null;
 
   const useCarousel = banners.length > CAROUSEL_THRESHOLD;
-  // Banner com prefixo ★ vira destaque; senão usa o primeiro
-  const destaqueIdx = banners.findIndex(b => isDestaque(b.titulo));
+  // Banner com destaque vira o featured; senão usa o primeiro
+  const destaqueIdx = banners.findIndex((b) => parseBannerTitulo(b.titulo).destaque);
   const featured = destaqueIdx >= 0 ? banners[destaqueIdx] : banners[0];
-  const rest = banners.filter(b => b.id !== featured.id);
+  const featuredMeta = parseBannerTitulo(featured.titulo);
+  const rest = banners.filter((b) => b.id !== featured.id);
 
   return (
     <section
