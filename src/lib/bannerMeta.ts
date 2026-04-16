@@ -56,9 +56,9 @@ export function buildBannerTitulo(meta: BannerMeta): string {
   return meta.destaque ? `${DESTAQUE_PREFIX}${base}` : base;
 }
 
-export function validateBannerLink(link: string): { ok: true } | { ok: false; error: string } {
+export function validateBannerLink(link: string): { ok: boolean; error: string } {
   const result = linkSchema.safeParse(link);
-  if (result.success) return { ok: true };
+  if (result.success) return { ok: true, error: "" };
   return { ok: false, error: result.error.issues[0]?.message ?? "Link inválido" };
 }
 
