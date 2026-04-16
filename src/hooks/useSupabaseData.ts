@@ -116,10 +116,11 @@ export function usePlans() {
 
   const fetch = useCallback(async () => {
     setLoading(true);
+    // Ordem manual persistida via created_at desc (reorder reescreve created_at)
     const { data, error } = await supabase
       .from("plans")
       .select("*")
-      .order("price", { ascending: true });
+      .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar planos: " + error.message);
     else setPlans(data || []);
     setLoading(false);
@@ -145,7 +146,33 @@ export function usePlans() {
     toast.success("Plano removido!"); await fetch(); return true;
   };
 
-  return { plans, loading, refetch: fetch, create, update, remove };
+  /**
+   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente
+   * (1s de diferença), já que a tabela não tem coluna `ordem` dedicada.
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   */
+  const reorder = async (orderedIds: string[]) => {
+    if (orderedIds.length === 0) return true;
+    setPlans((prev) => {
+      const map = new Map(prev.map((p) => [p.id, p]));
+      return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbPlan[];
+    });
+    const baseMs = Date.now();
+    const updates = orderedIds.map((id, idx) => {
+      const created_at = new Date(baseMs - idx * 1000).toISOString();
+      return supabase.from("plans").update({ created_at }).eq("id", id);
+    });
+    const results = await Promise.all(updates);
+    const firstError = results.find((r) => r.error)?.error;
+    if (firstError) {
+      toast.error("Erro ao reordenar: " + firstError.message);
+      await fetch();
+      return false;
+    }
+    return true;
+  };
+
+  return { plans, loading, refetch: fetch, create, update, remove, reorder };
 }
 
 export function useClients() {

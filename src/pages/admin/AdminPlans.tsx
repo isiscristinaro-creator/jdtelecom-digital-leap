@@ -1,15 +1,78 @@
-import { useState, useMemo } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePlans, type DbPlan } from "@/hooks/useSupabaseData";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+interface SortablePlanProps {
+  plan: DbPlan;
+  children: React.ReactNode;
+}
+
+const SortablePlan = ({ plan, children }: SortablePlanProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: plan.id,
+  });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Arrastar para reordenar"
+        className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-[hsl(var(--dark-section))]/80 backdrop-blur-sm border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary/40 cursor-grab active:cursor-grabbing transition-colors"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+      {children}
+    </div>
+  );
+};
 
 const AdminPlans = () => {
-  const { plans, loading, create, update, remove } = usePlans();
+  const { plans, loading, create, update, remove, reorder } = usePlans();
   const [editingPlan, setEditingPlan] = useState<DbPlan | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [form, setForm] = useState({ name: "", speed: "", price: "", benefits: "" });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = plans.findIndex((p) => p.id === active.id);
+    const newIndex = plans.findIndex((p) => p.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const newOrder = arrayMove(plans, oldIndex, newIndex).map((p) => p.id);
+    reorder(newOrder);
+  };
 
   const openCreate = () => {
     setForm({ name: "", speed: "", price: "", benefits: "" });
@@ -54,7 +117,9 @@ const AdminPlans = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Planos</h1>
-          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{plans.length} planos cadastrados</p>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">
+            {plans.length} planos cadastrados • Arraste pelo ícone <GripVertical className="inline w-3 h-3 align-text-top" /> para reordenar
+          </p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
           <Plus className="w-4 h-4 mr-1" /> Novo Plano
@@ -99,35 +164,41 @@ const AdminPlans = () => {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {plans.map((plan) => (
-          <div key={plan.id} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))]">{plan.name}</h3>
-                <p className="text-xs text-[hsl(var(--dark-section-muted))]">{plan.speed}</p>
-              </div>
-              <p className="font-display text-xl font-extrabold text-primary">R$ {plan.price.toFixed(2)}</p>
-            </div>
-            <div className="space-y-1 mb-4">
-              {plan.benefits.map((b) => (
-                <p key={b} className="text-xs text-[hsl(var(--dark-section-muted))] flex items-center gap-1.5">
-                  <Check className="w-3 h-3 text-primary" /> {b}
-                </p>
-              ))}
-            </div>
-            <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-3">{plan.active_clients} clientes ativos</p>
-            <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={() => openEdit(plan)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
-                <Edit2 className="w-3 h-3 mr-1" /> Editar
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => handleDelete(plan.id)} className="text-destructive hover:bg-destructive/10 rounded-lg text-xs">
-                <Trash2 className="w-3 h-3" />
-              </Button>
-            </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={plans.map((p) => p.id)} strategy={rectSortingStrategy}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {plans.map((plan) => (
+              <SortablePlan key={plan.id} plan={plan}>
+                <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+                  <div className="flex items-start justify-between mb-3 pr-10">
+                    <div>
+                      <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))]">{plan.name}</h3>
+                      <p className="text-xs text-[hsl(var(--dark-section-muted))]">{plan.speed}</p>
+                    </div>
+                    <p className="font-display text-xl font-extrabold text-primary">R$ {plan.price.toFixed(2)}</p>
+                  </div>
+                  <div className="space-y-1 mb-4">
+                    {plan.benefits.map((b) => (
+                      <p key={b} className="text-xs text-[hsl(var(--dark-section-muted))] flex items-center gap-1.5">
+                        <Check className="w-3 h-3 text-primary" /> {b}
+                      </p>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-3">{plan.active_clients} clientes ativos</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="ghost" onClick={() => openEdit(plan)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
+                      <Edit2 className="w-3 h-3 mr-1" /> Editar
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleDelete(plan.id)} className="text-destructive hover:bg-destructive/10 rounded-lg text-xs">
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </SortablePlan>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
