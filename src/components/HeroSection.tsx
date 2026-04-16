@@ -72,15 +72,13 @@ const HeroSection = () => {
           >
             {banners.map((src, i) => (
               <div key={i} className="min-w-full">
-                <div className="w-full aspect-[1896/523] sm:aspect-auto bg-[hsl(var(--dark-section))]">
-                  <img
-                    src={src}
-                    alt={`JD Telecom Banner ${i + 1}`}
-                    className="w-full h-full sm:h-auto block object-contain"
-                    loading={i === 0 ? "eager" : "lazy"}
-                    draggable={false}
-                  />
-                </div>
+                <img
+                  src={src}
+                  alt={`JD Telecom Banner ${i + 1}`}
+                  className="w-full h-auto block"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  draggable={false}
+                />
               </div>
             ))}
           </div>
