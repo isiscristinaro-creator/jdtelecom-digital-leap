@@ -1,34 +1,27 @@
+import { render, screen, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { useEffect, useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
-type IOEntryCb = (entries: IntersectionObserverEntry[]) => void;
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = "0px";
+  readonly scrollMargin = "0px";
+  readonly thresholds = [0];
 
-let observerCallbacks: IOEntryCb[] = [];
+  constructor(_callback: IntersectionObserverCallback) {}
 
-class MockIntersectionObserver {
-  cb: IOEntryCb;
-  constructor(cb: IOEntryCb) {
-    this.cb = cb;
-    observerCallbacks.push(cb);
-  }
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
   takeRecords = vi.fn(() => []);
-  root = null;
-  rootMargin = "";
-  thresholds = [];
 }
 
-function setMatchMedia(reducedMotion: boolean) {
+function setReducedMotion(enabled: boolean) {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: (query: string) => ({
-      matches:
-        reducedMotion && query === "(prefers-reduced-motion: reduce)"
-          ? true
-          : false,
+      matches: enabled && query === "(prefers-reduced-motion: reduce)",
       media: query,
       onchange: null,
       addListener: () => {},
@@ -41,8 +34,7 @@ function setMatchMedia(reducedMotion: boolean) {
 }
 
 function mockBoundingRect(rect: Partial<DOMRect>) {
-  // Override prototype so any element ref returns the mocked rect.
-  Element.prototype.getBoundingClientRect = vi.fn(
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(
     () =>
       ({
         top: 0,
@@ -59,18 +51,43 @@ function mockBoundingRect(rect: Partial<DOMRect>) {
   );
 }
 
+function HookProbe() {
+  const { ref, isVisible } = useScrollAnimation();
+
+  return (
+    <>
+      <div data-testid="target" ref={ref as (node: HTMLDivElement | null) => void} />
+      <span data-testid="state">{isVisible ? "visible" : "hidden"}</span>
+    </>
+  );
+}
+
+function DeferredMountProbe() {
+  const [ready, setReady] = useState(false);
+  const { ref, isVisible } = useScrollAnimation();
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
+  return (
+    <>
+      {ready ? <div data-testid="target" ref={ref as (node: HTMLDivElement | null) => void} /> : null}
+      <span data-testid="state">{isVisible ? "visible" : "hidden"}</span>
+    </>
+  );
+}
+
 describe("useScrollAnimation", () => {
   beforeEach(() => {
-    observerCallbacks = [];
     vi.useFakeTimers();
-    // @ts-expect-error - mock global IO
     global.IntersectionObserver = MockIntersectionObserver;
     Object.defineProperty(window, "innerHeight", {
       writable: true,
       configurable: true,
       value: 800,
     });
-    setMatchMedia(false);
+    setReducedMotion(false);
   });
 
   afterEach(() => {
@@ -79,73 +96,45 @@ describe("useScrollAnimation", () => {
   });
 
   it("marca isVisible imediatamente quando o elemento já está na viewport", () => {
-    mockBoundingRect({ top: 100, bottom: 400 });
+    mockBoundingRect({ top: 120, bottom: 420 });
 
-    const { result } = renderHook(() => useScrollAnimation());
+    render(<HookProbe />);
 
-    // Anexa o ref ao elemento DOM real para o efeito rodar.
-    const div = document.createElement("div");
-    Object.defineProperty(result.current.ref, "current", {
-      writable: true,
-      value: div,
-    });
-
-    // Re-render para acionar o useEffect com o ref preenchido.
-    const { result: r2 } = renderHook(() => {
-      const hook = useScrollAnimation();
-      // Simula ref preenchido antes do effect via attach manual no DOM
-      return hook;
-    });
-
-    // Caminho real: o hook usa ref.current dentro do effect. Como o ref
-    // começa null no primeiro render, validamos diretamente o comportamento
-    // criando um cenário com elemento montado:
-    const TestRef = () => {
-      const h = useScrollAnimation();
-      // attach do div ao current
-      (h.ref as { current: HTMLDivElement | null }).current = div;
-      return h;
-    };
-    const { result: r3 } = renderHook(() => TestRef());
-    expect(r3.current.isVisible).toBe(true);
-    void result;
-    void r2;
+    expect(screen.getByTestId("state")).toHaveTextContent("visible");
   });
 
   it("marca isVisible imediatamente quando prefers-reduced-motion está ativo", () => {
-    setMatchMedia(true);
-    // Mesmo se o elemento estivesse fora da viewport, reduced-motion vence.
+    setReducedMotion(true);
     mockBoundingRect({ top: 5000, bottom: 5400 });
 
-    const div = document.createElement("div");
-    const TestRef = () => {
-      const h = useScrollAnimation();
-      (h.ref as { current: HTMLDivElement | null }).current = div;
-      return h;
-    };
-    const { result } = renderHook(() => TestRef());
-    expect(result.current.isVisible).toBe(true);
+    render(<HookProbe />);
+
+    expect(screen.getByTestId("state")).toHaveTextContent("visible");
   });
 
   it("marca isVisible via fallback de 800ms quando o observer não dispara", () => {
-    // Elemento fora da viewport e sem reduced-motion -> registra observer.
     mockBoundingRect({ top: 5000, bottom: 5400 });
 
-    const div = document.createElement("div");
-    const TestRef = () => {
-      const h = useScrollAnimation();
-      (h.ref as { current: HTMLDivElement | null }).current = div;
-      return h;
-    };
-    const { result } = renderHook(() => TestRef());
+    render(<HookProbe />);
 
-    // Antes do timeout: ainda não visível.
-    expect(result.current.isVisible).toBe(false);
+    expect(screen.getByTestId("state")).toHaveTextContent("hidden");
 
     act(() => {
-      vi.advanceTimersByTime(800);
+      vi.advanceTimersByTime(799);
     });
+    expect(screen.getByTestId("state")).toHaveTextContent("hidden");
 
-    expect(result.current.isVisible).toBe(true);
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(screen.getByTestId("state")).toHaveTextContent("visible");
+  });
+
+  it("funciona quando o elemento surge apenas após carregamento assíncrono", () => {
+    mockBoundingRect({ top: 160, bottom: 460 });
+
+    render(<DeferredMountProbe />);
+
+    expect(screen.getByTestId("state")).toHaveTextContent("visible");
   });
 });
