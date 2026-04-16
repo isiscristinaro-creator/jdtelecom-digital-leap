@@ -199,7 +199,7 @@ const PlansCarousel = ({ plans, navigate }: { plans: typeof mobilePlans; navigat
 
   if (!isMobile) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto" style={{ perspective: "1200px" }}>
         {plans.map((plan) => <PlanCard key={plan.name} plan={plan} navigate={navigate} />)}
       </div>
     );
