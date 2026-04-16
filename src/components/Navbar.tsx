@@ -148,7 +148,7 @@ const Navbar = () => {
   const { selectedCity, setShowCityModal } = useCity();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav className="fixed top-0 left-0 right-0 z-50" role="navigation" aria-label="Navegação principal">
       {/* Top bar */}
       <div className="bg-[hsl(var(--navbar-bg))] border-b border-[hsl(var(--dark-section-border))]">
         <div className="container mx-auto px-4 py-2 lg:py-0 lg:h-10 text-sm lg:text-xs">
@@ -237,7 +237,13 @@ const Navbar = () => {
             </div>
           </div>
 
-          <button className="lg:hidden text-foreground ml-auto" onClick={() => setIsOpen(!isOpen)}>
+          <button
+            className="lg:hidden text-foreground ml-auto p-2 rounded-lg hover:bg-muted/50 transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+          >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
@@ -269,7 +275,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="lg:hidden bg-background border-b border-border px-4 pb-4 shadow-lg max-h-[calc(100dvh-116px)] overflow-y-auto">
+        <div id="mobile-menu" role="menu" className="lg:hidden bg-background border-b border-border px-4 pb-4 shadow-lg max-h-[calc(100dvh-116px)] overflow-y-auto animate-fade-in">
           {navLinks.map((link) => (
             <a
               key={link.href}
