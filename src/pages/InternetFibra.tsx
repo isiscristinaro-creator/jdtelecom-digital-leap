@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Wifi, Shield, Zap, ChevronDown, Check, ArrowRight, Headphones,
-  Star, Sparkles, Globe, Monitor, FileText, Phone,
+  Star, Sparkles, Globe, FileText, Phone,
   MessageCircle, MapPin, CreditCard, Activity, Gauge, Network
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";

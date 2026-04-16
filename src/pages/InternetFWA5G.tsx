@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Signal, Wifi, Zap, ChevronDown, Check, ArrowRight,
   Star, Sparkles, Globe, Monitor, Smartphone, MessageCircle,
-  Home, Router, Radio, Antenna, MapPin
+  Home, Router, MapPin
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";

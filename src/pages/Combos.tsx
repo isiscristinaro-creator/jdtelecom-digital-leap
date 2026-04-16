@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Tv, Music, Film, Smartphone, Wifi, ArrowRight, Sparkles, Package,
-  ChevronDown, Check, MessageCircle, Shield, Zap, Headphones,
-  Calculator, TrendingDown, Layers, Gift, Plus, BadgePercent
+  ChevronDown, Check, MessageCircle, Shield,
+  Calculator, TrendingDown, Layers, Gift, BadgePercent
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
