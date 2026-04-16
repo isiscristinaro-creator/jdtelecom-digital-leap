@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2, Eye, EyeOff, MessageSquare, Filter } from "lucide-react";
+import { useState } from "react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, Eye, EyeOff, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +26,9 @@ const AdminTestemunhos = () => {
   const [editing, setEditing] = useState<DbTestemunho | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [form, setForm] = useState({ nome: "", mensagem: "", ativo: true, produto: "geral" });
+  const [filtro, setFiltro] = useState("todos");
 
+  const filtered = filtro === "todos" ? testemunhos : testemunhos.filter(t => (t.produto || "geral") === filtro);
   const openCreate = () => { setForm({ nome: "", mensagem: "", ativo: true, produto: "geral" }); setIsCreating(true); setEditing(null); };
   const openEdit = (t: DbTestemunho) => { setForm({ nome: t.nome, mensagem: t.mensagem, ativo: t.ativo, produto: t.produto || "geral" }); setEditing(t); setIsCreating(false); };
 
