@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Sparkles, ArrowRight, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 interface Banner {
   id: string;
@@ -10,6 +13,7 @@ interface Banner {
 
 const BannersSection = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
+  const { ref, isVisible } = useScrollAnimation();
 
   useEffect(() => {
     (async () => {
@@ -24,45 +28,130 @@ const BannersSection = () => {
 
   if (!banners.length) return null;
 
+  // Featured = primeiro banner | Resto = grid
+  const [featured, ...rest] = banners;
+
   return (
-    <section className="py-12 sm:py-16 bg-background">
-      <div className="container mx-auto px-4">
+    <section
+      id="ofertas-especiais"
+      className="relative py-24 md:py-32 bg-dark-section overflow-hidden"
+      ref={ref}
+    >
+      {/* Ambient glows — coerentes com PlansSection */}
+      <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-primary/[0.05] blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[350px] bg-primary/[0.04] blur-[120px] pointer-events-none" />
+
+      {/* Grid pattern sutil */}
+      <div
+        className="absolute inset-0 opacity-[0.015] pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(hsl(var(--dark-section-fg)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--dark-section-fg)) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header — mesmo padrão de PlansSection */}
         <motion.div
+          className="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-6"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest rounded-full mb-3">
-            Promoções
-          </span>
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            Ofertas Especiais
-          </h2>
+          <div>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold uppercase tracking-[0.2em] rounded-full mb-4">
+              <Sparkles className="w-3 h-3" />
+              Promoções
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-[hsl(var(--dark-section-fg))] mb-3 leading-[1.1]">
+              Ofertas Especiais
+            </h2>
+            <p className="text-[hsl(var(--dark-section-muted))] text-lg max-w-xl">
+              Condições exclusivas selecionadas para você economizar mais.
+            </p>
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {banners.map((banner, i) => (
+        {/* Layout Bento: 1 destaque grande + grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+          {/* Featured */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            whileHover={{ y: -6 }}
+            className="lg:col-span-2 lg:row-span-2 group relative"
+          >
+            <div className="relative h-full min-h-[320px] md:min-h-[480px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 shadow-elevated">
+              {/* Imagem */}
+              <img
+                src={featured.imagem_url}
+                alt={featured.titulo}
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
+              />
+              {/* Overlay gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--dark-section))]/60 to-transparent" />
+
+              {/* Glow popular */}
+              <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary/20 blur-[80px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+              {/* Conteúdo */}
+              <div className="relative h-full flex flex-col justify-end p-6 md:p-10">
+                <div className="inline-flex w-fit items-center gap-1.5 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-[0.2em] rounded-full mb-4 shadow-glow">
+                  <Tag className="w-3 h-3" />
+                  Destaque
+                </div>
+                <h3 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-[hsl(var(--dark-section-fg))] mb-4 leading-tight">
+                  {featured.titulo}
+                </h3>
+                <Button
+                  asChild
+                  className="w-fit bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-2xl px-6 py-6 shadow-glow group/btn"
+                >
+                  <a
+                    href="#planos"
+                    aria-label={`Ver oferta: ${featured.titulo}`}
+                    className="inline-flex items-center gap-2"
+                  >
+                    Aproveitar agora
+                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Cards menores */}
+          {rest.slice(0, 4).map((banner, i) => (
             <motion.div
               key={banner.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group relative rounded-2xl overflow-hidden border border-border bg-card shadow-md hover:shadow-xl transition-shadow"
+              initial={{ opacity: 0, y: 40 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
+              whileHover={{ y: -6 }}
+              className="group relative"
             >
-              <div className="aspect-[16/9] overflow-hidden">
+              <div className="relative h-full min-h-[200px] md:min-h-[230px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
                 <img
                   src={banner.imagem_url}
                   alt={banner.titulo}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                 />
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                <p className="text-white font-semibold text-sm md:text-base">
-                  {banner.titulo}
-                </p>
+                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/30 to-transparent" />
+
+                <div className="relative h-full flex flex-col justify-end p-5 md:p-6">
+                  <h3 className="font-display text-base md:text-lg font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
+                    {banner.titulo}
+                  </h3>
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Ver detalhes
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
               </div>
             </motion.div>
           ))}
