@@ -8,6 +8,16 @@ export function useScrollAnimation(threshold = 0.15) {
     const el = ref.current;
     if (!el) return;
 
+    // Respeita prefers-reduced-motion: usuários com essa preferência veem
+    // o conteúdo imediatamente, sem animações condicionais à viewport.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      return;
+    }
+
     // Verificação imediata: se o elemento já está na viewport (ex: deep-link
     // direto para #planos, ou seção acima da dobra), marca como visível.
     const rect = el.getBoundingClientRect();
