@@ -97,10 +97,11 @@ const HeroSection = () => {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`h-2.5 rounded-full transition-all duration-400 ${
+              className={`h-2.5 rounded-full transition-all duration-400 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                 i === current ? "w-8 bg-white" : "w-2.5 bg-white/40 hover:bg-white/70"
               }`}
-              aria-label={`Banner ${i + 1}`}
+              aria-label={`Ir para banner ${i + 1}`}
+              aria-current={i === current ? "true" : undefined}
             />
           ))}
         </motion.div>
