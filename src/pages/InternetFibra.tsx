@@ -504,7 +504,77 @@ const InternetFibra = () => {
         </div>
       </section>
 
-      {/* NETWORK TOPOLOGY (UNIQUE) */}
+      {/* EQUIPMENT SHOWCASE */}
+      <section className="py-16 sm:py-24 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div
+              className="relative flex justify-center"
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full scale-75" />
+                <motion.img
+                  src={equipmentFiberRouter}
+                  alt="Roteador Wi-Fi 6 de Fibra Óptica JD Telecom"
+                  className="relative z-10 w-64 sm:w-80 h-auto drop-shadow-2xl"
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                  animate={{ y: [0, -12, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-48 h-6 bg-primary/10 rounded-full blur-xl"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
+            <motion.div
+              className="space-y-6"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold">
+                <Sparkles className="w-4 h-4" /> Equipamento Premium
+              </span>
+              <h2 className="font-display text-2xl sm:text-4xl font-bold">
+                Roteador <span className="text-primary">Wi-Fi 6</span> incluso
+              </h2>
+              <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-md">
+                Receba um roteador de última geração com tecnologia Wi-Fi 6, capaz de suportar dezenas de dispositivos simultâneos sem perda de velocidade.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Wi-Fi 6", desc: "802.11ax de última geração" },
+                  { label: "Dual Band", desc: "2.4 GHz + 5 GHz simultâneo" },
+                  { label: "MU-MIMO", desc: "Múltiplos dispositivos" },
+                  { label: "Beamforming", desc: "Sinal direcionado" },
+                ].map((spec, i) => (
+                  <motion.div
+                    key={spec.label}
+                    className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 hover:border-primary/20 transition-all"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <p className="text-xs font-bold text-primary mb-0.5">{spec.label}</p>
+                    <p className="text-[10px] text-white/40">{spec.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 sm:py-24 relative">
         <GlowingOrbs />
         <div className="container mx-auto px-4 relative z-10">
