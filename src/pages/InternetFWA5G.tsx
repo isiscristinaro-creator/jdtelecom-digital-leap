@@ -737,6 +737,88 @@ const InternetFWA5G = () => {
         </div>
       </section>
 
+      {/* EQUIPMENT SHOWCASE */}
+      <section className="py-16 sm:py-24 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <motion.div
+              className="order-2 lg:order-1 space-y-6"
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-flex items-center gap-2 text-primary text-xs font-bold">
+                <Signal className="w-4 h-4" /> Roteador 5G Incluso
+              </span>
+              <h2 className="font-display text-2xl sm:text-4xl font-bold">
+                Conecte-se ao <span className="text-primary">futuro</span>
+              </h2>
+              <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-md">
+                O roteador 5G FWA capta o sinal da torre diretamente e distribui Wi-Fi 6 pela sua casa. Sem cabos, sem instalação complexa — basta ligar na tomada.
+              </p>
+              <div className="space-y-3">
+                {[
+                  { label: "Plug & Play", desc: "Ligue na tomada e use em 2 minutos" },
+                  { label: "Wi-Fi 6 integrado", desc: "Cobertura de até 150m² sem repetidor" },
+                  { label: "Design compacto", desc: "Discreto e elegante em qualquer ambiente" },
+                ].map((spec, i) => (
+                  <motion.div
+                    key={spec.label}
+                    className="flex items-start gap-3 bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 hover:border-primary/20 transition-all"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white/80">{spec.label}</p>
+                      <p className="text-xs text-white/40">{spec.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+            <motion.div
+              className="order-1 lg:order-2 relative flex justify-center"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full scale-75" />
+                <motion.img
+                  src={equipment5gRouter}
+                  alt="Roteador 5G FWA JD Telecom"
+                  className="relative z-10 w-48 sm:w-64 h-auto drop-shadow-2xl"
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                  animate={{ y: [0, -14, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-6 bg-primary/10 rounded-full blur-xl"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute top-4 right-0 bg-gradient-to-br from-primary to-orange-600 text-primary-foreground text-xs font-black px-3 py-1.5 rounded-full shadow-glow z-20"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  Wi-Fi 6
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* ══ LATENCY MONITOR + COVERAGE (UNIQUE) ══ */}
       <section className="py-16 sm:py-24 border-y border-white/5 relative">
         <DataStreams />
