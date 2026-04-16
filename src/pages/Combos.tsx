@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Tv, Music, Film, Smartphone, Wifi, ArrowRight, Sparkles, Package,
-  ChevronDown, Check, Star, MessageCircle, Shield, Zap, Globe, Headphones
+  ChevronDown, Check, MessageCircle, Shield, Zap, Headphones
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";

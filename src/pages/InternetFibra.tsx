@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Wifi, Shield, Zap, ChevronDown, Check, ArrowRight, Headphones,
-  Star, Sparkles, Globe, Monitor, Smartphone, FileText, Phone,
-  MessageCircle, MapPin, Tv, CreditCard
+  Star, Sparkles, Globe, Monitor, FileText, Phone,
+  MessageCircle, MapPin, CreditCard
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";

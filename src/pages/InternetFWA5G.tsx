@@ -2,9 +2,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-  Signal, Wifi, Shield, Zap, ChevronDown, Check, ArrowRight, Headphones,
+  Signal, Wifi, Zap, ChevronDown, Check, ArrowRight,
   Star, Sparkles, Globe, Monitor, Smartphone, MessageCircle,
-  Home, Router, CreditCard
+  Home, Router
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
