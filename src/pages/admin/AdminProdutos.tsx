@@ -1,16 +1,77 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProdutos, uploadImage, type DbProduto } from "@/hooks/useSupabaseData";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+interface SortableProdutoProps {
+  p: DbProduto;
+  children: React.ReactNode;
+}
+
+const SortableProduto = ({ p, children }: SortableProdutoProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: p.id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : "auto",
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Arrastar para reordenar"
+        className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-[hsl(var(--dark-section))]/80 backdrop-blur-sm border border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-muted))] hover:text-primary hover:border-primary/40 cursor-grab active:cursor-grabbing transition-colors"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+      {children}
+    </div>
+  );
+};
 
 const AdminProdutos = () => {
-  const { produtos, loading, create, update, remove } = useProdutos();
+  const { produtos, loading, create, update, remove, reorder } = useProdutos();
   const [editing, setEditing] = useState<DbProduto | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ nome: "", descricao: "", preco: "", categoria: "", imagem_url: "", ativo: true });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = produtos.findIndex(p => p.id === active.id);
+    const newIndex = produtos.findIndex(p => p.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const newOrder = arrayMove(produtos, oldIndex, newIndex).map(p => p.id);
+    reorder(newOrder);
+  };
 
   const openCreate = () => {
     setForm({ nome: "", descricao: "", preco: "", categoria: "", imagem_url: "", ativo: true });
@@ -51,7 +112,9 @@ const AdminProdutos = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[hsl(var(--dark-section-fg))]">Produtos</h1>
-          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">{produtos.length} produtos cadastrados</p>
+          <p className="text-sm text-[hsl(var(--dark-section-muted))] mt-1">
+            {produtos.length} produtos cadastrados • Arraste pelo ícone <GripVertical className="inline w-3 h-3 align-text-top" /> para reordenar
+          </p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
           <Plus className="w-4 h-4 mr-1" /> Novo Produto
@@ -112,32 +175,38 @@ const AdminProdutos = () => {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {produtos.map(p => (
-          <div key={p.id} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
-            {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className="w-full h-32 object-cover rounded-xl mb-3" />}
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))]">{p.nome}</h3>
-                <p className="text-xs text-[hsl(var(--dark-section-muted))]">{p.categoria}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                {p.ativo ? <Eye className="w-3 h-3 text-emerald-400" /> : <EyeOff className="w-3 h-3 text-red-400" />}
-                <p className="font-display text-lg font-extrabold text-primary">R$ {p.preco.toFixed(2)}</p>
-              </div>
-            </div>
-            {p.descricao && <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-3 line-clamp-2">{p.descricao}</p>}
-            <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={() => openEdit(p)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
-                <Edit2 className="w-3 h-3 mr-1" /> Editar
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => remove(p.id)} className="text-destructive hover:bg-destructive/10 rounded-lg text-xs">
-                <Trash2 className="w-3 h-3" />
-              </Button>
-            </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={produtos.map(p => p.id)} strategy={rectSortingStrategy}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {produtos.map(p => (
+              <SortableProduto key={p.id} p={p}>
+                <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
+                  {p.imagem_url && <img src={p.imagem_url} alt={p.nome} className="w-full h-32 object-cover rounded-xl mb-3" />}
+                  <div className="flex items-start justify-between mb-2 pr-10">
+                    <div>
+                      <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))]">{p.nome}</h3>
+                      <p className="text-xs text-[hsl(var(--dark-section-muted))]">{p.categoria}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {p.ativo ? <Eye className="w-3 h-3 text-emerald-400" /> : <EyeOff className="w-3 h-3 text-red-400" />}
+                      <p className="font-display text-lg font-extrabold text-primary">R$ {p.preco.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  {p.descricao && <p className="text-xs text-[hsl(var(--dark-section-muted))] mb-3 line-clamp-2">{p.descricao}</p>}
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="ghost" onClick={() => openEdit(p)} className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1">
+                      <Edit2 className="w-3 h-3 mr-1" /> Editar
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => remove(p.id)} className="text-destructive hover:bg-destructive/10 rounded-lg text-xs">
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </SortableProduto>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
