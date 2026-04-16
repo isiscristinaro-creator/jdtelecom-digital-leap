@@ -35,7 +35,7 @@ import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
-const HIDE_CITY_ROUTES = ["/assinante", "/admin", "/movel"];
+const HIDE_CITY_ROUTES = ["/assinante", "/admin", "/movel", "/fibra", "/fwa-5g", "/combos"];
 
 const RoutesWithCitySelector = () => {
   const location = useLocation();
