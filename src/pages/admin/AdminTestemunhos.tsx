@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTestemunhos, type DbTestemunho } from "@/hooks/useSupabaseData";
 
+const FILTER_OPTIONS = [
+  { value: "todos", label: "Todos" },
+  { value: "geral", label: "Geral" },
+  { value: "fibra", label: "Fibra" },
+  { value: "fwa5g", label: "FWA 5G" },
+  { value: "combos", label: "Combos" },
+];
+
 const PRODUTO_OPTIONS = [
   { value: "geral", label: "Geral (Home)" },
   { value: "fibra", label: "Fibra Óptica" },
@@ -18,7 +26,9 @@ const AdminTestemunhos = () => {
   const [editing, setEditing] = useState<DbTestemunho | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [form, setForm] = useState({ nome: "", mensagem: "", ativo: true, produto: "geral" });
+  const [filtro, setFiltro] = useState("todos");
 
+  const filtered = filtro === "todos" ? testemunhos : testemunhos.filter(t => (t.produto || "geral") === filtro);
   const openCreate = () => { setForm({ nome: "", mensagem: "", ativo: true, produto: "geral" }); setIsCreating(true); setEditing(null); };
   const openEdit = (t: DbTestemunho) => { setForm({ nome: t.nome, mensagem: t.mensagem, ativo: t.ativo, produto: t.produto || "geral" }); setEditing(t); setIsCreating(false); };
 
@@ -53,6 +63,31 @@ const AdminTestemunhos = () => {
         <Button onClick={openCreate} className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold">
           <Plus className="w-4 h-4 mr-1" /> Novo Testemunho
         </Button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-2">
+        {FILTER_OPTIONS.map(o => (
+          <button
+            key={o.value}
+            onClick={() => setFiltro(o.value)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              filtro === o.value
+                ? "bg-primary text-primary-foreground"
+                : "bg-[hsl(var(--dark-section-card))] text-[hsl(var(--dark-section-muted))] border border-[hsl(var(--dark-section-border))] hover:text-[hsl(var(--dark-section-fg))]"
+            }`}
+          >
+            {o.label}
+            {o.value !== "todos" && (
+              <span className="ml-1.5 opacity-70">
+                {testemunhos.filter(t => (t.produto || "geral") === o.value).length}
+              </span>
+            )}
+            {o.value === "todos" && (
+              <span className="ml-1.5 opacity-70">{testemunhos.length}</span>
+            )}
+          </button>
+        ))}
       </div>
 
       {showForm && (
@@ -98,7 +133,7 @@ const AdminTestemunhos = () => {
       )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {testemunhos.map(t => (
+        {filtered.map(t => (
           <div key={t.id} className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
