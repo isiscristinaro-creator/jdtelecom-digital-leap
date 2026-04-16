@@ -539,7 +539,11 @@ export function useTestemunhos() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("testemunhos").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("testemunhos")
+      .select("*")
+      .order("ordem", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar testemunhos: " + error.message);
     else setTestemunhos(data || []);
     setLoading(false);
@@ -566,8 +570,8 @@ export function useTestemunhos() {
   };
 
   /**
-   * Persiste a nova ordem reescrevendo `created_at` em sequência decrescente.
-   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo).
+   * Persiste a nova ordem na coluna dedicada `ordem` (inteiro asc).
+   * `orderedIds` deve estar na ordem visual desejada (primeiro = topo, ordem=0).
    */
   const reorder = async (orderedIds: string[]) => {
     if (orderedIds.length === 0) return true;
@@ -575,11 +579,9 @@ export function useTestemunhos() {
       const map = new Map(prev.map((t) => [t.id, t]));
       return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbTestemunho[];
     });
-    const baseMs = Date.now();
-    const updates = orderedIds.map((id, idx) => {
-      const created_at = new Date(baseMs - idx * 1000).toISOString();
-      return supabase.from("testemunhos").update({ created_at }).eq("id", id);
-    });
+    const updates = orderedIds.map((id, idx) =>
+      supabase.from("testemunhos").update({ ordem: idx } as any).eq("id", id)
+    );
     const results = await Promise.all(updates);
     const firstError = results.find((r) => r.error)?.error;
     if (firstError) {
