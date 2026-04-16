@@ -3,16 +3,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useEffect, useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
-let observerCallback: IntersectionObserverCallback | null = null;
-
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null;
   readonly rootMargin = "0px";
+  readonly scrollMargin = "0px";
   readonly thresholds = [0];
 
-  constructor(callback: IntersectionObserverCallback) {
-    observerCallback = callback;
-  }
+  constructor(_callback: IntersectionObserverCallback) {}
 
   observe = vi.fn();
   unobserve = vi.fn();
@@ -83,7 +80,6 @@ function DeferredMountProbe() {
 
 describe("useScrollAnimation", () => {
   beforeEach(() => {
-    observerCallback = null;
     vi.useFakeTimers();
     global.IntersectionObserver = MockIntersectionObserver;
     Object.defineProperty(window, "innerHeight", {
