@@ -20,6 +20,10 @@ interface Banner {
 }
 
 const CAROUSEL_THRESHOLD = 5;
+const DESTAQUE_PREFIX = "★ ";
+
+const isDestaque = (titulo: string) => titulo.startsWith(DESTAQUE_PREFIX);
+const cleanTitulo = (titulo: string) => titulo.replace(DESTAQUE_PREFIX, "");
 
 const BannersSection = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
