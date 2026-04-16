@@ -138,9 +138,10 @@ const Navbar = () => {
   ];
 
   const subNavLinks = [
-    { label: "Internet", href: "#planos", icon: Wifi },
+    { label: "Internet", href: "/fibra", icon: Wifi, isRoute: true },
+    { label: "FWA 5G", href: "/fwa-5g", icon: Signal, isRoute: true },
     { label: "Móvel 5G", href: "/movel", icon: Smartphone, isRoute: true },
-    { label: "Combos", href: "#planos", icon: Tv },
+    { label: "Combos", href: "/combos", icon: Tv, isRoute: true },
     { label: "Autoatendimento", href: "#autoatendimento", icon: Headphones },
   ];
 
