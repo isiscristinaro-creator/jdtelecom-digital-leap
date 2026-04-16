@@ -1,7 +1,7 @@
 import { Zap, Shield, Headphones, MapPin, Clock } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { motion } from "framer-motion";
-import sofaImg from "@/assets/sofa.png";
+import sofaImg from "@/assets/sofa.webp";
 
 const benefits = [
   { icon: Zap, title: "Alta Velocidade", description: "Conexão ultra rápida com fibra óptica de última geração para streaming, jogos e trabalho." },
