@@ -330,73 +330,78 @@ const AdminBanners = () => {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {banners.map((b) => {
-          const meta = parseBannerTitulo(b.titulo);
-          return (
-            <div
-              key={b.id}
-              className={`bg-[hsl(var(--dark-section-card))] border rounded-2xl overflow-hidden transition-all ${
-                meta.destaque ? "border-primary shadow-glow" : "border-[hsl(var(--dark-section-border))]"
-              }`}
-            >
-              {b.imagem_url && (
-                <div className="relative">
-                  <img src={b.imagem_url} alt={meta.titulo} className="w-full h-40 object-cover" />
-                  {meta.destaque && (
-                    <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
-                      <Star className="w-3 h-3 fill-current" /> Destaque
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={banners.map((b) => b.id)} strategy={rectSortingStrategy}>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {banners.map((b) => {
+              const meta = parseBannerTitulo(b.titulo);
+              return (
+                <SortableBanner key={b.id} banner={b}>
+                  <div
+                    className={`bg-[hsl(var(--dark-section-card))] border rounded-2xl overflow-hidden transition-all ${
+                      meta.destaque ? "border-primary shadow-glow" : "border-[hsl(var(--dark-section-border))]"
+                    }`}
+                  >
+                    {b.imagem_url && (
+                      <div className="relative">
+                        <img src={b.imagem_url} alt={meta.titulo} className="w-full h-40 object-cover" />
+                        {meta.destaque && (
+                          <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider rounded-full shadow-glow">
+                            <Star className="w-3 h-3 fill-current" /> Destaque
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))] truncate">{meta.titulo}</h3>
+                        {b.ativo ? (
+                          <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                        ) : (
+                          <EyeOff className="w-4 h-4 text-red-400 shrink-0" />
+                        )}
+                      </div>
+                      {meta.link && (
+                        <p className="text-[10px] text-[hsl(var(--dark-section-muted))] truncate mb-2 flex items-center gap-1">
+                          <LinkIcon className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{meta.link}</span>
+                        </p>
+                      )}
+                      <div className="flex gap-1.5 mt-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => toggleDestaque(b)}
+                          className={`rounded-lg text-xs flex-1 ${meta.destaque ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-[hsl(var(--dark-section-muted))] hover:bg-primary/5 hover:text-primary"}`}
+                          title={meta.destaque ? "Remover destaque" : "Marcar como destaque"}
+                        >
+                          <Star className={`w-3 h-3 ${meta.destaque ? "fill-current" : ""}`} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEdit(b)}
+                          className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1"
+                        >
+                          <Edit2 className="w-3 h-3 mr-1" /> Editar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => remove(b.id)}
+                          className="text-destructive hover:bg-destructive/10 rounded-lg text-xs"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              )}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-display font-bold text-[hsl(var(--dark-section-fg))] truncate">{meta.titulo}</h3>
-                  {b.ativo ? (
-                    <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-red-400 shrink-0" />
-                  )}
-                </div>
-                {meta.link && (
-                  <p className="text-[10px] text-[hsl(var(--dark-section-muted))] truncate mb-2 flex items-center gap-1">
-                    <LinkIcon className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{meta.link}</span>
-                  </p>
-                )}
-                <div className="flex gap-1.5 mt-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => toggleDestaque(b)}
-                    className={`rounded-lg text-xs flex-1 ${meta.destaque ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-[hsl(var(--dark-section-muted))] hover:bg-primary/5 hover:text-primary"}`}
-                    title={meta.destaque ? "Remover destaque" : "Marcar como destaque"}
-                  >
-                    <Star className={`w-3 h-3 ${meta.destaque ? "fill-current" : ""}`} />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => openEdit(b)}
-                    className="text-primary hover:bg-primary/10 rounded-lg text-xs flex-1"
-                  >
-                    <Edit2 className="w-3 h-3 mr-1" /> Editar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => remove(b.id)}
-                    className="text-destructive hover:bg-destructive/10 rounded-lg text-xs"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                  </div>
+                </SortableBanner>
+              );
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
