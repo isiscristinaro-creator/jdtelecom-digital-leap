@@ -204,7 +204,7 @@ const BannersSection = () => {
                 <div className="relative h-full min-h-[200px] md:min-h-[230px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
                   <img
                     src={banner.imagem_url}
-                    alt={banner.titulo}
+                    alt={cleanTitulo(banner.titulo)}
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
                   />
@@ -212,7 +212,7 @@ const BannersSection = () => {
 
                   <div className="relative h-full flex flex-col justify-end p-5 md:p-6">
                     <h3 className="font-display text-base md:text-lg font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
-                      {banner.titulo}
+                      {cleanTitulo(banner.titulo)}
                     </h3>
                     <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       Ver detalhes
