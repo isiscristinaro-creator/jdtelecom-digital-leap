@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star, Link as LinkIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check, Loader2, Upload, Eye, EyeOff, Star, Link as LinkIcon, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,23 @@ import {
   buildBannerTitulo,
   validateBannerLink,
 } from "@/lib/bannerMeta";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const AdminBanners = () => {
   const { banners, loading, create, update, remove } = useBanners();
