@@ -37,10 +37,10 @@ const ClientDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           </p>
           <p className="text-xs font-bold text-[hsl(var(--navbar-fg))] mb-3 tracking-wide">Baixe o App JD Fibra</p>
           <div className="flex gap-3 mb-5">
-            <a href="#" className="block hover:opacity-80 transition-opacity">
+            <a href="#" className="block hover:opacity-80 transition-opacity rounded-lg border-2 border-primary overflow-hidden">
               <img src={badgeGooglePlay} alt="Disponível no Google Play" className="h-10 w-auto" />
             </a>
-            <a href="#" className="block hover:opacity-80 transition-opacity">
+            <a href="#" className="block hover:opacity-80 transition-opacity rounded-lg border-2 border-primary overflow-hidden">
               <img src={badgeAppStore} alt="Baixar na App Store" className="h-10 w-auto" />
             </a>
           </div>
@@ -64,10 +64,10 @@ const ClientDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           </p>
           <p className="text-xs font-bold text-[hsl(var(--navbar-fg))] mb-3 tracking-wide">Baixe o App JD Móvel</p>
           <div className="flex gap-3 mb-5">
-            <a href="#" className="block hover:opacity-80 transition-opacity">
+            <a href="#" className="block hover:opacity-80 transition-opacity rounded-lg border-2 border-primary overflow-hidden">
               <img src={badgeGooglePlay} alt="Disponível no Google Play" className="h-10 w-auto" />
             </a>
-            <a href="#" className="block hover:opacity-80 transition-opacity">
+            <a href="#" className="block hover:opacity-80 transition-opacity rounded-lg border-2 border-primary overflow-hidden">
               <img src={badgeAppStore} alt="Baixar na App Store" className="h-10 w-auto" />
             </a>
           </div>
