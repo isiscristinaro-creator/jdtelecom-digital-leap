@@ -61,7 +61,8 @@ const AdminBanners = () => {
       return;
     }
     const result = validateBannerLink(val);
-    setLinkError(result.ok ? "" : result.error);
+    if (result.ok) setLinkError("");
+    else setLinkError(result.error);
   };
 
   const handleSave = async () => {
