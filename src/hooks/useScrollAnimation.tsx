@@ -41,7 +41,7 @@ export function useScrollAnimation(threshold = 0.15) {
 
     // Fallback de segurança: garante que o conteúdo aparece mesmo se o
     // observer não disparar (ex: animações iniciais perdidas em deep-link).
-    const fallback = window.setTimeout(() => setIsVisible(true), 1500);
+    const fallback = window.setTimeout(() => setIsVisible(true), 800);
 
     return () => {
       observer.disconnect();

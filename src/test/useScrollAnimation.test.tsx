@@ -127,7 +127,7 @@ describe("useScrollAnimation", () => {
     expect(result.current.isVisible).toBe(true);
   });
 
-  it("marca isVisible via fallback de 1500ms quando o observer não dispara", () => {
+  it("marca isVisible via fallback de 800ms quando o observer não dispara", () => {
     // Elemento fora da viewport e sem reduced-motion -> registra observer.
     mockBoundingRect({ top: 5000, bottom: 5400 });
 
@@ -143,7 +143,7 @@ describe("useScrollAnimation", () => {
     expect(result.current.isVisible).toBe(false);
 
     act(() => {
-      vi.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(800);
     });
 
     expect(result.current.isVisible).toBe(true);
