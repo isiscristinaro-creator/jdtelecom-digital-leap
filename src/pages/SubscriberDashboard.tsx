@@ -64,7 +64,7 @@ const MOCK_PREFERENCES = {
 };
 
 const SubscriberDashboard = () => {
-  const { user, profile, isAuthenticated, loading, logout } = useAuth();
+  const { user, profile, isAuthenticated, loading, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ name: "", phone: "", address: "" });
@@ -82,8 +82,14 @@ const SubscriberDashboard = () => {
   }, [isAuthenticated, loading, navigate]);
 
   useEffect(() => {
-    setEditData({ name: displayName, phone: displayPhone, address: "Rua das Flores, 123 - Manaus, AM" });
-  }, [displayName, displayPhone]);
+    if (profile) {
+      setEditData({
+        name: profile.full_name || user?.email || "Assinante",
+        phone: profile.phone || "(92) 99123-4567",
+        address: "Rua das Flores, 123 - Manaus, AM",
+      });
+    }
+  }, [profile, user?.email]);
 
   if (loading) {
     return (
@@ -100,9 +106,17 @@ const SubscriberDashboard = () => {
     navigate("/assinante", { replace: true });
   };
 
-  const handleSaveEdit = () => {
-    toast.success("Dados atualizados com sucesso!");
-    setEditMode(false);
+  const handleSaveEdit = async () => {
+    const result = await updateProfile({
+      full_name: editData.name,
+      phone: editData.phone,
+    });
+    if (result.success) {
+      toast.success("Dados atualizados com sucesso!");
+      setEditMode(false);
+    } else {
+      toast.error(result.error || "Erro ao atualizar dados.");
+    }
   };
 
   const StatusBadge = ({ status }: { status: string }) => {
