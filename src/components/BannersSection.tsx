@@ -99,39 +99,45 @@ const BannersSection = () => {
             onMouseLeave={() => autoplayRef.current.play()}
           >
             <CarouselContent className="-ml-4">
-              {banners.map((banner, i) => (
-                <CarouselItem
-                  key={banner.id}
-                  className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, delay: i * 0.05 }}
-                    whileHover={{ y: -6 }}
-                    className="group relative h-full"
+              {banners.map((banner, i) => {
+                const meta = parseBannerTitulo(banner.titulo);
+                const href = safeBannerHref(meta.link);
+                return (
+                  <CarouselItem
+                    key={banner.id}
+                    className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
                   >
-                    <div className="relative h-full min-h-[280px] md:min-h-[340px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
-                      <img
-                        src={banner.imagem_url}
-                        alt={cleanTitulo(banner.titulo)}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/40 to-transparent" />
-                      <div className="relative h-full flex flex-col justify-end p-6">
-                        <h3 className="font-display text-lg md:text-xl font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
-                          {cleanTitulo(banner.titulo)}
-                        </h3>
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          Ver detalhes
-                          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                        </span>
+                    <motion.a
+                      href={href}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                      transition={{ duration: 0.5, delay: i * 0.05 }}
+                      whileHover={{ y: -6 }}
+                      className="group relative h-full block"
+                      aria-label={`Ver oferta: ${meta.titulo}`}
+                    >
+                      <div className="relative h-full min-h-[280px] md:min-h-[340px] rounded-3xl overflow-hidden border border-[hsl(var(--dark-section-border))] hover:border-primary/40 transition-all duration-500 hover:shadow-elevated">
+                        <img
+                          src={banner.imagem_url}
+                          alt={meta.titulo}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/40 to-transparent" />
+                        <div className="relative h-full flex flex-col justify-end p-6">
+                          <h3 className="font-display text-lg md:text-xl font-bold text-[hsl(var(--dark-section-fg))] leading-snug mb-2">
+                            {meta.titulo}
+                          </h3>
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Ver detalhes
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                </CarouselItem>
-              ))}
+                    </motion.a>
+                  </CarouselItem>
+                );
+              })}
             </CarouselContent>
             <CarouselPrevious
               className="hidden md:flex -left-4 lg:-left-12 bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))] hover:bg-primary hover:text-primary-foreground hover:border-primary"
