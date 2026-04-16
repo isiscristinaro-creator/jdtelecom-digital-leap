@@ -24,8 +24,17 @@ const AdminTestemunhos = () => {
 
   const handleSave = async () => {
     if (!form.nome || !form.mensagem) return;
-    if (editing) await update(editing.id, form);
-    else await create(form);
+    // Try saving with produto field, fallback to without if column doesn't exist
+    const payload: any = { nome: form.nome, mensagem: form.mensagem, ativo: form.ativo };
+    try {
+      payload.produto = form.produto;
+      if (editing) await update(editing.id, payload);
+      else await create(payload);
+    } catch {
+      delete payload.produto;
+      if (editing) await update(editing.id, payload);
+      else await create(payload);
+    }
     setEditing(null); setIsCreating(false);
   };
 
