@@ -23,7 +23,6 @@ const AdminPedidos = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = useMemo(() => {
-    setCurrentPage(1);
     let list = [...pedidos];
     if (statusFilter !== "Todos") list = list.filter(p => p.status === statusFilter.toLowerCase());
     if (search) list = list.filter(p => p.cliente_email.toLowerCase().includes(search.toLowerCase()));
@@ -37,6 +36,11 @@ const AdminPedidos = () => {
     }
     return list;
   }, [pedidos, statusFilter, search, dataInicial, dataFinal]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, search, dataInicial, dataFinal]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
