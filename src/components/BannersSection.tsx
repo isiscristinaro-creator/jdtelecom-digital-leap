@@ -46,7 +46,10 @@ const BannersSection = () => {
   if (!banners.length) return null;
 
   const useCarousel = banners.length > CAROUSEL_THRESHOLD;
-  const [featured, ...rest] = banners;
+  // Banner com prefixo ★ vira destaque; senão usa o primeiro
+  const destaqueIdx = banners.findIndex(b => isDestaque(b.titulo));
+  const featured = destaqueIdx >= 0 ? banners[destaqueIdx] : banners[0];
+  const rest = banners.filter(b => b.id !== featured.id);
 
   return (
     <section
