@@ -85,12 +85,13 @@ const AdminBanners = () => {
     imagem_url: "",
     ativo: true,
     destaque: false,
+    hero: false,
     link: "",
   });
   const [linkError, setLinkError] = useState<string>("");
 
   const openCreate = () => {
-    setForm({ titulo: "", imagem_url: "", ativo: true, destaque: false, link: "" });
+    setForm({ titulo: "", imagem_url: "", ativo: true, destaque: false, hero: false, link: "" });
     setLinkError("");
     setIsCreating(true);
     setEditing(null);
@@ -102,6 +103,7 @@ const AdminBanners = () => {
       imagem_url: b.imagem_url || "",
       ativo: b.ativo,
       destaque: meta.destaque,
+      hero: meta.hero,
       link: meta.link,
     });
     setLinkError("");
@@ -147,13 +149,17 @@ const AdminBanners = () => {
     const finalTitulo = buildBannerTitulo({
       titulo: form.titulo,
       destaque: form.destaque,
+      hero: form.hero,
       link: form.link,
     });
     const payload = { titulo: finalTitulo, imagem_url: form.imagem_url, ativo: form.ativo };
 
-    // Se este banner está sendo marcado como destaque, remove o destaque dos outros
-    if (form.destaque) {
-      const outros = banners.filter((b) => b.id !== editing?.id && parseBannerTitulo(b.titulo).destaque);
+    // Se este banner está sendo marcado como destaque (e NÃO é hero),
+    // remove o destaque dos outros banners de ofertas
+    if (form.destaque && !form.hero) {
+      const outros = banners.filter(
+        (b) => b.id !== editing?.id && parseBannerTitulo(b.titulo).destaque && !parseBannerTitulo(b.titulo).hero
+      );
       for (const b of outros) {
         const meta = parseBannerTitulo(b.titulo);
         await update(b.id, {
