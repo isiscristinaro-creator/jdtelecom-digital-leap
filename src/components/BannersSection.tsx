@@ -12,7 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { parseBannerTitulo, safeBannerHref } from "@/lib/bannerMeta";
+import { parseBannerTitulo, safeBannerHref, isHeroTitulo } from "@/lib/bannerMeta";
 
 interface Banner {
   id: string;
@@ -36,7 +36,9 @@ const BannersSection = () => {
         .select("id, titulo, imagem_url")
         .eq("ativo", true)
         .order("created_at", { ascending: false });
-      if (data?.length) setBanners(data);
+      // Exclui banners destinados ao Hero
+      const ofertas = (data || []).filter((b) => !isHeroTitulo(b.titulo));
+      if (ofertas.length) setBanners(ofertas);
     })();
   }, []);
 
