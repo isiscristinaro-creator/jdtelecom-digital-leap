@@ -131,14 +131,14 @@ const PlansSection = () => {
 
                   <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} className="relative z-10">
                     <Button
-                      className={`w-full font-bold text-sm py-6 rounded-2xl relative overflow-hidden group/btn ${
+                      className={`w-full font-bold text-sm py-6 rounded-2xl relative overflow-hidden group/btn min-h-[48px] ${
                         plan.popular
                           ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow"
                           : "bg-primary text-primary-foreground hover:bg-primary/90"
                       }`}
                       asChild
                     >
-                      <a href="/cadastro">
+                      <a href="/cadastro" aria-label={`Assinar plano ${plan.speed} MEGA por R$ ${plan.price},${plan.cents}/mês`}>
                         <span className="relative z-10">Aproveitar oferta</span>
                         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/10 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700" />
                       </a>
