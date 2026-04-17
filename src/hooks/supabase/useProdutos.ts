@@ -39,9 +39,6 @@ export function useProdutos() {
     toast.success("Produto removido!"); await fetchData(); return true;
   };
 
-  /**
-   * Persiste a nova ordem na coluna dedicada `ordem` (inteiro asc).
-   */
   const reorder = async (orderedIds: string[]) => {
     if (orderedIds.length === 0) return true;
     setProdutos((prev) => {
@@ -49,7 +46,7 @@ export function useProdutos() {
       return orderedIds.map((id) => map.get(id)).filter(Boolean) as DbProduto[];
     });
     const updates = orderedIds.map((id, idx) =>
-      supabase.from("produtos").update({ ordem: idx } as any).eq("id", id)
+      supabase.from("produtos").update({ ordem: idx }).eq("id", id)
     );
     const results = await Promise.all(updates);
     const firstError = results.find((r) => r.error)?.error;
