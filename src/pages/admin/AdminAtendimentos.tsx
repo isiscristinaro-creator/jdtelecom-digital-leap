@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useClients, useServiceRecords } from "@/hooks/useSupabaseData";
+import type { DbServiceRecord } from "@/hooks/supabase/types";
 import { Search, Plus, PhoneCall, Mail, MessageSquare, Wrench, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-const typeIcons: Record<string, any> = {
+type ServiceRecordType = DbServiceRecord["type"];
+type ServiceIcon = typeof PhoneCall;
+
+const typeIcons: Record<string, ServiceIcon> = {
   "Ligação": PhoneCall,
   "E-mail": Mail,
   "WhatsApp": MessageSquare,
@@ -22,7 +26,7 @@ const AdminAtendimentos = () => {
   const { records, loading: loadingRecords, create } = useServiceRecords(selectedClientId);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({ agent: "", type: "Ligação", description: "" });
+  const [form, setForm] = useState({ agent: "", type: "Ligação" as ServiceRecordType, description: "" });
 
   const filteredClients = clients.filter(
     (c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase())
@@ -57,7 +61,6 @@ const AdminAtendimentos = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Client list */}
         <div className="lg:col-span-1 space-y-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[hsl(var(--dark-section-muted))]" />
@@ -92,7 +95,6 @@ const AdminAtendimentos = () => {
           </div>
         </div>
 
-        {/* Records */}
         <div className="lg:col-span-2 space-y-4">
           {selectedClient ? (
             <>
@@ -153,7 +155,6 @@ const AdminAtendimentos = () => {
         </div>
       </div>
 
-      {/* New record dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-[hsl(var(--dark-section-card))] border-[hsl(var(--dark-section-border))] text-[hsl(var(--dark-section-fg))]">
           <DialogHeader>
@@ -171,7 +172,7 @@ const AdminAtendimentos = () => {
             </div>
             <div>
               <label className="text-sm text-[hsl(var(--dark-section-muted))]">Tipo</label>
-              <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
+              <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as ServiceRecordType })}>
                 <SelectTrigger className="bg-[hsl(var(--dark-section))] border-[hsl(var(--dark-section-border))]">
                   <SelectValue />
                 </SelectTrigger>

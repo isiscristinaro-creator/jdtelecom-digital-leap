@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbClient, DbPedido, DbServiceRecord } from "@/hooks/supabase/types";
 
 export interface AdminNotification {
   id: string;
@@ -92,7 +93,6 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Supabase Realtime: listen for new pedidos
   useEffect(() => {
     const channel = supabase
       .channel("realtime-pedidos")
@@ -100,10 +100,10 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "pedidos" },
         (payload) => {
-          const p = payload.new as any;
+          const pedido = payload.new as Partial<DbPedido>;
           addNotification({
             title: "Novo pedido recebido",
-            message: `Pedido de ${p.cliente_email || "cliente"} — R$ ${Number(p.valor || 0).toFixed(2)}`,
+            message: `Pedido de ${pedido.cliente_email || "cliente"} — R$ ${Number(pedido.valor || 0).toFixed(2)}`,
             type: "success",
           });
         }
@@ -112,17 +112,17 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "pedidos" },
         (payload) => {
-          const p = payload.new as any;
-          if (p.status === "cancelado") {
+          const pedido = payload.new as Partial<DbPedido>;
+          if (pedido.status === "cancelado") {
             addNotification({
               title: "Pedido cancelado",
-              message: `Pedido de ${p.cliente_email || "cliente"} foi cancelado.`,
+              message: `Pedido de ${pedido.cliente_email || "cliente"} foi cancelado.`,
               type: "warning",
             });
-          } else if (p.status === "pago") {
+          } else if (pedido.status === "pago") {
             addNotification({
               title: "Pagamento confirmado",
-              message: `Pedido de ${p.cliente_email || "cliente"} — R$ ${Number(p.valor || 0).toFixed(2)} pago.`,
+              message: `Pedido de ${pedido.cliente_email || "cliente"} — R$ ${Number(pedido.valor || 0).toFixed(2)} pago.`,
               type: "success",
             });
           }
@@ -130,10 +130,9 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { void supabase.removeChannel(channel); };
   }, [addNotification]);
 
-  // Supabase Realtime: listen for new service_records (atendimentos)
   useEffect(() => {
     const channel = supabase
       .channel("realtime-atendimentos")
@@ -141,20 +140,19 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "service_records" },
         (payload) => {
-          const r = payload.new as any;
+          const record = payload.new as Partial<DbServiceRecord>;
           addNotification({
             title: "Novo atendimento registrado",
-            message: `${r.type || "Atendimento"} por ${r.agent || "agente"}: ${(r.description || "").slice(0, 60)}`,
+            message: `${record.type || "Atendimento"} por ${record.agent || "agente"}: ${(record.description || "").slice(0, 60)}`,
             type: "info",
           });
         }
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { void supabase.removeChannel(channel); };
   }, [addNotification]);
 
-  // Supabase Realtime: listen for new clients
   useEffect(() => {
     const channel = supabase
       .channel("realtime-clients")
@@ -162,17 +160,17 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "clients" },
         (payload) => {
-          const c = payload.new as any;
+          const client = payload.new as Partial<DbClient>;
           addNotification({
             title: "Novo cliente cadastrado",
-            message: `${c.name || "Cliente"} acabou de se cadastrar.`,
+            message: `${client.name || "Cliente"} acabou de se cadastrar.`,
             type: "success",
           });
         }
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { void supabase.removeChannel(channel); };
   }, [addNotification]);
 
   return (

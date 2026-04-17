@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbClient } from "./types";
 
 interface DashboardStats {
   totalClients: number;
@@ -14,6 +15,13 @@ interface DashboardStats {
   newLast30: number;
   growthRate: number;
 }
+
+type DashboardClientRow = Pick<DbClient, "status" | "join_date"> & {
+  plan_id: string;
+  plans?: {
+    price?: number | null;
+  } | null;
+};
 
 const EMPTY: DashboardStats = {
   totalClients: 0,
@@ -30,26 +38,29 @@ const EMPTY: DashboardStats = {
 };
 
 async function fetchDashboardStats(): Promise<DashboardStats> {
-  const { data: clients, error } = await supabase
+  const { data, error } = await supabase
     .from("clients")
     .select("status, plan_id, join_date, plans(price)");
 
   if (error) throw error;
-  if (!clients) return EMPTY;
+  const clients = (data as DashboardClientRow[] | null) ?? [];
+  if (clients.length === 0) return EMPTY;
 
   const total = clients.length;
-  const active = clients.filter((c: any) => c.status === "Ativo").length;
-  const inad = clients.filter((c: any) => c.status === "Inadimplente").length;
-  const canc = clients.filter((c: any) => c.status === "Cancelado").length;
+  const active = clients.filter((c) => c.status === "Ativo").length;
+  const inad = clients.filter((c) => c.status === "Inadimplente").length;
+  const canc = clients.filter((c) => c.status === "Cancelado").length;
   const mrrVal = clients
-    .filter((c: any) => c.status === "Ativo")
-    .reduce((s: number, c: any) => s + (c.plans?.price || 0), 0);
+    .filter((c) => c.status === "Ativo")
+    .reduce((sum, c) => sum + (c.plans?.price || 0), 0);
 
   const now = new Date();
-  const d7 = new Date(now); d7.setDate(d7.getDate() - 7);
-  const d30 = new Date(now); d30.setDate(d30.getDate() - 30);
-  const last7 = clients.filter((c: any) => new Date(c.join_date) >= d7).length;
-  const last30 = clients.filter((c: any) => new Date(c.join_date) >= d30).length;
+  const d7 = new Date(now);
+  d7.setDate(d7.getDate() - 7);
+  const d30 = new Date(now);
+  d30.setDate(d30.getDate() - 30);
+  const last7 = clients.filter((c) => new Date(c.join_date) >= d7).length;
+  const last30 = clients.filter((c) => new Date(c.join_date) >= d30).length;
 
   return {
     totalClients: total,

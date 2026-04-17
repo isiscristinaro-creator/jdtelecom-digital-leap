@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, X, Users, CreditCard, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbClient, DbPayment, DbPedido } from "@/hooks/supabase/types";
 
 interface SearchResult {
   id: string;
@@ -10,6 +11,10 @@ interface SearchResult {
   subtitle: string;
   route: string;
 }
+
+type ClientSearchRow = Pick<DbClient, "id" | "name" | "email" | "status">;
+type PaymentSearchRow = Pick<DbPayment, "id" | "description" | "amount" | "status">;
+type PedidoSearchRow = Pick<DbPedido, "id" | "cliente_email" | "valor" | "status">;
 
 const typeConfig = {
   client: { icon: Users, label: "Cliente", color: "text-blue-400" },
@@ -26,7 +31,6 @@ const AdminGlobalSearch = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Keyboard shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -40,7 +44,6 @@ const AdminGlobalSearch = () => {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -50,7 +53,6 @@ const AdminGlobalSearch = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Search
   useEffect(() => {
     if (!query.trim() || query.length < 2) { setResults([]); return; }
     const timer = setTimeout(async () => {
@@ -60,23 +62,35 @@ const AdminGlobalSearch = () => {
 
       const [clientsRes, paymentsRes, pedidosRes] = await Promise.all([
         supabase.from("clients").select("id, name, email, status").ilike("name", `%${q}%`).limit(5),
-        supabase.from("payments").select("id, description, amount, status, clients(name)").or(`description.ilike.%${q}%`).limit(5),
+        supabase.from("payments").select("id, description, amount, status").or(`description.ilike.%${q}%`).limit(5),
         supabase.from("pedidos").select("id, cliente_email, valor, status").ilike("cliente_email", `%${q}%`).limit(5),
       ]);
 
       if (clientsRes.data) {
-        items.push(...clientsRes.data.map((c: any) => ({
-          id: c.id, type: "client" as const, title: c.name, subtitle: `${c.email} • ${c.status}`, route: "/admin/clientes",
+        items.push(...(clientsRes.data as ClientSearchRow[]).map((c) => ({
+          id: c.id,
+          type: "client" as const,
+          title: c.name,
+          subtitle: `${c.email} • ${c.status}`,
+          route: "/admin/clientes",
         })));
       }
       if (paymentsRes.data) {
-        items.push(...paymentsRes.data.map((p: any) => ({
-          id: p.id, type: "payment" as const, title: p.description, subtitle: `R$ ${p.amount.toFixed(2)} • ${p.status}`, route: "/admin/pagamentos",
+        items.push(...(paymentsRes.data as PaymentSearchRow[]).map((p) => ({
+          id: p.id,
+          type: "payment" as const,
+          title: p.description,
+          subtitle: `R$ ${p.amount.toFixed(2)} • ${p.status}`,
+          route: "/admin/pagamentos",
         })));
       }
       if (pedidosRes.data) {
-        items.push(...pedidosRes.data.map((p: any) => ({
-          id: p.id, type: "pedido" as const, title: p.cliente_email, subtitle: `R$ ${p.valor.toFixed(2)} • ${p.status}`, route: "/admin/pedidos",
+        items.push(...(pedidosRes.data as PedidoSearchRow[]).map((p) => ({
+          id: p.id,
+          type: "pedido" as const,
+          title: p.cliente_email,
+          subtitle: `R$ ${p.valor.toFixed(2)} • ${p.status}`,
+          route: "/admin/pedidos",
         })));
       }
 

@@ -47,11 +47,10 @@ export function useKpiGoals() {
         setLoading(false);
         return;
       }
-    } catch {
-      // Table doesn't exist yet
+    } catch (error) {
+      console.warn("KPI goals fallback para localStorage:", error);
     }
 
-    // Fallback to localStorage
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -60,13 +59,14 @@ export function useKpiGoals() {
           setGoals(parsed);
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn("Falha ao ler metas do localStorage:", error);
+    }
     setDbAvailable(false);
     setLoading(false);
   }, []);
 
   const fetchHistory = useCallback(async () => {
-    // Try DB first
     try {
       const { data, error } = await supabase
         .from("kpi_goals_history")
@@ -80,14 +80,12 @@ export function useKpiGoals() {
         return;
       }
       if (!error) {
-        // Table exists but empty
         setHistoryDbAvailable(true);
       }
-    } catch {
-      // Table doesn't exist
+    } catch (error) {
+      console.warn("KPI history fallback para localStorage:", error);
     }
 
-    // Fallback to localStorage
     try {
       const saved = localStorage.getItem(HISTORY_KEY);
       if (saved) {
@@ -96,13 +94,14 @@ export function useKpiGoals() {
           setHistory(parsed);
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn("Falha ao ler histórico de metas do localStorage:", error);
+    }
   }, []);
 
   useEffect(() => { fetchGoals(); fetchHistory(); }, [fetchGoals, fetchHistory]);
 
   const addHistoryEntry = useCallback(async (entry: KpiHistoryEntry) => {
-    // Try DB insert
     if (historyDbAvailable) {
       const { error } = await supabase
         .from("kpi_goals_history")
@@ -121,7 +120,6 @@ export function useKpiGoals() {
       }
     }
 
-    // Fallback to localStorage
     setHistory(prev => {
       const updated = [entry, ...prev].slice(0, 50);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
@@ -133,7 +131,6 @@ export function useKpiGoals() {
     const currentGoal = goals.find(g => g.key === key);
     const oldValue = currentGoal?.target_value ?? 0;
 
-    // Optimistic update
     setGoals(prev => prev.map(g => g.key === key ? { ...g, target_value } : g));
 
     if (dbAvailable) {
@@ -149,7 +146,6 @@ export function useKpiGoals() {
       }
     }
 
-    // Save history entry
     await addHistoryEntry({
       key,
       label: currentGoal?.label ?? key,
@@ -159,7 +155,6 @@ export function useKpiGoals() {
       changed_at: new Date().toISOString(),
     });
 
-    // Always save to localStorage as backup
     const updated = goals.map(g => g.key === key ? { ...g, target_value } : g);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     toast.success("Meta atualizada!");

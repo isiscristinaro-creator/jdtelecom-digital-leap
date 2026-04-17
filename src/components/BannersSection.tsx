@@ -133,7 +133,7 @@ const BannersSection = () => {
                           src={banner.imagem_url}
                           alt={meta.titulo}
                           loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1200ms] ease-out"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/40 to-transparent" />
                         <div className="relative h-full flex flex-col justify-end p-6">
@@ -176,7 +176,7 @@ const BannersSection = () => {
                   src={featured.imagem_url}
                   alt={featuredMeta.titulo}
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1200ms] ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/40 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--dark-section))]/60 to-transparent" />
@@ -227,7 +227,7 @@ const BannersSection = () => {
                       src={banner.imagem_url}
                       alt={meta.titulo}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.2s] ease-out"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1200ms] ease-out"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--dark-section))] via-[hsl(var(--dark-section))]/30 to-transparent" />
 
