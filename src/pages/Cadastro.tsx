@@ -170,8 +170,7 @@ const Cadastro = () => {
 
     setLoading(true);
     try {
-      // @ts-expect-error tabela 'leads' será adicionada aos types após migration
-      const { error } = await supabase.from("leads").insert(parsed.data);
+      const { error } = await (supabase.from as any)("leads").insert(parsed.data);
       if (error) throw error;
       toast.success("Cadastro recebido! Em breve nossa equipe entrará em contato.");
       setTimeout(() => navigate("/assinante"), 1500);
