@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,25 @@ import { motion } from "framer-motion";
 import cadastroPerson from "@/assets/cadastro-person.png";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
+
+// Zod schema — validação client-side espelhando os limites enforced pela RLS WITH CHECK
+const leadSchema = z.object({
+  nome: z.string().trim().min(2, "Nome muito curto").max(200),
+  email: z.string().trim().email("Email inválido").max(255),
+  cpf_cnpj: z.string().trim().min(11, "CPF/CNPJ inválido").max(18),
+  nascimento: z.string().min(1, "Obrigatório"),
+  celular: z.string().trim().min(10, "Celular inválido").max(20),
+  cep: z.string().trim().min(8, "CEP inválido").max(9),
+  endereco: z.string().trim().min(1, "Obrigatório").max(255),
+  numero: z.string().trim().min(1, "Obrigatório").max(20),
+  bairro: z.string().trim().min(1, "Obrigatório").max(120),
+  cidade: z.string().trim().min(1, "Obrigatório").max(120),
+  estado: z.string().length(2, "UF inválida"),
+  ponto_referencia: z.string().max(255).optional(),
+  vencimento: z.string().min(1, "Obrigatório"),
+  plano: z.string().min(1, "Obrigatório"),
+});
 
 const ESTADOS = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
@@ -123,11 +143,44 @@ const Cadastro = () => {
       toast.error("Preencha todos os campos corretamente.");
       return;
     }
+
+    // Normaliza para o formato persistido (snake_case + nascimento como date)
+    const payload = {
+      nome: form.nome.trim(),
+      email: form.email.trim().toLowerCase(),
+      cpf_cnpj: form.cpfCnpj.trim(),
+      nascimento: form.nascimento,
+      celular: form.celular.trim(),
+      cep: form.cep.trim(),
+      endereco: form.endereco.trim(),
+      numero: form.numero.trim(),
+      bairro: form.bairro.trim(),
+      cidade: form.cidade.trim(),
+      estado: form.estado,
+      ponto_referencia: form.pontoReferencia.trim() || undefined,
+      vencimento: form.vencimento,
+      plano: form.plano,
+    };
+
+    const parsed = leadSchema.safeParse(payload);
+    if (!parsed.success) {
+      toast.error("Dados inválidos. Revise os campos do formulário.");
+      return;
+    }
+
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
-    toast.success("Cadastro realizado com sucesso! Redirecionando...");
-    setTimeout(() => navigate("/assinante"), 1500);
-    setLoading(false);
+    try {
+      // @ts-expect-error tabela 'leads' será adicionada aos types após migration
+      const { error } = await supabase.from("leads").insert(parsed.data);
+      if (error) throw error;
+      toast.success("Cadastro recebido! Em breve nossa equipe entrará em contato.");
+      setTimeout(() => navigate("/assinante"), 1500);
+    } catch (err) {
+      console.error("Erro ao enviar cadastro:", err);
+      toast.error("Não foi possível enviar agora. Tente novamente em instantes.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass = (field: string) =>
