@@ -93,9 +93,11 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
+  // PERF: consolidação dos 3 channels (pedidos / atendimentos / clients) em um
+  // único channel reduz overhead de WebSocket e o número de subscriptions ativas.
   useEffect(() => {
     const channel = supabase
-      .channel("realtime-pedidos")
+      .channel("realtime-admin-notifications")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "pedidos" },
@@ -128,14 +130,6 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
           }
         }
       )
-      .subscribe();
-
-    return () => { void supabase.removeChannel(channel); };
-  }, [addNotification]);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime-atendimentos")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "service_records" },
@@ -148,14 +142,6 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
           });
         }
       )
-      .subscribe();
-
-    return () => { void supabase.removeChannel(channel); };
-  }, [addNotification]);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime-clients")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "clients" },
@@ -170,7 +156,9 @@ export function AdminNotificationsProvider({ children }: { children: ReactNode }
       )
       .subscribe();
 
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [addNotification]);
 
   return (
