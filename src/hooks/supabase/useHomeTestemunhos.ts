@@ -15,7 +15,7 @@ async function fetchHomeTestemunhos(): Promise<HomeTestemunho[]> {
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[useHomeTestemunhos] erro:", error.message);
-    return [];
+    throw new Error(error.message);
   }
   return data || [];
 }

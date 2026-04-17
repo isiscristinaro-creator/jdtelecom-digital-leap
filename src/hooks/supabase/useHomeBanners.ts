@@ -21,7 +21,7 @@ async function fetchHomeBanners(): Promise<RawBanner[]> {
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[useHomeBanners] erro:", error.message);
-    return [];
+    throw new Error(error.message);
   }
   return (data || []).filter((b) => !!b.imagem_url);
 }
