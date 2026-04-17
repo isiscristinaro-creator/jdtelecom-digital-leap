@@ -63,7 +63,7 @@ const SpeedGauge = ({ speed }: { speed: number }) => {
     const maxAngle = (speed / 1000) * 240 - 120;
     animate(angle, maxAngle, { duration: 2, ease: "easeOut" });
     animate(displaySpeed, speed, { duration: 2, ease: "easeOut" });
-  }, [speed]);
+  }, [speed, angle, displaySpeed]);
 
   const rotation = useTransform(angle, (v) => `rotate(${v}deg)`);
 

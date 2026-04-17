@@ -110,12 +110,12 @@ const ServiceOrbit = () => {
 const SavingsCalculator = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>(["internet", "music"]);
 
-  const services = [
+  const services = useMemo(() => ([
     { id: "internet", name: "Internet Fibra", icon: Wifi, separatePrice: 119.90, color: "from-primary/20 to-primary/10" },
     { id: "tv", name: "JD TV", icon: Tv, separatePrice: 49.90, color: "from-blue-500/20 to-blue-500/10" },
     { id: "music", name: "JD Music", icon: Music, separatePrice: 24.90, color: "from-purple-500/20 to-purple-500/10" },
     { id: "mobile", name: "JD Móvel", icon: Smartphone, separatePrice: 54.90, color: "from-green-500/20 to-green-500/10" },
-  ];
+  ]), []);
 
   const toggleService = (id: string) => {
     setSelectedServices((prev) =>
@@ -125,7 +125,7 @@ const SavingsCalculator = () => {
 
   const separateTotal = useMemo(
     () => services.filter((s) => selectedServices.includes(s.id)).reduce((sum, s) => sum + s.separatePrice, 0),
-    [selectedServices]
+    [selectedServices, services]
   );
 
   const comboPrice = useMemo(() => {

@@ -3,9 +3,12 @@ import { Users, Plus, Edit2, ToggleLeft, ToggleRight, Shield, X, Loader2 } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTeamMembers } from "@/hooks/useSupabaseData";
+import type { DbTeamMember } from "@/hooks/supabase/types";
 
 type Role = "Administrador" | "Atendimento" | "Financeiro" | "Comercial" | "Operação";
 type Permission = "dashboard" | "clientes" | "pagamentos" | "relatorios" | "planos" | "equipe" | "logs";
+
+type EditableTeamMember = Pick<DbTeamMember, "id" | "name" | "email" | "role" | "permissions">;
 
 const roles: Role[] = ["Administrador", "Atendimento", "Financeiro", "Comercial", "Operação"];
 
@@ -43,10 +46,12 @@ const AdminTeam = () => {
     setShowModal(true);
   };
 
-  const openEdit = (m: any) => {
-    setEditingId(m.id);
-    setFormName(m.name); setFormEmail(m.email); setFormRole(m.role as Role);
-    setFormPermissions([...(m.permissions || [])]);
+  const openEdit = (member: EditableTeamMember) => {
+    setEditingId(member.id);
+    setFormName(member.name);
+    setFormEmail(member.email);
+    setFormRole(member.role as Role);
+    setFormPermissions((member.permissions || []) as Permission[]);
     setShowModal(true);
   };
 

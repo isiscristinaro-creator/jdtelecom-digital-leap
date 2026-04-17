@@ -1088,7 +1088,7 @@ const AdminDashboard = () => {
             });
 
             const timelineData = allDates.map(date => {
-              const point: Record<string, any> = { date };
+              const point: Record<string, string | number> = { date };
               timelineKeys.forEach(k => {
                 const match = keyMap[k].entries.find(e => e.date === date);
                 if (match) point[keyMap[k].label] = match.value;
@@ -1425,8 +1425,8 @@ const AdminDashboard = () => {
           .sort((a, b) => a[0].localeCompare(b[0]))
           .map(([m, types]) => {
             const [y, mo] = m.split("-");
-            const entry: any = { mes: `${mo}/${y.slice(2)}`, total: 0 };
-            allTypes.forEach(t => { entry[t] = types[t] || 0; entry.total += types[t] || 0; });
+            const entry: Record<string, string | number> = { mes: `${mo}/${y.slice(2)}`, total: 0 };
+            allTypes.forEach(t => { entry[t] = types[t] || 0; entry.total = Number(entry.total) + (types[t] || 0); });
             return entry;
           });
 

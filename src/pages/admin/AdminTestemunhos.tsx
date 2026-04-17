@@ -38,6 +38,8 @@ const PRODUTO_OPTIONS = [
   { value: "combos", label: "Combos" },
 ];
 
+type TestemunhoPayload = Pick<DbTestemunho, "nome" | "mensagem" | "ativo" | "produto">;
+
 interface SortableTestemunhoProps {
   t: DbTestemunho;
   children: React.ReactNode;
@@ -71,7 +73,7 @@ const AdminTestemunhos = () => {
   const { testemunhos, loading, create, update, remove, reorder } = useTestemunhos();
   const [editing, setEditing] = useState<DbTestemunho | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [form, setForm] = useState({ nome: "", mensagem: "", ativo: true, produto: "geral" });
+  const [form, setForm] = useState<TestemunhoPayload>({ nome: "", mensagem: "", ativo: true, produto: "geral" });
   const [filtro, setFiltro] = useState("todos");
 
   const sensors = useSensors(
@@ -94,8 +96,6 @@ const AdminTestemunhos = () => {
       return;
     }
 
-    // Filtro ativo: reordena dentro do subconjunto e recompõe a lista global
-    // mantendo as posições originais dos itens não filtrados.
     const oldIndexInFiltered = filtered.findIndex(t => t.id === active.id);
     const newIndexInFiltered = filtered.findIndex(t => t.id === over.id);
     if (oldIndexInFiltered < 0 || newIndexInFiltered < 0) return;
@@ -117,16 +117,14 @@ const AdminTestemunhos = () => {
 
   const handleSave = async () => {
     if (!form.nome || !form.mensagem) return;
-    const payload: any = { nome: form.nome, mensagem: form.mensagem, ativo: form.ativo };
-    try {
-      payload.produto = form.produto;
-      if (editing) await update(editing.id, payload);
-      else await create(payload);
-    } catch {
-      delete payload.produto;
-      if (editing) await update(editing.id, payload);
-      else await create(payload);
-    }
+    const payload: TestemunhoPayload = {
+      nome: form.nome,
+      mensagem: form.mensagem,
+      ativo: form.ativo,
+      produto: form.produto,
+    };
+    if (editing) await update(editing.id, payload);
+    else await create(payload);
     setEditing(null); setIsCreating(false);
   };
 
@@ -149,7 +147,6 @@ const AdminTestemunhos = () => {
         </Button>
       </div>
 
-      {/* Filter bar */}
       <div className="flex flex-wrap gap-2">
         {FILTER_OPTIONS.map(o => (
           <button
