@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
 import { isHeroTitulo, parseBannerTitulo, safeBannerHref } from "@/lib/bannerMeta";
+import { useHomeBanners } from "@/hooks/supabase/useHomeBanners";
 import heroBanner from "@/assets/hero-banner.png";
 import bannerGames from "@/assets/banner-games.png";
 import bannerSocial from "@/assets/banner-social.png";
@@ -22,34 +22,27 @@ interface HeroBanner {
 }
 
 const HeroSection = () => {
-  const [banners, setBanners] = useState<HeroBanner[]>(FALLBACK_BANNERS);
+  const { banners: rawBanners } = useHomeBanners();
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const dragStartX = useRef<number | null>(null);
   const didSwipe = useRef(false);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("banners")
-        .select("id, titulo, imagem_url")
-        .eq("ativo", true)
-        .order("ordem", { ascending: true, nullsFirst: false })
-        .order("created_at", { ascending: false });
-      const heroOnly = (data || [])
-        .filter((b) => isHeroTitulo(b.titulo) && b.imagem_url)
-        .map((b) => {
-          const meta = parseBannerTitulo(b.titulo);
-          return {
-            id: b.id,
-            imagem_url: b.imagem_url,
-            titulo: meta.titulo || "JD Telecom",
-            link: meta.link,
-          };
-        });
-      if (heroOnly.length > 0) setBanners(heroOnly);
-    })();
-  }, []);
+  // Deriva apenas banners destinados ao Hero, com fallback estático
+  const banners = useMemo<HeroBanner[]>(() => {
+    const heroOnly = rawBanners
+      .filter((b) => isHeroTitulo(b.titulo))
+      .map((b) => {
+        const meta = parseBannerTitulo(b.titulo);
+        return {
+          id: b.id,
+          imagem_url: b.imagem_url,
+          titulo: meta.titulo || "JD Telecom",
+          link: meta.link,
+        };
+      });
+    return heroOnly.length > 0 ? heroOnly : FALLBACK_BANNERS;
+  }, [rawBanners]);
 
   const goTo = useCallback((index: number) => {
     if (isTransitioning) return;
