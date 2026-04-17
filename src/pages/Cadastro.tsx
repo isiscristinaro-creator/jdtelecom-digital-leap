@@ -170,8 +170,13 @@ const Cadastro = () => {
 
     setLoading(true);
     try {
-      const { error } = await (supabase.from as any)("leads").insert(parsed.data);
+      const { data, error } = await supabase.functions.invoke("submit-lead", {
+        body: parsed.data,
+      });
       if (error) throw error;
+      if (data && (data as { error?: string }).error) {
+        throw new Error((data as { error: string }).error);
+      }
       toast.success("Cadastro recebido! Em breve nossa equipe entrará em contato.");
       setTimeout(() => navigate("/assinante"), 1500);
     } catch (err) {
