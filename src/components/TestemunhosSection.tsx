@@ -68,6 +68,50 @@ const TestemunhosSection = () => {
     );
   }
 
+  // Skeleton loader durante carregamento inicial
+  if (loading && !testemunhos.length) {
+    return (
+      <section
+        className="py-16 sm:py-20 md:py-28 bg-[hsl(var(--dark-section))] relative overflow-hidden"
+        aria-busy="true"
+        aria-label="Carregando depoimentos"
+      >
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-primary/[0.04] blur-[120px] pointer-events-none" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <div className="h-6 w-32 rounded-full bg-[hsl(var(--dark-section-card))] animate-pulse mx-auto mb-4" />
+            <div className="h-10 md:h-12 w-80 max-w-full rounded-xl bg-[hsl(var(--dark-section-card))] animate-pulse mx-auto" />
+          </div>
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-3xl p-8 md:p-12">
+              <div className="flex justify-center gap-1 mb-6">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-5 rounded bg-[hsl(var(--dark-section-border))] animate-pulse"
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  />
+                ))}
+              </div>
+              <div className="space-y-3 mb-8">
+                <div className="h-5 w-full rounded-lg bg-[hsl(var(--dark-section-border))] animate-pulse" />
+                <div className="h-5 w-11/12 mx-auto rounded-lg bg-[hsl(var(--dark-section-border))] animate-pulse" />
+                <div className="h-5 w-3/4 mx-auto rounded-lg bg-[hsl(var(--dark-section-border))] animate-pulse" />
+              </div>
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[hsl(var(--dark-section-border))] animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-4 w-32 rounded bg-[hsl(var(--dark-section-border))] animate-pulse" />
+                  <div className="h-3 w-24 rounded bg-[hsl(var(--dark-section-border))] animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (!testemunhos.length) return null;
 
   return (

@@ -102,6 +102,37 @@ const BannersSection = () => {
     );
   }
 
+  // Skeleton loader durante carregamento inicial
+  if (loading && !derived) {
+    return (
+      <section
+        id="ofertas-especiais"
+        className="relative py-24 md:py-32 bg-dark-section overflow-hidden"
+        aria-busy="true"
+        aria-label="Carregando ofertas"
+      >
+        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-primary/[0.05] blur-[140px] pointer-events-none" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="mb-14">
+            <div className="h-6 w-32 rounded-full bg-[hsl(var(--dark-section-card))] animate-pulse mb-4" />
+            <div className="h-10 md:h-14 w-72 max-w-full rounded-xl bg-[hsl(var(--dark-section-card))] animate-pulse mb-3" />
+            <div className="h-5 w-96 max-w-full rounded-lg bg-[hsl(var(--dark-section-card))] animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+            <div className="lg:col-span-2 lg:row-span-2 min-h-[320px] md:min-h-[480px] rounded-3xl bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] animate-pulse" />
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="min-h-[200px] md:min-h-[230px] rounded-3xl bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] animate-pulse"
+                style={{ animationDelay: `${i * 80}ms` }}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (!derived) return null;
   const { useCarousel, featured, featuredMeta, rest } = derived;
 
