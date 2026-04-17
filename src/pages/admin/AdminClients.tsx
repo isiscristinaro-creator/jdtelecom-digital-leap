@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Loader2 } from "lucide-react";
+import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Loader2, Users } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useClients, usePlans, useServiceRecords, type DbClient } from "@/hooks/useSupabaseData";
 import { exportToExcel } from "@/utils/exportUtils";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { toast } from "sonner";
 
 const statusColors = {
@@ -20,7 +21,7 @@ const serviceTypeColors = {
 };
 
 const AdminClients = () => {
-  const { clients, loading } = useClients();
+  const { clients, loading, error, refetch } = useClients();
   const { plans } = usePlans();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("Todos");
@@ -80,6 +81,30 @@ const AdminClients = () => {
     return (
       <div className="admin-page flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-page">
+        <AdminErrorCard
+          title="Não foi possível carregar os clientes"
+          description="Houve um problema ao buscar a lista de clientes. Tente novamente."
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!clients.length) {
+    return (
+      <div className="admin-page">
+        <AdminEmptyCard
+          icon={Users}
+          title="Nenhum cliente cadastrado"
+          description="Quando novos clientes forem cadastrados, eles aparecerão aqui."
+        />
       </div>
     );
   }
