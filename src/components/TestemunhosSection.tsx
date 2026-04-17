@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Quote, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Quote, ChevronLeft, ChevronRight, Star, AlertTriangle, MessageSquareOff, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { getTestimonialAvatar } from "@/data/testimonialAvatars";
 import { useHomeTestemunhos } from "@/hooks/supabase/useHomeTestemunhos";
 
 const TestemunhosSection = () => {
-  const { testemunhos } = useHomeTestemunhos();
+  const { testemunhos, loading, error, refetch } = useHomeTestemunhos();
   const [current, setCurrent] = useState(0);
 
   const next = useCallback(
@@ -19,6 +20,53 @@ const TestemunhosSection = () => {
       ),
     [testemunhos.length]
   );
+
+  if (error) {
+    return (
+      <section className="py-16 sm:py-20 md:py-28 bg-[hsl(var(--dark-section))] relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-md mx-auto text-center bg-[hsl(var(--dark-section-card))] border border-destructive/30 rounded-3xl p-8 md:p-10">
+            <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto mb-5">
+              <AlertTriangle className="w-7 h-7 text-destructive" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl md:text-2xl font-bold text-[hsl(var(--dark-section-fg))] mb-2">
+              Não foi possível carregar os depoimentos
+            </h2>
+            <p className="text-sm text-[hsl(var(--dark-section-muted))] mb-6">
+              Houve um problema ao buscar avaliações de clientes. Tente novamente.
+            </p>
+            <Button
+              onClick={() => refetch()}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-2xl px-6"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Tentar novamente
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!loading && !testemunhos.length) {
+    return (
+      <section className="py-16 sm:py-20 md:py-28 bg-[hsl(var(--dark-section))] relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-md mx-auto text-center bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-3xl p-8 md:p-10">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+              <MessageSquareOff className="w-7 h-7 text-primary" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl md:text-2xl font-bold text-[hsl(var(--dark-section-fg))] mb-2">
+              Seja o primeiro a avaliar
+            </h2>
+            <p className="text-sm text-[hsl(var(--dark-section-muted))]">
+              Ainda não temos depoimentos publicados. Em breve, novos comentários de clientes.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!testemunhos.length) return null;
 
