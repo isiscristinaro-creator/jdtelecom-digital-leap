@@ -1,6 +1,6 @@
 import { useRef, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, Tag } from "lucide-react";
+import { Sparkles, ArrowRight, Tag, AlertTriangle, Inbox, RefreshCw } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -23,7 +23,7 @@ interface Banner {
 const CAROUSEL_THRESHOLD = 5;
 
 const BannersSection = () => {
-  const { banners: rawBanners } = useHomeBanners();
+  const { banners: rawBanners, loading, error, refetch } = useHomeBanners();
   const { ref, isVisible } = useScrollAnimation();
   const autoplayRef = useRef(
     Autoplay({ delay: 4500, stopOnInteraction: false, stopOnMouseEnter: true })
@@ -46,6 +46,61 @@ const BannersSection = () => {
     const rest = banners.filter((b) => b.id !== featured.id);
     return { useCarousel, featured, featuredMeta, rest };
   }, [banners]);
+
+  // Estado de erro: feedback visual + botão de retry
+  if (error) {
+    return (
+      <section
+        id="ofertas-especiais"
+        className="relative py-24 md:py-32 bg-dark-section overflow-hidden"
+      >
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-md mx-auto text-center bg-[hsl(var(--dark-section-card))] border border-destructive/30 rounded-3xl p-8 md:p-10">
+            <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto mb-5">
+              <AlertTriangle className="w-7 h-7 text-destructive" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl md:text-2xl font-bold text-[hsl(var(--dark-section-fg))] mb-2">
+              Não foi possível carregar as ofertas
+            </h2>
+            <p className="text-sm text-[hsl(var(--dark-section-muted))] mb-6">
+              Tivemos um problema ao buscar as promoções. Tente novamente em instantes.
+            </p>
+            <Button
+              onClick={() => refetch()}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-2xl px-6"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Tentar novamente
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty state: nenhum banner ativo (e não está carregando)
+  if (!loading && !derived) {
+    return (
+      <section
+        id="ofertas-especiais"
+        className="relative py-24 md:py-32 bg-dark-section overflow-hidden"
+      >
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-md mx-auto text-center bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-3xl p-8 md:p-10">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+              <Inbox className="w-7 h-7 text-primary" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl md:text-2xl font-bold text-[hsl(var(--dark-section-fg))] mb-2">
+              Em breve, novas ofertas
+            </h2>
+            <p className="text-sm text-[hsl(var(--dark-section-muted))]">
+              Estamos preparando promoções exclusivas. Volte em breve!
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!derived) return null;
   const { useCarousel, featured, featuredMeta, rest } = derived;
