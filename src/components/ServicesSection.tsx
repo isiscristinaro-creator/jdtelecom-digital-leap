@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Wifi, Tv, Smartphone } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Button } from "@/components/ui/button";
@@ -96,4 +97,4 @@ const ServicesSection = () => {
   );
 };
 
-export default ServicesSection;
+export default memo(ServicesSection);

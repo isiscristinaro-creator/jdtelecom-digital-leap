@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, Wifi } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -154,4 +155,4 @@ const PlansSection = () => {
   );
 };
 
-export default PlansSection;
+export default memo(PlansSection);

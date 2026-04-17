@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { MapPin, CheckCircle, Navigation, Wifi, Signal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -586,4 +586,4 @@ const CoverageSection = () => {
   );
 };
 
-export default CoverageSection;
+export default memo(CoverageSection);
