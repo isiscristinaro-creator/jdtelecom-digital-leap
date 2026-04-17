@@ -123,6 +123,14 @@ Deno.serve(async (req) => {
     return json({ error: "JSON inválido" }, 400);
   }
 
+  // Honeypot anti-bot: campo "website" deve vir vazio. Se preenchido, é bot.
+  // Respondemos 200 OK fake para não dar feedback ao atacante (silent drop).
+  const honeypot = (body as Record<string, unknown>)?.website;
+  if (typeof honeypot === "string" && honeypot.trim().length > 0) {
+    console.warn("Honeypot triggered from IP:", ip);
+    return json({ ok: true, id: "00000000-0000-0000-0000-000000000000" });
+  }
+
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     return json(
