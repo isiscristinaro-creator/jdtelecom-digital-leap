@@ -21,7 +21,7 @@ async function fetchHomeBanners(): Promise<RawBanner[]> {
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[useHomeBanners] erro:", error.message);
-    return [];
+    throw new Error(error.message);
   }
   return (data || []).filter((b) => !!b.imagem_url);
 }
@@ -33,5 +33,10 @@ export function useHomeBanners() {
     staleTime: 5 * 60_000, // 5min: banners mudam pouco
     refetchOnWindowFocus: false,
   });
-  return { banners: query.data ?? [], loading: query.isLoading };
+  return {
+    banners: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error as Error | null,
+    refetch: query.refetch,
+  };
 }
