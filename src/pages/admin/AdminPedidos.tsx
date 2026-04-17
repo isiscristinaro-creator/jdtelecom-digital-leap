@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
-import { Loader2, FileSpreadsheet, Download, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, FileSpreadsheet, Download, Search, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePedidos } from "@/hooks/useSupabaseData";
 import { exportToExcel, exportToCSV } from "@/utils/exportUtils";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 15;
@@ -15,7 +16,7 @@ const statusColors: Record<string, string> = {
 };
 
 const AdminPedidos = () => {
-  const { pedidos, loading, updateStatus } = usePedidos();
+  const { pedidos, loading, error, refetch, updateStatus } = usePedidos();
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
@@ -48,6 +49,30 @@ const AdminPedidos = () => {
   const totalValor = filtered.reduce((s, p) => s + p.valor, 0);
 
   if (loading) return <div className="admin-page flex items-center justify-center min-h-[400px]"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+
+  if (error) {
+    return (
+      <div className="admin-page">
+        <AdminErrorCard
+          title="Não foi possível carregar os pedidos"
+          description="Houve um problema ao buscar a lista de pedidos. Tente novamente."
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!pedidos.length) {
+    return (
+      <div className="admin-page">
+        <AdminEmptyCard
+          icon={ShoppingCart}
+          title="Nenhum pedido recebido"
+          description="Quando novos pedidos forem realizados, eles aparecerão aqui."
+        />
+      </div>
+    );
+  }
 
   const exportData = () => filtered.map(p => ({
     Email: p.cliente_email, "Valor (R$)": p.valor, Status: p.status,

@@ -40,6 +40,7 @@ export function useClients() {
   return {
     clients: query.data ?? [],
     loading: query.isLoading,
+    error: query.error as Error | null,
     refetch: query.refetch,
   };
 }
