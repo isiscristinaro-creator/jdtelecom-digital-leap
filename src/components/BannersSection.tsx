@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Tag } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useHomeBanners } from "@/hooks/supabase/useHomeBanners";
 import {
   Carousel,
   CarouselContent,
@@ -23,29 +23,18 @@ interface Banner {
 const CAROUSEL_THRESHOLD = 5;
 
 const BannersSection = () => {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const { banners: rawBanners } = useHomeBanners();
   const { ref, isVisible } = useScrollAnimation();
   const autoplayRef = useRef(
     Autoplay({ delay: 4500, stopOnInteraction: false, stopOnMouseEnter: true })
   );
 
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("banners")
-        .select("id, titulo, imagem_url")
-        .eq("ativo", true)
-        .order("created_at", { ascending: false });
-      // BUGFIX: erros do Supabase eram silenciados (sem feedback ao dev).
-      if (error) {
-        console.error("[BannersSection] erro ao carregar banners:", error.message);
-        return;
-      }
-      // Exclui banners destinados ao Hero
-      const ofertas = (data || []).filter((b) => !isHeroTitulo(b.titulo));
-      setBanners(ofertas);
-    })();
-  }, []);
+  // Cacheado via React Query — sem refetch ao remontar.
+  // Exclui banners do Hero (renderizados em HeroSection).
+  const banners = useMemo<Banner[]>(
+    () => rawBanners.filter((b) => !isHeroTitulo(b.titulo)),
+    [rawBanners]
+  );
 
   // Memoiza derivações pesadas: parse de títulos só re-executa se banners mudar
   const derived = useMemo(() => {

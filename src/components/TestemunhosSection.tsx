@@ -1,35 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Quote, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { getTestimonialAvatar } from "@/data/testimonialAvatars";
-
-interface Testemunho {
-  id: string;
-  nome: string;
-  mensagem: string;
-}
+import { useHomeTestemunhos } from "@/hooks/supabase/useHomeTestemunhos";
 
 const TestemunhosSection = () => {
-  const [testemunhos, setTestemunhos] = useState<Testemunho[]>([]);
+  const { testemunhos } = useHomeTestemunhos();
   const [current, setCurrent] = useState(0);
-  
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("testemunhos")
-        .select("id, nome, mensagem")
-        .eq("ativo", true)
-        .order("created_at", { ascending: false });
-      if (data?.length) setTestemunhos(data);
-    })();
-  }, []);
+  const next = useCallback(
+    () => setCurrent((c) => (testemunhos.length ? (c + 1) % testemunhos.length : 0)),
+    [testemunhos.length]
+  );
+  const prev = useCallback(
+    () =>
+      setCurrent((c) =>
+        testemunhos.length ? (c - 1 + testemunhos.length) % testemunhos.length : 0
+      ),
+    [testemunhos.length]
+  );
 
   if (!testemunhos.length) return null;
-
-  const next = () => setCurrent((c) => (c + 1) % testemunhos.length);
-  const prev = () => setCurrent((c) => (c - 1 + testemunhos.length) % testemunhos.length);
 
   return (
     <section className="py-16 sm:py-20 md:py-28 bg-[hsl(var(--dark-section))] relative overflow-hidden">
