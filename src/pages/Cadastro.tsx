@@ -110,6 +110,7 @@ const Cadastro = () => {
     nome: "", email: "", cpfCnpj: "", nascimento: "", celular: "",
     cep: "", endereco: "", numero: "", bairro: "", cidade: "",
     estado: "", pontoReferencia: "", vencimento: "", plano: "",
+    website: "", // honeypot — usuários reais nunca preenchem (oculto via CSS + aria-hidden)
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -146,6 +147,7 @@ const Cadastro = () => {
 
     // Normaliza para o formato persistido (snake_case + nascimento como date)
     const payload = {
+      website: form.website, // honeypot — enviado para a edge function rejeitar bots
       nome: form.nome.trim(),
       email: form.email.trim().toLowerCase(),
       cpf_cnpj: form.cpfCnpj.trim(),
@@ -171,7 +173,7 @@ const Cadastro = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("submit-lead", {
-        body: parsed.data,
+        body: { ...parsed.data, website: form.website },
       });
       if (error) throw error;
       if (data && (data as { error?: string }).error) {
@@ -242,7 +244,26 @@ const Cadastro = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8" autoComplete="on">
+              {/* Honeypot anti-bot — invisível para humanos, ignorado por leitores de tela.
+                  Bots tendem a preencher todos os campos do form; se vier preenchido, rejeitamos. */}
+              <div
+                aria-hidden="true"
+                className="absolute w-px h-px overflow-hidden -left-[9999px] opacity-0 pointer-events-none"
+                style={{ position: "absolute" }}
+              >
+                <Label htmlFor="website">Website (não preencha)</Label>
+                <Input
+                  id="website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={form.website}
+                  onChange={e => set("website", e.target.value)}
+                />
+              </div>
+
               {/* Dados Pessoais */}
               <div className="space-y-5">
                 <div className="flex items-center gap-2 mb-1">
