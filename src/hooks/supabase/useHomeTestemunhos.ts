@@ -27,5 +27,10 @@ export function useHomeTestemunhos() {
     staleTime: 5 * 60_000,
     refetchOnWindowFocus: false,
   });
-  return { testemunhos: query.data ?? [], loading: query.isLoading };
+  return {
+    testemunhos: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error as Error | null,
+    refetch: query.refetch,
+  };
 }

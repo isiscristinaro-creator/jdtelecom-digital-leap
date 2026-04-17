@@ -33,5 +33,10 @@ export function useHomeBanners() {
     staleTime: 5 * 60_000, // 5min: banners mudam pouco
     refetchOnWindowFocus: false,
   });
-  return { banners: query.data ?? [], loading: query.isLoading };
+  return {
+    banners: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error as Error | null,
+    refetch: query.refetch,
+  };
 }
