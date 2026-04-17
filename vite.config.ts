@@ -23,6 +23,13 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
+        // Nomes de arquivo determinísticos com hash de conteúdo:
+        // - chunks vendor mantêm o mesmo nome enquanto o conteúdo não muda
+        //   → cache de longo prazo (Cache-Control: immutable) sobrevive entre deploys
+        // - apenas chunks alterados recebem hash novo, forçando re-download só do que mudou
+        entryFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
         // manualChunks: agrupa SOMENTE libs leves e amplamente compartilhadas em chunks vendor.
         // Libs pesadas (xlsx, jspdf, recharts, html2canvas) ficam de fora e o Vite mantém
         // o code-splitting natural — elas só são baixadas quando a rota admin que as usa carrega.
