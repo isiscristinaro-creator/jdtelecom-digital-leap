@@ -73,7 +73,15 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
     forecast: mrrVal * 1.05,
     newLast7: last7,
     newLast30: last30,
-    growthRate: total > 0 ? parseFloat(((last30 / total) * 100).toFixed(1)) : 0,
+    // BUG FIX: a fórmula anterior (last30 / total) era enviesada — o denominador
+    // continha os próprios novos clientes. A taxa de crescimento real compara
+    // novos contra a base existente antes do período (total - last30).
+    growthRate:
+      total - last30 > 0
+        ? parseFloat(((last30 / (total - last30)) * 100).toFixed(1))
+        : last30 > 0
+          ? 100
+          : 0,
   };
 }
 

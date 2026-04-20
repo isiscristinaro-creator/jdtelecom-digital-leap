@@ -2,9 +2,9 @@ import { useState, useMemo, useEffect } from "react";
 import { Loader2, FileSpreadsheet, Download, Search, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { usePedidos } from "@/hooks/useSupabaseData";
 import { exportToExcel, exportToCSV } from "@/utils/exportUtils";
-import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 15;
@@ -54,8 +54,8 @@ const AdminPedidos = () => {
     return (
       <div className="admin-page">
         <AdminErrorCard
-          title="Não foi possível carregar os pedidos"
-          description="Houve um problema ao buscar a lista de pedidos. Tente novamente."
+          title="Erro ao carregar pedidos"
+          description="Não conseguimos buscar os pedidos agora. Tente novamente."
           onRetry={() => refetch()}
         />
       </div>
@@ -67,8 +67,8 @@ const AdminPedidos = () => {
       <div className="admin-page">
         <AdminEmptyCard
           icon={ShoppingCart}
-          title="Nenhum pedido recebido"
-          description="Quando novos pedidos forem realizados, eles aparecerão aqui."
+          title="Nenhum pedido registrado"
+          description="Ainda não há pedidos cadastrados na plataforma."
         />
       </div>
     );

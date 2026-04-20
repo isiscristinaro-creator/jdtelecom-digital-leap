@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { Search, Download, Calendar, FileSpreadsheet, Loader2, CreditCard } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { usePayments, usePlans } from "@/hooks/useSupabaseData";
 import { exportToCSV, exportToExcel } from "@/utils/exportUtils";
-import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { toast } from "sonner";
 
 const statusColors = {
@@ -73,8 +73,8 @@ const AdminPayments = () => {
     return (
       <div className="admin-page">
         <AdminErrorCard
-          title="Não foi possível carregar os pagamentos"
-          description="Houve um problema ao buscar a lista de pagamentos. Tente novamente."
+          title="Erro ao carregar pagamentos"
+          description="Não conseguimos buscar os registros financeiros. Tente novamente."
           onRetry={() => refetch()}
         />
       </div>
@@ -87,7 +87,7 @@ const AdminPayments = () => {
         <AdminEmptyCard
           icon={CreditCard}
           title="Nenhum pagamento registrado"
-          description="Quando houver registros de pagamentos, eles aparecerão aqui."
+          description="Ainda não há pagamentos cadastrados na plataforma."
         />
       </div>
     );

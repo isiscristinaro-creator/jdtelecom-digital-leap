@@ -78,6 +78,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { success: false, error: error.message };
 
+    // BUG FIX: data.user pode ser null em edge cases (ex: email não confirmado)
+    // — sem este guard, `checkAdminRole(null)` jogava TypeError em runtime.
+    if (!data?.user) {
+      return { success: false, error: "Sessão inválida. Tente novamente." };
+    }
+
     const adminUser = await checkAdminRole(data.user);
     if (!adminUser) {
       await supabase.auth.signOut();

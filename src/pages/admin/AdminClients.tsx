@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Loader2, Users } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useClients, usePlans, useServiceRecords, type DbClient } from "@/hooks/useSupabaseData";
 import { exportToExcel } from "@/utils/exportUtils";
-import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { toast } from "sonner";
 
 const statusColors = {
@@ -85,12 +85,13 @@ const AdminClients = () => {
     );
   }
 
+  // BUG FIX: AdminErrorCard/AdminEmptyCard não estavam sendo usados (regressão).
   if (error) {
     return (
       <div className="admin-page">
         <AdminErrorCard
-          title="Não foi possível carregar os clientes"
-          description="Houve um problema ao buscar a lista de clientes. Tente novamente."
+          title="Erro ao carregar clientes"
+          description="Não conseguimos buscar a lista de clientes. Verifique sua conexão e tente novamente."
           onRetry={() => refetch()}
         />
       </div>
@@ -103,7 +104,7 @@ const AdminClients = () => {
         <AdminEmptyCard
           icon={Users}
           title="Nenhum cliente cadastrado"
-          description="Quando novos clientes forem cadastrados, eles aparecerão aqui."
+          description="Ainda não há clientes registrados na plataforma."
         />
       </div>
     );

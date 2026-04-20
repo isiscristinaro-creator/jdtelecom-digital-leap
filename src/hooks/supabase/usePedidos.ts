@@ -16,8 +16,8 @@ export function usePedidos() {
       .select("*")
       .order("created_at", { ascending: false });
     if (err) {
-      setError(new Error(err.message));
       toast.error("Erro ao carregar pedidos: " + err.message);
+      setError(new Error(err.message));
     } else {
       setPedidos(data || []);
     }
@@ -27,14 +27,14 @@ export function usePedidos() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const create = async (p: Omit<DbPedido, "id" | "created_at">) => {
-    const { error: err } = await supabase.from("pedidos").insert(p);
-    if (err) { toast.error(err.message); return false; }
+    const { error } = await supabase.from("pedidos").insert(p);
+    if (error) { toast.error(error.message); return false; }
     toast.success("Pedido criado!"); await fetchData(); return true;
   };
 
   const updateStatus = async (id: string, status: string) => {
-    const { error: err } = await supabase.from("pedidos").update({ status }).eq("id", id);
-    if (err) { toast.error(err.message); return false; }
+    const { error } = await supabase.from("pedidos").update({ status }).eq("id", id);
+    if (error) { toast.error(error.message); return false; }
     toast.success("Status atualizado!"); await fetchData(); return true;
   };
 
