@@ -34,6 +34,12 @@ const AdminGlobalSearch = () => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        // BUG FIX: ⌘K nativo (foco na URL bar) era roubado mesmo sem intenção do usuário.
+        // Só ativamos a busca global quando o foco NÃO está em um campo editável.
+        const t = e.target as HTMLElement | null;
+        const isEditable =
+          !!t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+        if (isEditable) return;
         e.preventDefault();
         setOpen(true);
         setTimeout(() => inputRef.current?.focus(), 50);
@@ -57,12 +63,16 @@ const AdminGlobalSearch = () => {
     if (!query.trim() || query.length < 2) { setResults([]); return; }
     const timer = setTimeout(async () => {
       setLoading(true);
-      const q = query.toLowerCase();
+      // BUG FIX: escapar wildcards (%, _) e caracteres que quebram filtros PostgREST
+      // (vírgulas, parênteses) antes de injetar na ilike. Também troca .or() por
+      // .ilike() direto em payments — usar .or() com uma única condição é frágil
+      // e expõe a expressão à injeção de operadores PostgREST.
+      const q = query.toLowerCase().replace(/[%_,()]/g, (c) => `\\${c}`);
       const items: SearchResult[] = [];
 
       const [clientsRes, paymentsRes, pedidosRes] = await Promise.all([
         supabase.from("clients").select("id, name, email, status").ilike("name", `%${q}%`).limit(5),
-        supabase.from("payments").select("id, description, amount, status").or(`description.ilike.%${q}%`).limit(5),
+        supabase.from("payments").select("id, description, amount, status").ilike("description", `%${q}%`).limit(5),
         supabase.from("pedidos").select("id, cliente_email, valor, status").ilike("cliente_email", `%${q}%`).limit(5),
       ]);
 

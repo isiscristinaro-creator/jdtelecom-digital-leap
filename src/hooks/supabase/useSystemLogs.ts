@@ -7,7 +7,8 @@ export function useSystemLogs() {
   const [logs, setLogs] = useState<DbSystemLog[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetch = useCallback(async () => {
+  // BUG FIX: renomeado de `fetch` p/ `load` para evitar shadowing do `globalThis.fetch`.
+  const load = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("system_logs")
@@ -19,6 +20,6 @@ export function useSystemLogs() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetch(); }, [fetch]);
-  return { logs, loading, refetch: fetch };
+  useEffect(() => { load(); }, [load]);
+  return { logs, loading, refetch: load };
 }

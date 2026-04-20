@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -106,6 +106,11 @@ function maskCEP(v: string) {
 const Cadastro = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  // BUG FIX: setTimeout sem cleanup pode disparar navigate em componente desmontado.
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (navTimerRef.current) clearTimeout(navTimerRef.current);
+  }, []);
   const [form, setForm] = useState({
     nome: "", email: "", cpfCnpj: "", nascimento: "", celular: "",
     cep: "", endereco: "", numero: "", bairro: "", cidade: "",
@@ -180,7 +185,7 @@ const Cadastro = () => {
         throw new Error((data as { error: string }).error);
       }
       toast.success("Cadastro recebido! Em breve nossa equipe entrará em contato.");
-      setTimeout(() => navigate("/assinante"), 1500);
+      navTimerRef.current = setTimeout(() => navigate("/assinante"), 1500);
     } catch (err) {
       console.error("Erro ao enviar cadastro:", err);
       toast.error("Não foi possível enviar agora. Tente novamente em instantes.");

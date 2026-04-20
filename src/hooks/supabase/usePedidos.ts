@@ -6,12 +6,21 @@ import type { DbPedido } from "./types";
 export function usePedidos() {
   const [pedidos, setPedidos] = useState<DbPedido[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("pedidos").select("*").order("created_at", { ascending: false });
-    if (error) toast.error("Erro ao carregar pedidos: " + error.message);
-    else setPedidos(data || []);
+    setError(null);
+    const { data, error: err } = await supabase
+      .from("pedidos")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (err) {
+      toast.error("Erro ao carregar pedidos: " + err.message);
+      setError(new Error(err.message));
+    } else {
+      setPedidos(data || []);
+    }
     setLoading(false);
   }, []);
 
@@ -29,5 +38,5 @@ export function usePedidos() {
     toast.success("Status atualizado!"); await fetchData(); return true;
   };
 
-  return { pedidos, loading, refetch: fetchData, create, updateStatus };
+  return { pedidos, loading, error, refetch: fetchData, create, updateStatus };
 }

@@ -78,32 +78,11 @@ const BannersSection = () => {
     );
   }
 
-  // Empty state: nenhum banner ativo (e não está carregando)
-  if (!loading && !derived) {
-    return (
-      <section
-        id="ofertas-especiais"
-        className="relative py-24 md:py-32 bg-dark-section overflow-hidden"
-      >
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-md mx-auto text-center bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-3xl p-8 md:p-10">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
-              <Inbox className="w-7 h-7 text-primary" aria-hidden="true" />
-            </div>
-            <h2 className="font-display text-xl md:text-2xl font-bold text-[hsl(var(--dark-section-fg))] mb-2">
-              Em breve, novas ofertas
-            </h2>
-            <p className="text-sm text-[hsl(var(--dark-section-muted))]">
-              Estamos preparando promoções exclusivas. Volte em breve!
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
+  // BUG FIX: ordem dos estados invertida — skeleton precisa vir ANTES do empty state.
+  // Antes: durante refetch (loading=true) com cache vazio, mostrávamos empty state
+  // em vez do skeleton. Agora usamos rawBanners.length como fonte de verdade.
   // Skeleton loader durante carregamento inicial
-  if (loading && !derived) {
+  if (loading && !rawBanners.length) {
     return (
       <section
         id="ofertas-especiais"
@@ -133,7 +112,29 @@ const BannersSection = () => {
     );
   }
 
-  if (!derived) return null;
+  // Empty state: nenhum banner ativo (e não está carregando)
+  if (!derived) {
+    return (
+      <section
+        id="ofertas-especiais"
+        className="relative py-24 md:py-32 bg-dark-section overflow-hidden"
+      >
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-md mx-auto text-center bg-[hsl(var(--dark-section-card))] border border-[hsl(var(--dark-section-border))] rounded-3xl p-8 md:p-10">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+              <Inbox className="w-7 h-7 text-primary" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl md:text-2xl font-bold text-[hsl(var(--dark-section-fg))] mb-2">
+              Em breve, novas ofertas
+            </h2>
+            <p className="text-sm text-[hsl(var(--dark-section-muted))]">
+              Estamos preparando promoções exclusivas. Volte em breve!
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
   const { useCarousel, featured, featuredMeta, rest } = derived;
 
   return (
