@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Loader2 } from "lucide-react";
+import { Search, X, Edit2, UserX as UserXIcon, UserCheck, FileSpreadsheet, MessageCircle, Plus, Loader2, Users } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useClients, usePlans, useServiceRecords, type DbClient } from "@/hooks/useSupabaseData";
