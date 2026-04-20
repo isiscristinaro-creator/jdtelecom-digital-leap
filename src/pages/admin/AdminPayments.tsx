@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, Download, Calendar, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Search, Download, Calendar, FileSpreadsheet, Loader2, CreditCard } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { AdminErrorCard, AdminEmptyCard } from "@/components/admin/AdminStateCards";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { usePayments, usePlans } from "@/hooks/useSupabaseData";
@@ -14,7 +15,7 @@ const statusColors = {
 };
 
 const AdminPayments = () => {
-  const { payments, loading } = usePayments();
+  const { payments, loading, error, refetch } = usePayments();
   const { plans } = usePlans();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -64,6 +65,30 @@ const AdminPayments = () => {
     return (
       <div className="admin-page flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-page">
+        <AdminErrorCard
+          title="Erro ao carregar pagamentos"
+          description="Não conseguimos buscar os registros financeiros. Tente novamente."
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!payments.length) {
+    return (
+      <div className="admin-page">
+        <AdminEmptyCard
+          icon={CreditCard}
+          title="Nenhum pagamento registrado"
+          description="Ainda não há pagamentos cadastrados na plataforma."
+        />
       </div>
     );
   }
